@@ -11,4 +11,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/_Project/Scenes/Prototype_Lab.unity
     guid: f4173bc90118f074095d0f8e915d0d1f
+  - enabled: 1
+    path: Assets/_Project/Scenes/Prototype_RoomLoop.unity
+    guid: 154961984279b5846b7068f7f5076932
   m_configObjects: {}

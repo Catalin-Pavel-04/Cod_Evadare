@@ -52,6 +52,13 @@ public class Bullet2D : MonoBehaviour
         if (enemyHealth != null)
         {
             enemyHealth.TakeDamage(damage);
+            Destroy(gameObject);
+            return;
+        }
+
+        if (other.isTrigger)
+        {
+            return;
         }
 
         Destroy(gameObject);

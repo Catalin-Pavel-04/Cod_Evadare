@@ -11,12 +11,16 @@ using UnityEngine.SceneManagement;
 public static class PrototypeSceneBuilder
 {
     private const string ScenePath = "Assets/_Project/Scenes/Prototype_Lab.unity";
+    private const string RoomLoopScenePath = "Assets/_Project/Scenes/Prototype_RoomLoop.unity";
     private const string BulletPrefabPath = "Assets/_Project/Prefabs/Weapons/Bullet.prefab";
+    private const string EnemyPrefabPath = "Assets/_Project/Prefabs/Enemies/TestEnemy.prefab";
+    private const string RewardPrefabPath = "Assets/_Project/Prefabs/Pickups/PrototypeReward.prefab";
     private const string GeneratedArtFolder = "Assets/_Project/Art/Generated";
     private const string PlayerSpritePath = GeneratedArtFolder + "/Player_Prototype.png";
     private const string EnemySpritePath = GeneratedArtFolder + "/Enemy_Prototype.png";
     private const string BulletSpritePath = GeneratedArtFolder + "/Bullet_Prototype.png";
     private const string WallSpritePath = GeneratedArtFolder + "/Wall_Prototype.png";
+    private const string RewardSpritePath = GeneratedArtFolder + "/Reward_Prototype.png";
     private const string PlayerTag = "Player";
 
     private static readonly string[] RequiredFolders =
@@ -30,6 +34,7 @@ public static class PrototypeSceneBuilder
         "Assets/_Project/Prefabs/Player",
         "Assets/_Project/Prefabs/Weapons",
         "Assets/_Project/Prefabs/Enemies",
+        "Assets/_Project/Prefabs/Pickups",
         "Assets/_Project/Prefabs/Rooms",
         "Assets/_Project/Scenes",
         "Assets/_Project/Scripts",
@@ -37,6 +42,8 @@ public static class PrototypeSceneBuilder
         "Assets/_Project/Scripts/Player",
         "Assets/_Project/Scripts/Weapons",
         "Assets/_Project/Scripts/Enemies",
+        "Assets/_Project/Scripts/Rooms",
+        "Assets/_Project/Scripts/Pickups",
         "Assets/_Project/Scripts/Camera",
         "Assets/_Project/Scripts/Editor"
     };
@@ -84,6 +91,65 @@ public static class PrototypeSceneBuilder
         Debug.Log($"Created Prototype 0.1 scene at {ScenePath}.");
     }
 
+    [MenuItem("Tools/Cod Evadare/Create Prototype 0.2 Room Scene")]
+    public static void CreatePrototypeRoomScene()
+    {
+        if (!Application.isBatchMode && !EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo())
+        {
+            return;
+        }
+
+        CreateRequiredFolders();
+        GeneratePlaceholderSprites();
+        EnsureTag(PlayerTag);
+
+        Scene scene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
+        SceneManager.SetActiveScene(scene);
+
+        Sprite playerSprite = AssetDatabase.LoadAssetAtPath<Sprite>(PlayerSpritePath);
+        Sprite enemySprite = AssetDatabase.LoadAssetAtPath<Sprite>(EnemySpritePath);
+        Sprite bulletSprite = AssetDatabase.LoadAssetAtPath<Sprite>(BulletSpritePath);
+        Sprite wallSprite = AssetDatabase.LoadAssetAtPath<Sprite>(WallSpritePath);
+        Sprite rewardSprite = AssetDatabase.LoadAssetAtPath<Sprite>(RewardSpritePath);
+
+        GameObject root = new GameObject("Prototype_RoomLoop");
+        GameObject cameraObject = CreateCamera(root.transform);
+        CreateLighting(root.transform);
+
+        GameObject player = CreatePlayer(root.transform, playerSprite, out Transform firePoint, out PlayerShooting2D playerShooting);
+        player.transform.position = new Vector3(-9f, 0f, 0f);
+
+        GameObject bulletPrefab = GetOrCreateBulletPrefab(bulletSprite);
+        AssignObjectReference(playerShooting, "firePoint", firePoint);
+        AssignObjectReference(playerShooting, "bulletPrefab", bulletPrefab);
+
+        CameraFollow2D cameraFollow = cameraObject.GetComponent<CameraFollow2D>();
+        AssignObjectReference(cameraFollow, "target", player.transform);
+
+        CreateRoomLoopWalls(root.transform, wallSprite, out DoorController2D leftDoor, out DoorController2D rightDoor);
+
+        GameObject enemyPrefab = CreateEnemyPrefab(enemySprite);
+        GameObject rewardPrefab = CreateRewardPrefab(rewardSprite);
+        EnemySpawner2D enemySpawner = CreateEnemySpawner(root.transform, enemyPrefab);
+        Transform rewardSpawnPoint = CreateMarker(root.transform, "RewardSpawnPoint", new Vector3(4f, 0f, 0f));
+
+        RoomController2D roomController = CreateRoomController(
+            root.transform,
+            new[] { leftDoor, rightDoor },
+            enemySpawner,
+            rewardPrefab,
+            rewardSpawnPoint);
+
+        CreateRoomTrigger(root.transform, roomController);
+
+        EditorSceneManager.SaveScene(scene, RoomLoopScenePath);
+        AddSceneToBuildSettings(RoomLoopScenePath);
+        AssetDatabase.SaveAssets();
+        AssetDatabase.Refresh();
+
+        Debug.Log($"Created Prototype 0.2 room loop scene at {RoomLoopScenePath}.");
+    }
+
     private static void CreateRequiredFolders()
     {
         foreach (string folder in RequiredFolders)
@@ -100,6 +166,7 @@ public static class PrototypeSceneBuilder
         WriteSpriteTexture(EnemySpritePath, 64, CreateEnemyPixel);
         WriteSpriteTexture(BulletSpritePath, 32, CreateBulletPixel);
         WriteSpriteTexture(WallSpritePath, 64, CreateWallPixel);
+        WriteSpriteTexture(RewardSpritePath, 64, CreateRewardPixel);
     }
 
     private static GameObject CreateCamera(Transform parent)
@@ -210,6 +277,72 @@ public static class PrototypeSceneBuilder
         return prefab;
     }
 
+    private static GameObject GetOrCreateBulletPrefab(Sprite sprite)
+    {
+        GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(BulletPrefabPath);
+        return prefab != null ? prefab : CreateBulletPrefab(sprite);
+    }
+
+    private static GameObject CreateEnemyPrefab(Sprite sprite)
+    {
+        GameObject enemy = new GameObject("TestEnemy");
+        enemy.transform.localScale = new Vector3(0.8f, 0.8f, 1f);
+
+        SpriteRenderer spriteRenderer = enemy.AddComponent<SpriteRenderer>();
+        spriteRenderer.sprite = sprite;
+        spriteRenderer.sortingOrder = 10;
+
+        Rigidbody2D body = enemy.AddComponent<Rigidbody2D>();
+        body.gravityScale = 0f;
+        body.interpolation = RigidbodyInterpolation2D.Interpolate;
+        body.freezeRotation = true;
+
+        enemy.AddComponent<BoxCollider2D>();
+
+        EnemyHealth health = enemy.AddComponent<EnemyHealth>();
+        AssignInt(health, "maxHealth", 3);
+
+        SimpleEnemyChaser2D chaser = enemy.AddComponent<SimpleEnemyChaser2D>();
+        AssignFloat(chaser, "moveSpeed", 1.5f);
+        AssignFloat(chaser, "stopDistance", 1f);
+
+        GameObject prefab = PrefabUtility.SaveAsPrefabAsset(enemy, EnemyPrefabPath);
+        UnityEngine.Object.DestroyImmediate(enemy);
+
+        if (prefab == null)
+        {
+            prefab = AssetDatabase.LoadAssetAtPath<GameObject>(EnemyPrefabPath);
+        }
+
+        return prefab;
+    }
+
+    private static GameObject CreateRewardPrefab(Sprite sprite)
+    {
+        GameObject reward = new GameObject("PrototypeReward");
+        reward.transform.localScale = new Vector3(0.45f, 0.45f, 1f);
+
+        SpriteRenderer spriteRenderer = reward.AddComponent<SpriteRenderer>();
+        spriteRenderer.sprite = sprite;
+        spriteRenderer.sortingOrder = 15;
+
+        CircleCollider2D collider = reward.AddComponent<CircleCollider2D>();
+        collider.isTrigger = true;
+
+        RewardPickup2D pickup = reward.AddComponent<RewardPickup2D>();
+        AssignString(pickup, "rewardName", "Prototype Reward");
+
+        GameObject prefab = PrefabUtility.SaveAsPrefabAsset(reward, RewardPrefabPath);
+        UnityEngine.Object.DestroyImmediate(reward);
+
+        if (prefab == null)
+        {
+            prefab = AssetDatabase.LoadAssetAtPath<GameObject>(RewardPrefabPath);
+        }
+
+        return prefab;
+    }
+
     private static void CreateEnemy(Transform parent, Sprite sprite)
     {
         GameObject enemy = new GameObject("TestEnemy");
@@ -259,6 +392,108 @@ public static class PrototypeSceneBuilder
         spriteRenderer.sortingOrder = 0;
 
         wall.AddComponent<BoxCollider2D>();
+    }
+
+    private static void CreateRoomLoopWalls(Transform parent, Sprite sprite, out DoorController2D leftDoor, out DoorController2D rightDoor)
+    {
+        GameObject walls = new GameObject("Walls");
+        walls.transform.SetParent(parent);
+
+        CreateWall(walls.transform, "Wall_Top", sprite, new Vector3(0f, 4f, 0f), new Vector3(14.5f, 0.4f, 1f));
+        CreateWall(walls.transform, "Wall_Bottom", sprite, new Vector3(0f, -4f, 0f), new Vector3(14.5f, 0.4f, 1f));
+        CreateWall(walls.transform, "Wall_Left_Top", sprite, new Vector3(-7f, 2.7f, 0f), new Vector3(0.4f, 2.6f, 1f));
+        CreateWall(walls.transform, "Wall_Left_Bottom", sprite, new Vector3(-7f, -2.7f, 0f), new Vector3(0.4f, 2.6f, 1f));
+        CreateWall(walls.transform, "Wall_Right_Top", sprite, new Vector3(7f, 2.7f, 0f), new Vector3(0.4f, 2.6f, 1f));
+        CreateWall(walls.transform, "Wall_Right_Bottom", sprite, new Vector3(7f, -2.7f, 0f), new Vector3(0.4f, 2.6f, 1f));
+
+        leftDoor = CreateDoor(walls.transform, "Door_Left", sprite, new Vector3(-7f, 0f, 0f));
+        rightDoor = CreateDoor(walls.transform, "Door_Right", sprite, new Vector3(7f, 0f, 0f));
+    }
+
+    private static DoorController2D CreateDoor(Transform parent, string name, Sprite sprite, Vector3 position)
+    {
+        GameObject door = new GameObject(name);
+        door.transform.SetParent(parent);
+        door.transform.position = position;
+        door.transform.localScale = new Vector3(0.5f, 2f, 1f);
+
+        SpriteRenderer spriteRenderer = door.AddComponent<SpriteRenderer>();
+        spriteRenderer.sprite = sprite;
+        spriteRenderer.sortingOrder = 5;
+        spriteRenderer.enabled = false;
+
+        BoxCollider2D collider = door.AddComponent<BoxCollider2D>();
+        collider.enabled = false;
+
+        DoorController2D doorController = door.AddComponent<DoorController2D>();
+        AssignObjectReference(doorController, "spriteRenderer", spriteRenderer);
+        AssignObjectReference(doorController, "doorCollider", collider);
+
+        return doorController;
+    }
+
+    private static EnemySpawner2D CreateEnemySpawner(Transform parent, GameObject enemyPrefab)
+    {
+        GameObject spawnerObject = new GameObject("EnemySpawner2D");
+        spawnerObject.transform.SetParent(parent);
+
+        Transform[] spawnPoints =
+        {
+            CreateMarker(spawnerObject.transform, "SpawnPoint_01", new Vector3(2.5f, 1.5f, 0f)),
+            CreateMarker(spawnerObject.transform, "SpawnPoint_02", new Vector3(2.5f, -1.5f, 0f)),
+            CreateMarker(spawnerObject.transform, "SpawnPoint_03", new Vector3(0f, 2f, 0f))
+        };
+
+        EnemySpawner2D spawner = spawnerObject.AddComponent<EnemySpawner2D>();
+        AssignObjectReference(spawner, "enemyPrefab", enemyPrefab);
+        AssignObjectReferenceArray(spawner, "spawnPoints", spawnPoints);
+        AssignInt(spawner, "enemyCount", 3);
+
+        return spawner;
+    }
+
+    private static RoomController2D CreateRoomController(
+        Transform parent,
+        DoorController2D[] doors,
+        EnemySpawner2D enemySpawner,
+        GameObject rewardPrefab,
+        Transform rewardSpawnPoint)
+    {
+        GameObject roomControllerObject = new GameObject("RoomController2D");
+        roomControllerObject.transform.SetParent(parent);
+
+        RoomController2D roomController = roomControllerObject.AddComponent<RoomController2D>();
+        AssignObjectReferenceArray(roomController, "doors", doors);
+        AssignObjectReference(roomController, "enemySpawner", enemySpawner);
+        AssignObjectReference(roomController, "rewardPrefab", rewardPrefab);
+        AssignObjectReference(roomController, "rewardSpawnPoint", rewardSpawnPoint);
+
+        return roomController;
+    }
+
+    private static void CreateRoomTrigger(Transform parent, RoomController2D roomController)
+    {
+        GameObject trigger = new GameObject("RoomTrigger");
+        trigger.transform.SetParent(parent);
+        trigger.transform.position = Vector3.zero;
+
+        BoxCollider2D collider = trigger.AddComponent<BoxCollider2D>();
+        collider.isTrigger = true;
+        collider.size = new Vector2(12.5f, 6.5f);
+
+        RoomTrigger2D roomTrigger = trigger.AddComponent<RoomTrigger2D>();
+        AssignObjectReference(roomTrigger, "roomController", roomController);
+    }
+
+    private static Transform CreateMarker(Transform parent, string name, Vector3 position)
+    {
+        GameObject marker = new GameObject(name);
+        marker.transform.SetParent(parent);
+        marker.transform.position = position;
+        marker.transform.localRotation = Quaternion.identity;
+        marker.transform.localScale = Vector3.one;
+
+        return marker.transform;
     }
 
     private static void ConfigureLight2D(Component lightComponent)
@@ -382,6 +617,25 @@ public static class PrototypeSceneBuilder
         return stripe
             ? new Color(0.38f, 0.42f, 0.46f, 1f)
             : new Color(0.3f, 0.34f, 0.38f, 1f);
+    }
+
+    private static Color CreateRewardPixel(int x, int y, int size)
+    {
+        float halfSize = size * 0.5f;
+        float distance = Mathf.Abs(x + 0.5f - halfSize) + Mathf.Abs(y + 0.5f - halfSize);
+        float radius = size * 0.42f;
+
+        if (distance > radius)
+        {
+            return Color.clear;
+        }
+
+        if (distance > radius - 4f)
+        {
+            return new Color(0.95f, 0.8f, 0.1f, 1f);
+        }
+
+        return new Color(0.25f, 0.9f, 0.65f, 1f);
     }
 
     private static Color CirclePixel(int x, int y, int size, Color fill, Color outline)
@@ -517,6 +771,19 @@ public static class PrototypeSceneBuilder
         property.serializedObject.ApplyModifiedPropertiesWithoutUndo();
     }
 
+    private static void AssignString(UnityEngine.Object target, string propertyName, string value)
+    {
+        SerializedProperty property = FindSerializedProperty(target, propertyName);
+
+        if (property == null)
+        {
+            return;
+        }
+
+        property.stringValue = value;
+        property.serializedObject.ApplyModifiedPropertiesWithoutUndo();
+    }
+
     private static void AssignVector3(UnityEngine.Object target, string propertyName, Vector3 value)
     {
         SerializedProperty property = FindSerializedProperty(target, propertyName);
@@ -527,6 +794,25 @@ public static class PrototypeSceneBuilder
         }
 
         property.vector3Value = value;
+        property.serializedObject.ApplyModifiedPropertiesWithoutUndo();
+    }
+
+    private static void AssignObjectReferenceArray(UnityEngine.Object target, string propertyName, UnityEngine.Object[] values)
+    {
+        SerializedProperty property = FindSerializedProperty(target, propertyName);
+
+        if (property == null)
+        {
+            return;
+        }
+
+        property.arraySize = values != null ? values.Length : 0;
+
+        for (int i = 0; i < property.arraySize; i++)
+        {
+            property.GetArrayElementAtIndex(i).objectReferenceValue = values[i];
+        }
+
         property.serializedObject.ApplyModifiedPropertiesWithoutUndo();
     }
 
