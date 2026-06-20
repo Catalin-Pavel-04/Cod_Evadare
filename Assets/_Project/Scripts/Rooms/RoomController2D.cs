@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -14,10 +15,12 @@ public class RoomController2D : MonoBehaviour
     [SerializeField] private EnemySpawner2D enemySpawner;
     [SerializeField] private GameObject rewardPrefab;
     [SerializeField] private Transform rewardSpawnPoint;
+    [SerializeField] private float doorCloseDelay = 0.5f;
 
     private readonly List<EnemyHealth> spawnedEnemies = new List<EnemyHealth>();
     private RoomState state = RoomState.Inactive;
     private bool rewardSpawned;
+    private bool hasSpawnedEnemies;
 
     public void ActivateRoom()
     {
@@ -28,20 +31,43 @@ public class RoomController2D : MonoBehaviour
         }
 
         state = RoomState.Active;
-        Debug.Log($"Room '{name}' activated. Closing doors and spawning enemies.", this);
+        Debug.Log($"Room '{name}' activated. Doors close in {doorCloseDelay:0.##} seconds.", this);
 
-        CloseDoors();
-        SpawnEnemies();
-        CheckForRoomClear();
+        if (doorCloseDelay > 0f)
+        {
+            StartCoroutine(ActivateAfterDelay());
+            return;
+        }
+
+        CloseDoorsAndSpawnEnemies();
     }
 
     private void Update()
+    {
+        if (state != RoomState.Active || !hasSpawnedEnemies)
+        {
+            return;
+        }
+
+        CheckForRoomClear();
+    }
+
+    private IEnumerator ActivateAfterDelay()
+    {
+        yield return new WaitForSeconds(doorCloseDelay);
+        CloseDoorsAndSpawnEnemies();
+    }
+
+    private void CloseDoorsAndSpawnEnemies()
     {
         if (state != RoomState.Active)
         {
             return;
         }
 
+        CloseDoors();
+        SpawnEnemies();
+        hasSpawnedEnemies = true;
         CheckForRoomClear();
     }
 

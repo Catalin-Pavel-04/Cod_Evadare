@@ -126,21 +126,9 @@ public static class PrototypeSceneBuilder
         CameraFollow2D cameraFollow = cameraObject.GetComponent<CameraFollow2D>();
         AssignObjectReference(cameraFollow, "target", player.transform);
 
-        CreateRoomLoopWalls(root.transform, wallSprite, out DoorController2D leftDoor, out DoorController2D rightDoor);
-
         GameObject enemyPrefab = CreateEnemyPrefab(enemySprite);
         GameObject rewardPrefab = CreateRewardPrefab(rewardSprite);
-        EnemySpawner2D enemySpawner = CreateEnemySpawner(root.transform, enemyPrefab);
-        Transform rewardSpawnPoint = CreateMarker(root.transform, "RewardSpawnPoint", new Vector3(4f, 0f, 0f));
-
-        RoomController2D roomController = CreateRoomController(
-            root.transform,
-            new[] { leftDoor, rightDoor },
-            enemySpawner,
-            rewardPrefab,
-            rewardSpawnPoint);
-
-        CreateRoomTrigger(root.transform, roomController);
+        CreateRoomLoopRoom(root.transform, wallSprite, enemyPrefab, rewardPrefab);
 
         EditorSceneManager.SaveScene(scene, RoomLoopScenePath);
         AddSceneToBuildSettings(RoomLoopScenePath);
@@ -401,13 +389,57 @@ public static class PrototypeSceneBuilder
 
         CreateWall(walls.transform, "Wall_Top", sprite, new Vector3(0f, 4f, 0f), new Vector3(14.5f, 0.4f, 1f));
         CreateWall(walls.transform, "Wall_Bottom", sprite, new Vector3(0f, -4f, 0f), new Vector3(14.5f, 0.4f, 1f));
-        CreateWall(walls.transform, "Wall_Left_Top", sprite, new Vector3(-7f, 2.7f, 0f), new Vector3(0.4f, 2.6f, 1f));
-        CreateWall(walls.transform, "Wall_Left_Bottom", sprite, new Vector3(-7f, -2.7f, 0f), new Vector3(0.4f, 2.6f, 1f));
-        CreateWall(walls.transform, "Wall_Right_Top", sprite, new Vector3(7f, 2.7f, 0f), new Vector3(0.4f, 2.6f, 1f));
-        CreateWall(walls.transform, "Wall_Right_Bottom", sprite, new Vector3(7f, -2.7f, 0f), new Vector3(0.4f, 2.6f, 1f));
+        CreateWallWithDoorGap(walls.transform, "Wall_Left", sprite, -7f);
+        CreateWallWithDoorGap(walls.transform, "Wall_Right", sprite, 7f);
 
-        leftDoor = CreateDoor(walls.transform, "Door_Left", sprite, new Vector3(-7f, 0f, 0f));
-        rightDoor = CreateDoor(walls.transform, "Door_Right", sprite, new Vector3(7f, 0f, 0f));
+        GameObject doors = new GameObject("Doors");
+        doors.transform.SetParent(parent);
+
+        leftDoor = CreateDoor(doors.transform, "Door_Left", sprite, new Vector3(-7f, 0f, 0f));
+        rightDoor = CreateDoor(doors.transform, "Door_Right", sprite, new Vector3(7f, 0f, 0f));
+    }
+
+    private static void CreateRoomLoopRoom(Transform parent, Sprite wallSprite, GameObject enemyPrefab, GameObject rewardPrefab)
+    {
+        GameObject room = new GameObject("Room_01");
+        room.transform.SetParent(parent);
+
+        CreateRoomLoopWalls(room.transform, wallSprite, out DoorController2D leftDoor, out DoorController2D rightDoor);
+
+        EnemySpawner2D enemySpawner = CreateEnemySpawner(room.transform, enemyPrefab);
+        Transform rewardSpawnPoint = CreateMarker(room.transform, "RewardSpawnPoint", new Vector3(4.5f, 0f, 0f));
+
+        RoomController2D roomController = room.AddComponent<RoomController2D>();
+        AssignObjectReferenceArray(roomController, "doors", new[] { leftDoor, rightDoor });
+        AssignObjectReference(roomController, "enemySpawner", enemySpawner);
+        AssignObjectReference(roomController, "rewardPrefab", rewardPrefab);
+        AssignObjectReference(roomController, "rewardSpawnPoint", rewardSpawnPoint);
+        AssignFloat(roomController, "doorCloseDelay", 0.5f);
+
+        CreateRoomTrigger(room.transform, roomController);
+    }
+
+    private static void CreateWallWithDoorGap(Transform parent, string name, Sprite sprite, float x)
+    {
+        GameObject wall = new GameObject(name);
+        wall.transform.SetParent(parent);
+
+        CreateWallSegment(wall.transform, name + "_Upper", sprite, new Vector3(x, 2.7f, 0f), new Vector3(0.4f, 2.6f, 1f));
+        CreateWallSegment(wall.transform, name + "_Lower", sprite, new Vector3(x, -2.7f, 0f), new Vector3(0.4f, 2.6f, 1f));
+    }
+
+    private static void CreateWallSegment(Transform parent, string name, Sprite sprite, Vector3 position, Vector3 scale)
+    {
+        GameObject segment = new GameObject(name);
+        segment.transform.SetParent(parent);
+        segment.transform.position = position;
+        segment.transform.localScale = scale;
+
+        SpriteRenderer spriteRenderer = segment.AddComponent<SpriteRenderer>();
+        spriteRenderer.sprite = sprite;
+        spriteRenderer.sortingOrder = 0;
+
+        segment.AddComponent<BoxCollider2D>();
     }
 
     private static DoorController2D CreateDoor(Transform parent, string name, Sprite sprite, Vector3 position)
@@ -415,7 +447,7 @@ public static class PrototypeSceneBuilder
         GameObject door = new GameObject(name);
         door.transform.SetParent(parent);
         door.transform.position = position;
-        door.transform.localScale = new Vector3(0.5f, 2f, 1f);
+        door.transform.localScale = new Vector3(0.4f, 2.8f, 1f);
 
         SpriteRenderer spriteRenderer = door.AddComponent<SpriteRenderer>();
         spriteRenderer.sprite = sprite;
@@ -434,14 +466,14 @@ public static class PrototypeSceneBuilder
 
     private static EnemySpawner2D CreateEnemySpawner(Transform parent, GameObject enemyPrefab)
     {
-        GameObject spawnerObject = new GameObject("EnemySpawner2D");
+        GameObject spawnerObject = new GameObject("EnemySpawner");
         spawnerObject.transform.SetParent(parent);
 
         Transform[] spawnPoints =
         {
-            CreateMarker(spawnerObject.transform, "SpawnPoint_01", new Vector3(2.5f, 1.5f, 0f)),
-            CreateMarker(spawnerObject.transform, "SpawnPoint_02", new Vector3(2.5f, -1.5f, 0f)),
-            CreateMarker(spawnerObject.transform, "SpawnPoint_03", new Vector3(0f, 2f, 0f))
+            CreateMarker(spawnerObject.transform, "SpawnPoint_01", new Vector3(1.5f, 1.5f, 0f)),
+            CreateMarker(spawnerObject.transform, "SpawnPoint_02", new Vector3(3f, 0f, 0f)),
+            CreateMarker(spawnerObject.transform, "SpawnPoint_03", new Vector3(1.5f, -1.5f, 0f))
         };
 
         EnemySpawner2D spawner = spawnerObject.AddComponent<EnemySpawner2D>();
@@ -467,6 +499,7 @@ public static class PrototypeSceneBuilder
         AssignObjectReference(roomController, "enemySpawner", enemySpawner);
         AssignObjectReference(roomController, "rewardPrefab", rewardPrefab);
         AssignObjectReference(roomController, "rewardSpawnPoint", rewardSpawnPoint);
+        AssignFloat(roomController, "doorCloseDelay", 0.5f);
 
         return roomController;
     }
