@@ -14,4 +14,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/_Project/Scenes/Prototype_RoomLoop.unity
     guid: 154961984279b5846b7068f7f5076932
+  - enabled: 1
+    path: Assets/_Project/Scenes/Prototype_HealthCombat.unity
+    guid: c67f7000ff6826443a07e38801f9e0ac
   m_configObjects: {}

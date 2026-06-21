@@ -7,11 +7,13 @@ using UnityEditor.SceneManagement;
 using UnityEditorInternal;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public static class PrototypeSceneBuilder
 {
     private const string ScenePath = "Assets/_Project/Scenes/Prototype_Lab.unity";
     private const string RoomLoopScenePath = "Assets/_Project/Scenes/Prototype_RoomLoop.unity";
+    private const string HealthCombatScenePath = "Assets/_Project/Scenes/Prototype_HealthCombat.unity";
     private const string BulletPrefabPath = "Assets/_Project/Prefabs/Weapons/Bullet.prefab";
     private const string EnemyPrefabPath = "Assets/_Project/Prefabs/Enemies/TestEnemy.prefab";
     private const string RewardPrefabPath = "Assets/_Project/Prefabs/Pickups/PrototypeReward.prefab";
@@ -39,6 +41,7 @@ public static class PrototypeSceneBuilder
         "Assets/_Project/Scenes",
         "Assets/_Project/Scripts",
         "Assets/_Project/Scripts/Core",
+        "Assets/_Project/Scripts/UI",
         "Assets/_Project/Scripts/Player",
         "Assets/_Project/Scripts/Weapons",
         "Assets/_Project/Scripts/Enemies",
@@ -136,6 +139,61 @@ public static class PrototypeSceneBuilder
         AssetDatabase.Refresh();
 
         Debug.Log($"Created Prototype 0.2 room loop scene at {RoomLoopScenePath}.");
+    }
+
+    [MenuItem("Tools/Cod Evadare/Create Prototype 0.3 Health Combat Scene")]
+    public static void CreatePrototypeHealthCombatScene()
+    {
+        if (!Application.isBatchMode && !EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo())
+        {
+            return;
+        }
+
+        CreateRequiredFolders();
+        GeneratePlaceholderSprites();
+        EnsureTag(PlayerTag);
+
+        Scene scene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
+        SceneManager.SetActiveScene(scene);
+
+        Sprite playerSprite = AssetDatabase.LoadAssetAtPath<Sprite>(PlayerSpritePath);
+        Sprite enemySprite = AssetDatabase.LoadAssetAtPath<Sprite>(EnemySpritePath);
+        Sprite bulletSprite = AssetDatabase.LoadAssetAtPath<Sprite>(BulletSpritePath);
+        Sprite wallSprite = AssetDatabase.LoadAssetAtPath<Sprite>(WallSpritePath);
+        Sprite rewardSprite = AssetDatabase.LoadAssetAtPath<Sprite>(RewardSpritePath);
+
+        GameObject root = new GameObject("Prototype_HealthCombat");
+        GameObject cameraObject = CreateCamera(root.transform);
+        CreateLighting(root.transform);
+
+        GameObject player = CreatePlayer(root.transform, playerSprite, out Transform firePoint, out PlayerShooting2D playerShooting);
+        player.transform.position = new Vector3(-9f, 0f, 0f);
+
+        PlayerHealth2D playerHealth = player.AddComponent<PlayerHealth2D>();
+        AssignInt(playerHealth, "maxHealth", 5);
+        AssignFloat(playerHealth, "invincibilityDuration", 0.75f);
+        AssignBool(playerHealth, "destroyOnDeath", false);
+
+        GameObject bulletPrefab = GetOrCreateBulletPrefab(bulletSprite);
+        AssignObjectReference(playerShooting, "firePoint", firePoint);
+        AssignObjectReference(playerShooting, "bulletPrefab", bulletPrefab);
+
+        CameraFollow2D cameraFollow = cameraObject.GetComponent<CameraFollow2D>();
+        AssignObjectReference(cameraFollow, "target", player.transform);
+
+        GameObject enemyPrefab = CreateEnemyPrefab(enemySprite);
+        GameObject rewardPrefab = CreateRewardPrefab(rewardSprite);
+        CreateRoomLoopRoom(root.transform, wallSprite, enemyPrefab, rewardPrefab);
+
+        GameObject gameOverPanel = CreateHealthCombatUI(root.transform, playerHealth);
+        CreateGameSystems(root.transform, playerHealth, gameOverPanel);
+
+        EditorSceneManager.SaveScene(scene, HealthCombatScenePath);
+        AddSceneToBuildSettings(HealthCombatScenePath);
+        AssetDatabase.SaveAssets();
+        AssetDatabase.Refresh();
+
+        Debug.Log($"Created Prototype 0.3 health combat scene at {HealthCombatScenePath}.");
     }
 
     private static void CreateRequiredFolders()
@@ -293,6 +351,10 @@ public static class PrototypeSceneBuilder
         SimpleEnemyChaser2D chaser = enemy.AddComponent<SimpleEnemyChaser2D>();
         AssignFloat(chaser, "moveSpeed", 1.5f);
         AssignFloat(chaser, "stopDistance", 1f);
+
+        EnemyContactDamage2D contactDamage = enemy.AddComponent<EnemyContactDamage2D>();
+        AssignInt(contactDamage, "damage", 1);
+        AssignFloat(contactDamage, "damageCooldown", 1f);
 
         GameObject prefab = PrefabUtility.SaveAsPrefabAsset(enemy, EnemyPrefabPath);
         UnityEngine.Object.DestroyImmediate(enemy);
@@ -527,6 +589,122 @@ public static class PrototypeSceneBuilder
         marker.transform.localScale = Vector3.one;
 
         return marker.transform;
+    }
+
+    private static GameObject CreateHealthCombatUI(Transform parent, PlayerHealth2D playerHealth)
+    {
+        GameObject ui = new GameObject("UI");
+        ui.transform.SetParent(parent);
+
+        GameObject canvasObject = new GameObject("Canvas", typeof(RectTransform), typeof(Canvas), typeof(CanvasScaler), typeof(GraphicRaycaster));
+        canvasObject.transform.SetParent(ui.transform);
+
+        Canvas canvas = canvasObject.GetComponent<Canvas>();
+        canvas.renderMode = RenderMode.ScreenSpaceOverlay;
+
+        CanvasScaler canvasScaler = canvasObject.GetComponent<CanvasScaler>();
+        canvasScaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
+        canvasScaler.referenceResolution = new Vector2(1280f, 720f);
+        canvasScaler.matchWidthOrHeight = 0.5f;
+
+        GameObject healthPanel = CreateRectObject("HealthPanel", canvasObject.transform);
+        SetRectTransform(healthPanel.GetComponent<RectTransform>(), new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(24f, -24f), new Vector2(220f, 42f));
+
+        Image healthPanelImage = healthPanel.AddComponent<Image>();
+        healthPanelImage.color = new Color(0f, 0f, 0f, 0.65f);
+
+        GameObject healthFillObject = CreateRectObject("HealthFill", healthPanel.transform);
+        StretchRectTransform(healthFillObject.GetComponent<RectTransform>(), new Vector2(4f, 4f), new Vector2(-4f, -4f));
+
+        Image healthFill = healthFillObject.AddComponent<Image>();
+        healthFill.color = new Color(0.18f, 0.85f, 0.32f, 0.9f);
+        healthFill.type = Image.Type.Filled;
+        healthFill.fillMethod = Image.FillMethod.Horizontal;
+        healthFill.fillOrigin = (int)Image.OriginHorizontal.Left;
+        healthFill.fillAmount = 1f;
+
+        GameObject healthTextObject = CreateRectObject("HealthText", healthPanel.transform);
+        StretchRectTransform(healthTextObject.GetComponent<RectTransform>(), Vector2.zero, Vector2.zero);
+
+        Text healthText = healthTextObject.AddComponent<Text>();
+        healthText.font = GetBuiltinUIFont();
+        healthText.text = "HP: 5 / 5";
+        healthText.fontSize = 18;
+        healthText.alignment = TextAnchor.MiddleCenter;
+        healthText.color = Color.white;
+        healthText.raycastTarget = false;
+
+        HealthUI2D healthUI = healthPanel.AddComponent<HealthUI2D>();
+        AssignObjectReference(healthUI, "playerHealth", playerHealth);
+        AssignObjectReference(healthUI, "healthFill", healthFill);
+        AssignObjectReference(healthUI, "healthText", healthText);
+
+        GameObject gameOverPanel = CreateRectObject("GameOverPanel", canvasObject.transform);
+        SetRectTransform(gameOverPanel.GetComponent<RectTransform>(), new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(360f, 160f));
+
+        Image gameOverBackground = gameOverPanel.AddComponent<Image>();
+        gameOverBackground.color = new Color(0f, 0f, 0f, 0.82f);
+
+        GameObject gameOverTextObject = CreateRectObject("GameOverText", gameOverPanel.transform);
+        StretchRectTransform(gameOverTextObject.GetComponent<RectTransform>(), new Vector2(16f, 16f), new Vector2(-16f, -16f));
+
+        Text gameOverText = gameOverTextObject.AddComponent<Text>();
+        gameOverText.font = GetBuiltinUIFont();
+        gameOverText.text = "GAME OVER\nPress R to restart";
+        gameOverText.fontSize = 30;
+        gameOverText.alignment = TextAnchor.MiddleCenter;
+        gameOverText.color = Color.white;
+        gameOverText.raycastTarget = false;
+
+        gameOverPanel.SetActive(false);
+        return gameOverPanel;
+    }
+
+    private static void CreateGameSystems(Transform parent, PlayerHealth2D playerHealth, GameObject gameOverPanel)
+    {
+        GameObject gameSystems = new GameObject("GameSystems");
+        gameSystems.transform.SetParent(parent);
+
+        GameObject gameOverControllerObject = new GameObject("GameOverController");
+        gameOverControllerObject.transform.SetParent(gameSystems.transform);
+
+        GameOverController2D gameOverController = gameOverControllerObject.AddComponent<GameOverController2D>();
+        AssignObjectReference(gameOverController, "playerHealth", playerHealth);
+        AssignObjectReference(gameOverController, "gameOverPanel", gameOverPanel);
+        AssignString(gameOverController, "restartKey", "r");
+    }
+
+    private static GameObject CreateRectObject(string name, Transform parent)
+    {
+        GameObject gameObject = new GameObject(name, typeof(RectTransform));
+        gameObject.transform.SetParent(parent, false);
+        return gameObject;
+    }
+
+    private static void SetRectTransform(RectTransform rectTransform, Vector2 anchorMin, Vector2 anchorMax, Vector2 pivot, Vector2 anchoredPosition, Vector2 sizeDelta)
+    {
+        rectTransform.anchorMin = anchorMin;
+        rectTransform.anchorMax = anchorMax;
+        rectTransform.pivot = pivot;
+        rectTransform.anchoredPosition = anchoredPosition;
+        rectTransform.sizeDelta = sizeDelta;
+        rectTransform.localScale = Vector3.one;
+    }
+
+    private static void StretchRectTransform(RectTransform rectTransform, Vector2 offsetMin, Vector2 offsetMax)
+    {
+        rectTransform.anchorMin = Vector2.zero;
+        rectTransform.anchorMax = Vector2.one;
+        rectTransform.pivot = new Vector2(0.5f, 0.5f);
+        rectTransform.offsetMin = offsetMin;
+        rectTransform.offsetMax = offsetMax;
+        rectTransform.localScale = Vector3.one;
+    }
+
+    private static Font GetBuiltinUIFont()
+    {
+        Font font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+        return font != null ? font : Resources.GetBuiltinResource<Font>("Arial.ttf");
     }
 
     private static void ConfigureLight2D(Component lightComponent)
@@ -801,6 +979,19 @@ public static class PrototypeSceneBuilder
         }
 
         property.intValue = value;
+        property.serializedObject.ApplyModifiedPropertiesWithoutUndo();
+    }
+
+    private static void AssignBool(UnityEngine.Object target, string propertyName, bool value)
+    {
+        SerializedProperty property = FindSerializedProperty(target, propertyName);
+
+        if (property == null)
+        {
+            return;
+        }
+
+        property.boolValue = value;
         property.serializedObject.ApplyModifiedPropertiesWithoutUndo();
     }
 
