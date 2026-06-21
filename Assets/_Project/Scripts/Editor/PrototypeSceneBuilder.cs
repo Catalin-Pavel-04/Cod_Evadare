@@ -19,9 +19,12 @@ public static class PrototypeSceneBuilder
     private const string WeaponLootScenePath = "Assets/_Project/Scenes/Prototype_WeaponLoot.unity";
     private const string ShopScenePath = "Assets/_Project/Scenes/Prototype_Shop.unity";
     private const string MinibossBuffScenePath = "Assets/_Project/Scenes/Prototype_MinibossBuffs.unity";
+    private const string BossFightScenePath = "Assets/_Project/Scenes/Prototype_BossFight.unity";
     private const string BulletPrefabPath = "Assets/_Project/Prefabs/Weapons/Bullet.prefab";
     private const string EnemyPrefabPath = "Assets/_Project/Prefabs/Enemies/TestEnemy.prefab";
     private const string MinibossPrefabPath = "Assets/_Project/Prefabs/Enemies/PrototypeMiniboss.prefab";
+    private const string BossPrefabPath = "Assets/_Project/Prefabs/Boss/Experiment01Boss.prefab";
+    private const string EnemyProjectilePrefabPath = "Assets/_Project/Prefabs/Projectiles/EnemyProjectile.prefab";
     private const string RewardPrefabPath = "Assets/_Project/Prefabs/Pickups/PrototypeReward.prefab";
     private const string HealthPickupPrefabPath = "Assets/_Project/Prefabs/Pickups/HealthPickup.prefab";
     private const string AmmoPickupPrefabPath = "Assets/_Project/Prefabs/Pickups/AmmoPickup.prefab";
@@ -49,8 +52,12 @@ public static class PrototypeSceneBuilder
     private const string PlayerSpritePath = GeneratedArtFolder + "/Player_Prototype.png";
     private const string EnemySpritePath = GeneratedArtFolder + "/Enemy_Prototype.png";
     private const string MinibossSpritePath = GeneratedArtFolder + "/Miniboss_Prototype.png";
+    private const string BossSpritePath = GeneratedArtFolder + "/Boss_Experiment01.png";
     private const string BulletSpritePath = GeneratedArtFolder + "/Bullet_Prototype.png";
+    private const string EnemyProjectileSpritePath = GeneratedArtFolder + "/EnemyProjectile.png";
     private const string WallSpritePath = GeneratedArtFolder + "/Wall_Prototype.png";
+    private const string BossArenaWallSpritePath = GeneratedArtFolder + "/BossArenaWall.png";
+    private const string CoverSpritePath = GeneratedArtFolder + "/Cover_Block.png";
     private const string RewardSpritePath = GeneratedArtFolder + "/Reward_Prototype.png";
     private const string HealthPickupSpritePath = GeneratedArtFolder + "/HealthPickup_Prototype.png";
     private const string AmmoPickupSpritePath = GeneratedArtFolder + "/AmmoPickup_Prototype.png";
@@ -75,6 +82,9 @@ public static class PrototypeSceneBuilder
         "Assets/_Project/Prefabs/Player",
         "Assets/_Project/Prefabs/Weapons",
         "Assets/_Project/Prefabs/Enemies",
+        "Assets/_Project/Prefabs/Boss",
+        "Assets/_Project/Prefabs/Projectiles",
+        "Assets/_Project/Prefabs/Environment",
         "Assets/_Project/Prefabs/Pickups",
         "Assets/_Project/Prefabs/Loot",
         "Assets/_Project/Prefabs/Buffs",
@@ -87,8 +97,11 @@ public static class PrototypeSceneBuilder
         "Assets/_Project/ScriptableObjects/Buffs",
         "Assets/_Project/Scripts",
         "Assets/_Project/Scripts/Buffs",
+        "Assets/_Project/Scripts/Boss",
         "Assets/_Project/Scripts/Core",
+        "Assets/_Project/Scripts/Environment",
         "Assets/_Project/Scripts/Loot",
+        "Assets/_Project/Scripts/Projectiles",
         "Assets/_Project/Scripts/Resources",
         "Assets/_Project/Scripts/Shop",
         "Assets/_Project/Scripts/UI",
@@ -551,6 +564,78 @@ public static class PrototypeSceneBuilder
         Debug.Log($"Created Prototype 0.7 miniboss buff scene at {MinibossBuffScenePath}.");
     }
 
+    [MenuItem("Tools/Cod Evadare/Create Prototype 0.8 Boss Fight Scene")]
+    public static void CreatePrototypeBossFightScene()
+    {
+        if (!Application.isBatchMode && !EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo())
+        {
+            return;
+        }
+
+        CreateRequiredFolders();
+        GeneratePlaceholderSprites();
+        EnsureTag(PlayerTag);
+
+        Scene scene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
+        SceneManager.SetActiveScene(scene);
+
+        Sprite playerSprite = AssetDatabase.LoadAssetAtPath<Sprite>(PlayerSpritePath);
+        Sprite bulletSprite = AssetDatabase.LoadAssetAtPath<Sprite>(BulletSpritePath);
+        Sprite wallSprite = AssetDatabase.LoadAssetAtPath<Sprite>(BossArenaWallSpritePath);
+        Sprite bossSprite = AssetDatabase.LoadAssetAtPath<Sprite>(BossSpritePath);
+        Sprite enemyProjectileSprite = AssetDatabase.LoadAssetAtPath<Sprite>(EnemyProjectileSpritePath);
+        Sprite coverSprite = AssetDatabase.LoadAssetAtPath<Sprite>(CoverSpritePath);
+
+        GameObject root = new GameObject("Prototype_BossFight");
+        GameObject cameraObject = CreateCamera(root.transform);
+        CreateLighting(root.transform);
+
+        GameObject player = CreatePlayer(root.transform, playerSprite, out Transform firePoint, out PlayerShooting2D playerShooting);
+        player.transform.position = new Vector3(-9f, 0f, 0f);
+
+        PlayerHealth2D playerHealth = player.AddComponent<PlayerHealth2D>();
+        AssignInt(playerHealth, "maxHealth", 6);
+        AssignFloat(playerHealth, "invincibilityDuration", 0.75f);
+        AssignBool(playerHealth, "destroyOnDeath", false);
+
+        PlayerResources2D playerResources = player.AddComponent<PlayerResources2D>();
+        AssignInt(playerResources, "startingAmmo", 90);
+        AssignInt(playerResources, "maxAmmo", 150);
+        AssignInt(playerResources, "startingMoney", 0);
+
+        PlayerBuffs2D playerBuffs = player.AddComponent<PlayerBuffs2D>();
+
+        GameObject bulletPrefab = GetOrCreateBulletPrefab(bulletSprite);
+        WeaponDefinition2D smg = CreateWeaponDefinition(SMGWeaponPath, "SMG", WeaponRarity2D.Uncommon, bulletPrefab, 0.08f, 30, 1, 1.1f, 1, 14f, 2f, 1, 5f);
+        CreateWeaponDefinition(ShotgunWeaponPath, "Shotgun", WeaponRarity2D.Rare, bulletPrefab, 0.55f, 6, 1, 1.35f, 1, 11f, 1.3f, 5, 32f);
+
+        AssignObjectReference(playerShooting, "firePoint", firePoint);
+        AssignObjectReference(playerShooting, "bulletPrefab", bulletPrefab);
+        AssignBool(playerShooting, "useAmmo", true);
+        AssignObjectReference(playerShooting, "playerResources", playerResources);
+        AssignObjectReference(playerShooting, "startingWeapon", smg);
+        AssignObjectReference(playerShooting, "equippedWeapon", smg);
+
+        CameraFollow2D cameraFollow = cameraObject.GetComponent<CameraFollow2D>();
+        AssignObjectReference(cameraFollow, "target", player.transform);
+
+        GameObject enemyProjectilePrefab = CreateEnemyProjectilePrefab(enemyProjectileSprite);
+        GameObject bossPrefab = CreateBossPrefab(bossSprite, enemyProjectilePrefab);
+
+        GameObject gameOverPanel = CreateBossFightUI(root.transform, playerHealth, playerResources, playerShooting, playerBuffs, out GameObject victoryPanel, out Text victoryText);
+        LevelEndController2D levelEndController = CreateBossFightGameSystems(root.transform, playerHealth, gameOverPanel, victoryPanel, victoryText);
+
+        CreateBossRoom(root.transform, wallSprite, coverSprite, bossPrefab, levelEndController);
+        CreateEventSystem(root.transform);
+
+        EditorSceneManager.SaveScene(scene, BossFightScenePath);
+        AddSceneToBuildSettings(BossFightScenePath);
+        AssetDatabase.SaveAssets();
+        AssetDatabase.Refresh();
+
+        Debug.Log($"Created Prototype 0.8 boss fight scene at {BossFightScenePath}.");
+    }
+
     private static void CreateRequiredFolders()
     {
         foreach (string folder in RequiredFolders)
@@ -566,8 +651,12 @@ public static class PrototypeSceneBuilder
         WriteSpriteTexture(PlayerSpritePath, 64, CreatePlayerPixel);
         WriteSpriteTexture(EnemySpritePath, 64, CreateEnemyPixel);
         WriteSpriteTexture(MinibossSpritePath, 64, CreateMinibossPixel);
+        WriteSpriteTexture(BossSpritePath, 64, CreateBossPixel);
         WriteSpriteTexture(BulletSpritePath, 32, CreateBulletPixel);
+        WriteSpriteTexture(EnemyProjectileSpritePath, 32, CreateEnemyProjectilePixel);
         WriteSpriteTexture(WallSpritePath, 64, CreateWallPixel);
+        WriteSpriteTexture(BossArenaWallSpritePath, 64, CreateBossArenaWallPixel);
+        WriteSpriteTexture(CoverSpritePath, 64, CreateCoverPixel);
         WriteSpriteTexture(RewardSpritePath, 64, CreateRewardPixel);
         WriteSpriteTexture(HealthPickupSpritePath, 64, CreateHealthPickupPixel);
         WriteSpriteTexture(AmmoPickupSpritePath, 64, CreateAmmoPickupPixel);
@@ -769,6 +858,99 @@ public static class PrototypeSceneBuilder
         if (prefab == null)
         {
             prefab = AssetDatabase.LoadAssetAtPath<GameObject>(MinibossPrefabPath);
+        }
+
+        return prefab;
+    }
+
+    private static GameObject CreateEnemyProjectilePrefab(Sprite sprite)
+    {
+        GameObject projectile = new GameObject("EnemyProjectile");
+        projectile.transform.localScale = new Vector3(0.22f, 0.22f, 1f);
+
+        SpriteRenderer spriteRenderer = projectile.AddComponent<SpriteRenderer>();
+        spriteRenderer.sprite = sprite;
+        spriteRenderer.sortingOrder = 18;
+
+        Rigidbody2D body = projectile.AddComponent<Rigidbody2D>();
+        body.gravityScale = 0f;
+        body.collisionDetectionMode = CollisionDetectionMode2D.Continuous;
+
+        CircleCollider2D collider = projectile.AddComponent<CircleCollider2D>();
+        collider.isTrigger = true;
+
+        EnemyProjectile2D projectileComponent = projectile.AddComponent<EnemyProjectile2D>();
+        AssignFloat(projectileComponent, "speed", 7f);
+        AssignFloat(projectileComponent, "lifetime", 4f);
+        AssignInt(projectileComponent, "damage", 1);
+
+        GameObject prefab = PrefabUtility.SaveAsPrefabAsset(projectile, EnemyProjectilePrefabPath);
+        UnityEngine.Object.DestroyImmediate(projectile);
+
+        if (prefab == null)
+        {
+            prefab = AssetDatabase.LoadAssetAtPath<GameObject>(EnemyProjectilePrefabPath);
+        }
+
+        return prefab;
+    }
+
+    private static GameObject CreateBossPrefab(Sprite sprite, GameObject enemyProjectilePrefab)
+    {
+        GameObject boss = new GameObject("Experiment-01");
+        boss.transform.localScale = new Vector3(1.9f, 1.9f, 1f);
+
+        SpriteRenderer spriteRenderer = boss.AddComponent<SpriteRenderer>();
+        spriteRenderer.sprite = sprite;
+        spriteRenderer.sortingOrder = 10;
+
+        Rigidbody2D body = boss.AddComponent<Rigidbody2D>();
+        body.gravityScale = 0f;
+        body.interpolation = RigidbodyInterpolation2D.Interpolate;
+        body.freezeRotation = true;
+
+        CircleCollider2D collider = boss.AddComponent<CircleCollider2D>();
+        collider.radius = 0.52f;
+
+        EnemyHealth health = boss.AddComponent<EnemyHealth>();
+        AssignInt(health, "maxHealth", 50);
+
+        EnemyContactDamage2D contactDamage = boss.AddComponent<EnemyContactDamage2D>();
+        AssignInt(contactDamage, "damage", 1);
+        AssignFloat(contactDamage, "damageCooldown", 1f);
+
+        GameObject projectileSpawnPoint = new GameObject("ProjectileSpawnPoint");
+        projectileSpawnPoint.transform.SetParent(boss.transform);
+        projectileSpawnPoint.transform.localPosition = new Vector3(0.8f, 0f, 0f);
+        projectileSpawnPoint.transform.localRotation = Quaternion.identity;
+        projectileSpawnPoint.transform.localScale = Vector3.one;
+
+        BossAttackController2D attackController = boss.AddComponent<BossAttackController2D>();
+        AssignString(attackController, "bossName", "Experiment-01");
+        AssignObjectReference(attackController, "projectileSpawnPoint", projectileSpawnPoint.transform);
+        AssignObjectReference(attackController, "enemyProjectilePrefab", enemyProjectilePrefab);
+        AssignFloat(attackController, "moveSpeed", 1.1f);
+        AssignFloat(attackController, "stopDistance", 3f);
+        AssignFloat(attackController, "attackInterval", 1.5f);
+        AssignFloat(attackController, "phaseTwoHealthPercent", 0.5f);
+        AssignFloat(attackController, "phaseTwoAttackIntervalMultiplier", 0.65f);
+        AssignInt(attackController, "aimedShotDamage", 1);
+        AssignInt(attackController, "radialShotDamage", 1);
+        AssignFloat(attackController, "projectileSpeed", 7f);
+        AssignFloat(attackController, "projectileLifetime", 4f);
+        AssignInt(attackController, "phaseOneRadialProjectiles", 8);
+        AssignInt(attackController, "phaseTwoRadialProjectiles", 14);
+        AssignBool(attackController, "activateOnStart", true);
+
+        BossMarker2D marker = boss.AddComponent<BossMarker2D>();
+        AssignString(marker, "bossName", "Experiment-01");
+
+        GameObject prefab = PrefabUtility.SaveAsPrefabAsset(boss, BossPrefabPath);
+        UnityEngine.Object.DestroyImmediate(boss);
+
+        if (prefab == null)
+        {
+            prefab = AssetDatabase.LoadAssetAtPath<GameObject>(BossPrefabPath);
         }
 
         return prefab;
@@ -1161,6 +1343,111 @@ public static class PrototypeSceneBuilder
         AssignFloat(roomController, "doorCloseDelay", 0.5f);
 
         CreateRoomTrigger(room.transform, roomController);
+    }
+
+    private static void CreateBossRoom(Transform parent, Sprite wallSprite, Sprite coverSprite, GameObject bossPrefab, LevelEndController2D levelEndController)
+    {
+        GameObject room = new GameObject("Boss_Room");
+        room.transform.SetParent(parent);
+
+        CreateBossRoomWalls(room.transform, wallSprite, out DoorController2D leftDoor, out DoorController2D rightDoor);
+        CreateBossCover(room.transform, coverSprite);
+
+        EnemySpawner2D enemySpawner = CreateBossSpawner(room.transform, bossPrefab);
+
+        RoomController2D roomController = room.AddComponent<RoomController2D>();
+        AssignObjectReferenceArray(roomController, "doors", new[] { leftDoor, rightDoor });
+        AssignObjectReference(roomController, "enemySpawner", enemySpawner);
+        AssignObjectReference(roomController, "levelEndController", levelEndController);
+        AssignBool(roomController, "showVictoryOnClear", true);
+        AssignString(roomController, "victoryMessage", "LABORATORY CLEARED");
+        AssignFloat(roomController, "doorCloseDelay", 0.5f);
+
+        CreateBossRoomTrigger(room.transform, roomController);
+    }
+
+    private static void CreateBossRoomWalls(Transform parent, Sprite sprite, out DoorController2D leftDoor, out DoorController2D rightDoor)
+    {
+        GameObject walls = new GameObject("Walls");
+        walls.transform.SetParent(parent);
+
+        CreateWall(walls.transform, "Wall_Top", sprite, new Vector3(1f, 5f, 0f), new Vector3(18.5f, 0.4f, 1f));
+        CreateWall(walls.transform, "Wall_Bottom", sprite, new Vector3(1f, -5f, 0f), new Vector3(18.5f, 0.4f, 1f));
+        CreateBossWallWithDoorGap(walls.transform, "Wall_Left", sprite, -8f);
+        CreateBossWallWithDoorGap(walls.transform, "Wall_Right", sprite, 10f);
+
+        GameObject doors = new GameObject("Doors");
+        doors.transform.SetParent(parent);
+
+        leftDoor = CreateDoor(doors.transform, "Door_Left", sprite, new Vector3(-8f, 0f, 0f));
+        rightDoor = CreateDoor(doors.transform, "Door_Right", sprite, new Vector3(10f, 0f, 0f));
+    }
+
+    private static void CreateBossWallWithDoorGap(Transform parent, string name, Sprite sprite, float x)
+    {
+        GameObject wall = new GameObject(name);
+        wall.transform.SetParent(parent);
+
+        CreateWallSegment(wall.transform, name + "_Upper", sprite, new Vector3(x, 3.6f, 0f), new Vector3(0.4f, 2.8f, 1f));
+        CreateWallSegment(wall.transform, name + "_Lower", sprite, new Vector3(x, -3.6f, 0f), new Vector3(0.4f, 2.8f, 1f));
+    }
+
+    private static void CreateBossCover(Transform parent, Sprite sprite)
+    {
+        GameObject coverRoot = new GameObject("Cover");
+        coverRoot.transform.SetParent(parent);
+
+        CreateCoverObject(coverRoot.transform, "Cover_01", sprite, new Vector3(-1.5f, 2f, 0f));
+        CreateCoverObject(coverRoot.transform, "Cover_02", sprite, new Vector3(-1.5f, -2f, 0f));
+        CreateCoverObject(coverRoot.transform, "Cover_03", sprite, new Vector3(3f, 2f, 0f));
+        CreateCoverObject(coverRoot.transform, "Cover_04", sprite, new Vector3(3f, -2f, 0f));
+    }
+
+    private static void CreateCoverObject(Transform parent, string name, Sprite sprite, Vector3 position)
+    {
+        GameObject cover = new GameObject(name);
+        cover.transform.SetParent(parent);
+        cover.transform.position = position;
+        cover.transform.localScale = new Vector3(1.2f, 0.8f, 1f);
+
+        SpriteRenderer spriteRenderer = cover.AddComponent<SpriteRenderer>();
+        spriteRenderer.sprite = sprite;
+        spriteRenderer.sortingOrder = 4;
+
+        cover.AddComponent<BoxCollider2D>();
+        cover.AddComponent<CoverObject2D>();
+    }
+
+    private static EnemySpawner2D CreateBossSpawner(Transform parent, GameObject bossPrefab)
+    {
+        GameObject spawnerObject = new GameObject("EnemySpawner");
+        spawnerObject.transform.SetParent(parent);
+
+        Transform[] spawnPoints =
+        {
+            CreateMarker(spawnerObject.transform, "SpawnPoint_Boss", new Vector3(4f, 0f, 0f))
+        };
+
+        EnemySpawner2D spawner = spawnerObject.AddComponent<EnemySpawner2D>();
+        AssignObjectReference(spawner, "enemyPrefab", bossPrefab);
+        AssignObjectReferenceArray(spawner, "spawnPoints", spawnPoints);
+        AssignInt(spawner, "enemyCount", 1);
+
+        return spawner;
+    }
+
+    private static void CreateBossRoomTrigger(Transform parent, RoomController2D roomController)
+    {
+        GameObject triggerObject = new GameObject("RoomTrigger");
+        triggerObject.transform.SetParent(parent);
+        triggerObject.transform.position = new Vector3(1f, 0f, 0f);
+
+        BoxCollider2D triggerCollider = triggerObject.AddComponent<BoxCollider2D>();
+        triggerCollider.isTrigger = true;
+        triggerCollider.size = new Vector2(16.8f, 8.6f);
+
+        RoomTrigger2D trigger = triggerObject.AddComponent<RoomTrigger2D>();
+        AssignObjectReference(trigger, "roomController", roomController);
     }
 
     private static void CreateWallWithDoorGap(Transform parent, string name, Sprite sprite, float x)
@@ -2033,6 +2320,217 @@ public static class PrototypeSceneBuilder
         return gameOverPanel;
     }
 
+    private static GameObject CreateBossFightUI(
+        Transform parent,
+        PlayerHealth2D playerHealth,
+        PlayerResources2D playerResources,
+        PlayerShooting2D playerShooting,
+        PlayerBuffs2D playerBuffs,
+        out GameObject victoryPanel,
+        out Text victoryText)
+    {
+        GameObject ui = new GameObject("UI");
+        ui.transform.SetParent(parent);
+
+        GameObject canvasObject = new GameObject("Canvas", typeof(RectTransform), typeof(Canvas), typeof(CanvasScaler), typeof(GraphicRaycaster));
+        canvasObject.transform.SetParent(ui.transform);
+
+        Canvas canvas = canvasObject.GetComponent<Canvas>();
+        canvas.renderMode = RenderMode.ScreenSpaceOverlay;
+
+        CanvasScaler canvasScaler = canvasObject.GetComponent<CanvasScaler>();
+        canvasScaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
+        canvasScaler.referenceResolution = new Vector2(1280f, 720f);
+        canvasScaler.matchWidthOrHeight = 0.5f;
+
+        GameObject healthPanel = CreateRectObject("HealthPanel", canvasObject.transform);
+        SetRectTransform(healthPanel.GetComponent<RectTransform>(), new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(24f, -24f), new Vector2(220f, 42f));
+
+        GameObject healthBackground = CreateRectObject("HealthBackground", healthPanel.transform);
+        StretchRectTransform(healthBackground.GetComponent<RectTransform>(), Vector2.zero, Vector2.zero);
+        Image healthBackgroundImage = healthBackground.AddComponent<Image>();
+        healthBackgroundImage.color = new Color(0f, 0f, 0f, 0.65f);
+
+        GameObject healthFillObject = CreateRectObject("HealthFill", healthPanel.transform);
+        StretchRectTransform(healthFillObject.GetComponent<RectTransform>(), new Vector2(4f, 4f), new Vector2(-4f, -4f));
+
+        Image healthFill = healthFillObject.AddComponent<Image>();
+        healthFill.color = new Color(0.18f, 0.85f, 0.32f, 0.9f);
+        healthFill.type = Image.Type.Filled;
+        healthFill.fillMethod = Image.FillMethod.Horizontal;
+        healthFill.fillOrigin = (int)Image.OriginHorizontal.Left;
+        healthFill.fillAmount = 1f;
+
+        GameObject healthTextObject = CreateRectObject("HealthText", healthPanel.transform);
+        StretchRectTransform(healthTextObject.GetComponent<RectTransform>(), Vector2.zero, Vector2.zero);
+
+        Text healthText = healthTextObject.AddComponent<Text>();
+        healthText.font = GetBuiltinUIFont();
+        healthText.text = "HP: 6 / 6";
+        healthText.fontSize = 18;
+        healthText.alignment = TextAnchor.MiddleCenter;
+        healthText.color = Color.white;
+        healthText.raycastTarget = false;
+
+        HealthUI2D healthUI = healthPanel.AddComponent<HealthUI2D>();
+        AssignObjectReference(healthUI, "playerHealth", playerHealth);
+        AssignObjectReference(healthUI, "healthFill", healthFill);
+        AssignObjectReference(healthUI, "healthText", healthText);
+
+        GameObject resourcePanel = CreateRectObject("ResourcePanel", canvasObject.transform);
+        SetRectTransform(resourcePanel.GetComponent<RectTransform>(), new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(24f, -76f), new Vector2(460f, 120f));
+
+        Image resourcePanelImage = resourcePanel.AddComponent<Image>();
+        resourcePanelImage.color = new Color(0f, 0f, 0f, 0.65f);
+
+        GameObject ammoTextObject = CreateRectObject("AmmoText", resourcePanel.transform);
+        SetRectTransform(ammoTextObject.GetComponent<RectTransform>(), new Vector2(0f, 1f), new Vector2(1f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -8f), new Vector2(-16f, 24f));
+
+        Text ammoText = ammoTextObject.AddComponent<Text>();
+        ammoText.font = GetBuiltinUIFont();
+        ammoText.text = "Ammo: 30 / 30 | Reserve: 90 / 150";
+        ammoText.fontSize = 16;
+        ammoText.alignment = TextAnchor.MiddleLeft;
+        ammoText.color = Color.white;
+        ammoText.raycastTarget = false;
+
+        GameObject moneyTextObject = CreateRectObject("MoneyText", resourcePanel.transform);
+        SetRectTransform(moneyTextObject.GetComponent<RectTransform>(), new Vector2(0f, 0.67f), new Vector2(1f, 0.67f), new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(-16f, 24f));
+
+        Text moneyText = moneyTextObject.AddComponent<Text>();
+        moneyText.font = GetBuiltinUIFont();
+        moneyText.text = "Money: 0";
+        moneyText.fontSize = 16;
+        moneyText.alignment = TextAnchor.MiddleLeft;
+        moneyText.color = Color.white;
+        moneyText.raycastTarget = false;
+
+        GameObject weaponTextObject = CreateRectObject("WeaponText", resourcePanel.transform);
+        SetRectTransform(weaponTextObject.GetComponent<RectTransform>(), new Vector2(0f, 0.34f), new Vector2(1f, 0.34f), new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(-16f, 24f));
+
+        Text weaponText = weaponTextObject.AddComponent<Text>();
+        weaponText.font = GetBuiltinUIFont();
+        weaponText.text = "Weapon: SMG [Uncommon]";
+        weaponText.fontSize = 16;
+        weaponText.alignment = TextAnchor.MiddleLeft;
+        weaponText.color = Color.white;
+        weaponText.raycastTarget = false;
+
+        GameObject buffStatusTextObject = CreateRectObject("BuffStatusText", resourcePanel.transform);
+        SetRectTransform(buffStatusTextObject.GetComponent<RectTransform>(), new Vector2(0f, 0f), new Vector2(1f, 0f), new Vector2(0.5f, 0f), new Vector2(0f, 8f), new Vector2(-16f, 24f));
+
+        Text buffStatusText = buffStatusTextObject.AddComponent<Text>();
+        buffStatusText.font = GetBuiltinUIFont();
+        buffStatusText.text = "Buffs: none";
+        buffStatusText.fontSize = 16;
+        buffStatusText.alignment = TextAnchor.MiddleLeft;
+        buffStatusText.color = Color.white;
+        buffStatusText.raycastTarget = false;
+
+        ResourceUI2D resourceUI = resourcePanel.AddComponent<ResourceUI2D>();
+        AssignObjectReference(resourceUI, "playerResources", playerResources);
+        AssignObjectReference(resourceUI, "playerShooting", playerShooting);
+        AssignObjectReference(resourceUI, "ammoText", ammoText);
+        AssignObjectReference(resourceUI, "moneyText", moneyText);
+
+        WeaponUI2D weaponUI = resourcePanel.AddComponent<WeaponUI2D>();
+        AssignObjectReference(weaponUI, "playerShooting", playerShooting);
+        AssignObjectReference(weaponUI, "weaponText", weaponText);
+
+        BuffStatusUI2D buffStatusUI = resourcePanel.AddComponent<BuffStatusUI2D>();
+        AssignObjectReference(buffStatusUI, "playerBuffs", playerBuffs);
+        AssignObjectReference(buffStatusUI, "buffStatusText", buffStatusText);
+
+        GameObject bossHealthPanel = CreateRectObject("BossHealthPanel", canvasObject.transform);
+        SetRectTransform(bossHealthPanel.GetComponent<RectTransform>(), new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -24f), new Vector2(460f, 66f));
+
+        Image bossPanelBackground = bossHealthPanel.AddComponent<Image>();
+        bossPanelBackground.color = new Color(0f, 0f, 0f, 0.72f);
+
+        GameObject bossNameTextObject = CreateRectObject("BossNameText", bossHealthPanel.transform);
+        SetRectTransform(bossNameTextObject.GetComponent<RectTransform>(), new Vector2(0f, 1f), new Vector2(1f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -6f), new Vector2(-16f, 24f));
+
+        Text bossNameText = bossNameTextObject.AddComponent<Text>();
+        bossNameText.font = GetBuiltinUIFont();
+        bossNameText.text = "Experiment-01";
+        bossNameText.fontSize = 18;
+        bossNameText.alignment = TextAnchor.MiddleCenter;
+        bossNameText.color = Color.white;
+        bossNameText.raycastTarget = false;
+
+        GameObject bossHealthBackground = CreateRectObject("BossHealthBackground", bossHealthPanel.transform);
+        SetRectTransform(bossHealthBackground.GetComponent<RectTransform>(), new Vector2(0f, 0f), new Vector2(1f, 0f), new Vector2(0.5f, 0f), new Vector2(0f, 6f), new Vector2(-20f, 26f));
+
+        Image bossHealthBackgroundImage = bossHealthBackground.AddComponent<Image>();
+        bossHealthBackgroundImage.color = new Color(0.12f, 0.02f, 0.03f, 0.95f);
+
+        GameObject bossHealthFillObject = CreateRectObject("BossHealthFill", bossHealthBackground.transform);
+        StretchRectTransform(bossHealthFillObject.GetComponent<RectTransform>(), new Vector2(3f, 3f), new Vector2(-3f, -3f));
+
+        Image bossHealthFill = bossHealthFillObject.AddComponent<Image>();
+        bossHealthFill.color = new Color(0.9f, 0.14f, 0.18f, 0.95f);
+        bossHealthFill.type = Image.Type.Filled;
+        bossHealthFill.fillMethod = Image.FillMethod.Horizontal;
+        bossHealthFill.fillOrigin = (int)Image.OriginHorizontal.Left;
+        bossHealthFill.fillAmount = 1f;
+
+        GameObject bossHealthTextObject = CreateRectObject("BossHealthText", bossHealthBackground.transform);
+        StretchRectTransform(bossHealthTextObject.GetComponent<RectTransform>(), Vector2.zero, Vector2.zero);
+
+        Text bossHealthText = bossHealthTextObject.AddComponent<Text>();
+        bossHealthText.font = GetBuiltinUIFont();
+        bossHealthText.text = "HP: 50 / 50";
+        bossHealthText.fontSize = 15;
+        bossHealthText.alignment = TextAnchor.MiddleCenter;
+        bossHealthText.color = Color.white;
+        bossHealthText.raycastTarget = false;
+
+        BossHealthUI2D bossHealthUI = bossHealthPanel.AddComponent<BossHealthUI2D>();
+        AssignObjectReference(bossHealthUI, "bossPanel", bossHealthPanel);
+        AssignObjectReference(bossHealthUI, "healthFill", bossHealthFill);
+        AssignObjectReference(bossHealthUI, "healthText", bossHealthText);
+        AssignObjectReference(bossHealthUI, "bossNameText", bossNameText);
+        bossHealthPanel.SetActive(false);
+
+        GameObject gameOverPanel = CreateRectObject("GameOverPanel", canvasObject.transform);
+        SetRectTransform(gameOverPanel.GetComponent<RectTransform>(), new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(360f, 160f));
+
+        Image gameOverBackground = gameOverPanel.AddComponent<Image>();
+        gameOverBackground.color = new Color(0f, 0f, 0f, 0.82f);
+
+        GameObject gameOverTextObject = CreateRectObject("GameOverText", gameOverPanel.transform);
+        StretchRectTransform(gameOverTextObject.GetComponent<RectTransform>(), new Vector2(16f, 16f), new Vector2(-16f, -16f));
+
+        Text gameOverText = gameOverTextObject.AddComponent<Text>();
+        gameOverText.font = GetBuiltinUIFont();
+        gameOverText.text = "GAME OVER\nPress R to restart";
+        gameOverText.fontSize = 30;
+        gameOverText.alignment = TextAnchor.MiddleCenter;
+        gameOverText.color = Color.white;
+        gameOverText.raycastTarget = false;
+        gameOverPanel.SetActive(false);
+
+        victoryPanel = CreateRectObject("VictoryPanel", canvasObject.transform);
+        SetRectTransform(victoryPanel.GetComponent<RectTransform>(), new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(460f, 180f));
+
+        Image victoryBackground = victoryPanel.AddComponent<Image>();
+        victoryBackground.color = new Color(0f, 0f, 0f, 0.84f);
+
+        GameObject victoryTextObject = CreateRectObject("VictoryText", victoryPanel.transform);
+        StretchRectTransform(victoryTextObject.GetComponent<RectTransform>(), new Vector2(18f, 18f), new Vector2(-18f, -18f));
+
+        victoryText = victoryTextObject.AddComponent<Text>();
+        victoryText.font = GetBuiltinUIFont();
+        victoryText.text = "LABORATORY CLEARED\nPress R to restart";
+        victoryText.fontSize = 30;
+        victoryText.alignment = TextAnchor.MiddleCenter;
+        victoryText.color = Color.white;
+        victoryText.raycastTarget = false;
+        victoryPanel.SetActive(false);
+
+        return gameOverPanel;
+    }
+
     private static Button CreateBuffChoiceButton(Transform parent, string name, Vector2 anchoredPosition, out Text buttonText)
     {
         GameObject buttonObject = CreateRectObject(name, parent);
@@ -2117,6 +2615,36 @@ public static class PrototypeSceneBuilder
         AssignObjectReference(gameOverController, "playerHealth", playerHealth);
         AssignObjectReference(gameOverController, "gameOverPanel", gameOverPanel);
         AssignString(gameOverController, "restartKey", "r");
+    }
+
+    private static LevelEndController2D CreateBossFightGameSystems(
+        Transform parent,
+        PlayerHealth2D playerHealth,
+        GameObject gameOverPanel,
+        GameObject victoryPanel,
+        Text victoryText)
+    {
+        GameObject gameSystems = new GameObject("GameSystems");
+        gameSystems.transform.SetParent(parent);
+
+        GameObject gameOverControllerObject = new GameObject("GameOverController");
+        gameOverControllerObject.transform.SetParent(gameSystems.transform);
+
+        GameOverController2D gameOverController = gameOverControllerObject.AddComponent<GameOverController2D>();
+        AssignObjectReference(gameOverController, "playerHealth", playerHealth);
+        AssignObjectReference(gameOverController, "gameOverPanel", gameOverPanel);
+        AssignString(gameOverController, "restartKey", "r");
+
+        GameObject levelEndControllerObject = new GameObject("LevelEndController");
+        levelEndControllerObject.transform.SetParent(gameSystems.transform);
+
+        LevelEndController2D levelEndController = levelEndControllerObject.AddComponent<LevelEndController2D>();
+        AssignObjectReference(levelEndController, "victoryPanel", victoryPanel);
+        AssignObjectReference(levelEndController, "victoryText", victoryText);
+        AssignString(levelEndController, "restartKey", "r");
+        AssignBool(levelEndController, "pauseOnVictory", true);
+
+        return levelEndController;
     }
 
     private static GameObject CreateRectObject(string name, Transform parent)
@@ -2276,11 +2804,53 @@ public static class PrototypeSceneBuilder
         return horns ? new Color(0.9f, 0.9f, 1f, 1f) : basePixel;
     }
 
+    private static Color CreateBossPixel(int x, int y, int size)
+    {
+        Color fill = new Color(0.58f, 0.1f, 0.14f, 1f);
+        Color outline = new Color(0.08f, 0.02f, 0.03f, 1f);
+        Color basePixel = CirclePixel(x, y, size, fill, outline);
+
+        if (basePixel.a <= 0f)
+        {
+            return basePixel;
+        }
+
+        float center = size * 0.5f;
+        float dx = Mathf.Abs(x + 0.5f - center);
+        float dy = Mathf.Abs(y + 0.5f - center);
+        bool core = dx < size * 0.12f && dy < size * 0.3f;
+        bool vialBand = dy < size * 0.08f && dx < size * 0.32f;
+        bool eye = y > size * 0.54f && dx > size * 0.12f && dx < size * 0.28f;
+
+        if (core || vialBand)
+        {
+            return new Color(0.2f, 1f, 0.82f, 1f);
+        }
+
+        return eye ? new Color(1f, 0.85f, 0.2f, 1f) : basePixel;
+    }
+
     private static Color CreateBulletPixel(int x, int y, int size)
     {
         Color fill = new Color(1f, 0.86f, 0.12f, 1f);
         Color outline = new Color(0.85f, 0.42f, 0.04f, 1f);
         return CirclePixel(x, y, size, fill, outline);
+    }
+
+    private static Color CreateEnemyProjectilePixel(int x, int y, int size)
+    {
+        Color fill = new Color(0.2f, 0.95f, 0.78f, 1f);
+        Color outline = new Color(0.02f, 0.3f, 0.26f, 1f);
+        Color basePixel = CirclePixel(x, y, size, fill, outline);
+
+        if (basePixel.a <= 0f)
+        {
+            return basePixel;
+        }
+
+        float center = size * 0.5f;
+        bool spark = Mathf.Abs(x + 0.5f - center) < size * 0.08f || Mathf.Abs(y + 0.5f - center) < size * 0.08f;
+        return spark ? Color.white : basePixel;
     }
 
     private static Color CreateWallPixel(int x, int y, int size)
@@ -2296,6 +2866,42 @@ public static class PrototypeSceneBuilder
         return stripe
             ? new Color(0.38f, 0.42f, 0.46f, 1f)
             : new Color(0.3f, 0.34f, 0.38f, 1f);
+    }
+
+    private static Color CreateBossArenaWallPixel(int x, int y, int size)
+    {
+        bool border = x < 4 || y < 4 || x >= size - 4 || y >= size - 4;
+        bool stripe = (x * 2 + y) % 18 < 9;
+
+        if (border)
+        {
+            return new Color(0.04f, 0.08f, 0.1f, 1f);
+        }
+
+        return stripe
+            ? new Color(0.32f, 0.42f, 0.46f, 1f)
+            : new Color(0.22f, 0.31f, 0.35f, 1f);
+    }
+
+    private static Color CreateCoverPixel(int x, int y, int size)
+    {
+        bool body = x >= 6 && x < size - 6 && y >= 10 && y < size - 10;
+        bool border = x < 10 || y < 14 || x >= size - 10 || y >= size - 14;
+        bool stripe = (x + y) % 14 < 7;
+
+        if (!body)
+        {
+            return Color.clear;
+        }
+
+        if (border)
+        {
+            return new Color(0.08f, 0.12f, 0.14f, 1f);
+        }
+
+        return stripe
+            ? new Color(0.42f, 0.52f, 0.56f, 1f)
+            : new Color(0.28f, 0.38f, 0.42f, 1f);
     }
 
     private static Color CreateRewardPixel(int x, int y, int size)

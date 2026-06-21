@@ -13,14 +13,14 @@ MonoBehaviour:
   m_Name: SMG
   m_EditorClassIdentifier: 
   weaponName: SMG
-  rarity: 2
+  rarity: 1
   bulletPrefab: {fileID: 8109097552232962844, guid: d6b20b6d17beec840891ffc9c01db3ef, type: 3}
   fireCooldown: 0.08
-  magazineSize: 24
+  magazineSize: 30
   ammoPerShot: 1
-  reloadDuration: 1.2
+  reloadDuration: 1.1
   projectileDamage: 1
-  projectileSpeed: 13
+  projectileSpeed: 14
   projectileLifetime: 2
   projectilesPerShot: 1
-  spreadAngle: 3
+  spreadAngle: 5

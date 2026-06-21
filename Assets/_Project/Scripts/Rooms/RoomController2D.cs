@@ -19,6 +19,9 @@ public class RoomController2D : MonoBehaviour
     [SerializeField] private BuffChoiceController2D buffChoiceController;
     [SerializeField] private bool showBuffChoiceOnClear;
     [SerializeField] private float doorCloseDelay = 0.5f;
+    [SerializeField] private LevelEndController2D levelEndController;
+    [SerializeField] private bool showVictoryOnClear;
+    [SerializeField] private string victoryMessage = "LABORATORY CLEARED";
 
     private readonly List<EnemyHealth> spawnedEnemies = new List<EnemyHealth>();
     private RoomState state = RoomState.Inactive;
@@ -151,6 +154,7 @@ public class RoomController2D : MonoBehaviour
         OpenDoors();
         SpawnClearReward();
         ShowBuffChoicesIfNeeded();
+        ShowVictoryIfNeeded();
     }
 
     private void ShowBuffChoicesIfNeeded()
@@ -159,6 +163,22 @@ public class RoomController2D : MonoBehaviour
         {
             buffChoiceController.ShowChoices();
         }
+    }
+
+    private void ShowVictoryIfNeeded()
+    {
+        if (!showVictoryOnClear)
+        {
+            return;
+        }
+
+        if (levelEndController == null)
+        {
+            Debug.LogWarning($"Room '{name}' is configured to show victory, but no LevelEndController2D is assigned.", this);
+            return;
+        }
+
+        levelEndController.ShowVictory(victoryMessage);
     }
 
     private void SpawnClearReward()

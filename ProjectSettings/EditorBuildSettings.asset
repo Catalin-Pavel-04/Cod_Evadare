@@ -29,4 +29,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/_Project/Scenes/Prototype_MinibossBuffs.unity
     guid: f6dc04a045551de41a8a669b0efce2be
+  - enabled: 1
+    path: Assets/_Project/Scenes/Prototype_BossFight.unity
+    guid: 2d98e10f6dd01154bbe971516bfabfae
   m_configObjects: {}
