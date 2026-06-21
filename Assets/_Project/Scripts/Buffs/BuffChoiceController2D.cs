@@ -9,6 +9,10 @@ public class BuffChoiceController2D : MonoBehaviour
     [SerializeField] private GameObject choicePanel;
     [SerializeField] private Button[] choiceButtons;
     [SerializeField] private Text[] choiceTexts;
+    [SerializeField] private Image[] choiceIcons;
+    [SerializeField] private Image[] choiceCardFrames;
+    [SerializeField] private Text[] choiceNameTexts;
+    [SerializeField] private Text[] choiceDescriptionTexts;
     [SerializeField] private bool pauseGameWhileChoosing = true;
     [SerializeField] private int choicesToShow = 3;
 
@@ -118,6 +122,27 @@ public class BuffChoiceController2D : MonoBehaviour
             if (choiceTexts != null && i < choiceTexts.Length && choiceTexts[i] != null)
             {
                 choiceTexts[i].text = $"{buff.DisplayName}\n{buff.Description}";
+            }
+
+            if (choiceNameTexts != null && i < choiceNameTexts.Length && choiceNameTexts[i] != null)
+            {
+                choiceNameTexts[i].text = buff.DisplayName;
+            }
+
+            if (choiceDescriptionTexts != null && i < choiceDescriptionTexts.Length && choiceDescriptionTexts[i] != null)
+            {
+                choiceDescriptionTexts[i].text = buff.Description;
+            }
+
+            if (choiceIcons != null && i < choiceIcons.Length && choiceIcons[i] != null)
+            {
+                choiceIcons[i].sprite = buff.Icon;
+                choiceIcons[i].enabled = buff.Icon != null;
+            }
+
+            if (choiceCardFrames != null && i < choiceCardFrames.Length && choiceCardFrames[i] != null)
+            {
+                choiceCardFrames[i].enabled = true;
             }
 
             button.onClick.AddListener(() => ChooseBuff(buff));

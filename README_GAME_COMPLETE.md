@@ -55,3 +55,9 @@ All art and audio are generated placeholders. Layouts are functional MVP combat 
 - Level Select locks/unlocks levels.
 - Each level can be completed from start to victory.
 - Shops, pickups, buffs, bosses, hazards, pause, game over, reload, and next level flow work.
+
+## UI Art Pass 1.0
+
+Run `Tools/Cod Evadare/UI/Build Complete UI Art Pass` to regenerate the generated UI sprites, theme assets, showcase scene, and safe scene styling pass.
+
+Showcase scene: `Assets/_Project/Scenes/Game/UI_Showcase.unity`
