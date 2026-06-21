@@ -4,6 +4,7 @@ using UnityEngine;
 public class EnemySpawner2D : MonoBehaviour
 {
     [SerializeField] private GameObject enemyPrefab;
+    [SerializeField] private GameObject[] enemyPrefabs;
     [SerializeField] private Transform[] spawnPoints;
     [SerializeField] private int enemyCount = 3;
 
@@ -11,9 +12,9 @@ public class EnemySpawner2D : MonoBehaviour
     {
         List<EnemyHealth> spawnedEnemies = new List<EnemyHealth>();
 
-        if (enemyPrefab == null)
+        if (!HasAnyEnemyPrefab())
         {
-            Debug.LogWarning($"EnemySpawner2D on '{name}' cannot spawn because enemyPrefab is missing.", this);
+            Debug.LogWarning($"EnemySpawner2D on '{name}' cannot spawn because no enemy prefab is assigned.", this);
             return spawnedEnemies;
         }
 
@@ -35,7 +36,15 @@ public class EnemySpawner2D : MonoBehaviour
                 continue;
             }
 
-            GameObject enemyObject = Instantiate(enemyPrefab, spawnPoint.position, spawnPoint.rotation, transform.parent);
+            GameObject prefab = GetPrefabForSpawnIndex(i);
+
+            if (prefab == null)
+            {
+                Debug.LogWarning($"EnemySpawner2D on '{name}' skipped a missing enemy prefab.", this);
+                continue;
+            }
+
+            GameObject enemyObject = Instantiate(prefab, spawnPoint.position, spawnPoint.rotation, transform.parent);
             EnemyHealth enemyHealth = enemyObject.GetComponent<EnemyHealth>();
 
             if (enemyHealth == null)
@@ -59,5 +68,43 @@ public class EnemySpawner2D : MonoBehaviour
     private void OnValidate()
     {
         enemyCount = Mathf.Max(0, enemyCount);
+    }
+
+    private bool HasAnyEnemyPrefab()
+    {
+        if (enemyPrefab != null)
+        {
+            return true;
+        }
+
+        if (enemyPrefabs == null)
+        {
+            return false;
+        }
+
+        foreach (GameObject prefab in enemyPrefabs)
+        {
+            if (prefab != null)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private GameObject GetPrefabForSpawnIndex(int index)
+    {
+        if (enemyPrefabs != null && enemyPrefabs.Length > 0)
+        {
+            GameObject selectedPrefab = enemyPrefabs[index % enemyPrefabs.Length];
+
+            if (selectedPrefab != null)
+            {
+                return selectedPrefab;
+            }
+        }
+
+        return enemyPrefab;
     }
 }

@@ -12,9 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1abc97e96f96c724c8dfb0951f4c4ab2, type: 3}
   m_Name: Shop_AmmoPack
   m_EditorClassIdentifier: 
-  displayName: Ammo +15
+  displayName: Ammo +20
   itemType: 1
   price: 20
-  amount: 15
+  amount: 20
   weaponDefinition: {fileID: 0}
   icon: {fileID: 21300000, guid: 6e2ebba0773c59e4b92681a04a261142, type: 3}

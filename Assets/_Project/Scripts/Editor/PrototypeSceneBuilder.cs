@@ -24,11 +24,19 @@ public static class PrototypeSceneBuilder
     private const string FullLaboratoryLevelScenePath = "Assets/_Project/Scenes/Prototype_FullLaboratoryLevel.unity";
     private const string MainMenuScenePath = "Assets/_Project/Scenes/MainMenu.unity";
     private const string FinalDemoScenePath = "Assets/_Project/Scenes/Prototype_FinalDemo.unity";
+    private const string PrisonLevelScenePath = "Assets/_Project/Scenes/Prototype_PrisonLevel.unity";
     private const string BulletPrefabPath = "Assets/_Project/Prefabs/Weapons/Bullet.prefab";
     private const string EnemyPrefabPath = "Assets/_Project/Prefabs/Enemies/TestEnemy.prefab";
+    private const string PrisonGuardPrefabPath = "Assets/_Project/Prefabs/Enemies/PrisonGuard.prefab";
+    private const string PrisonRangedGuardPrefabPath = "Assets/_Project/Prefabs/Enemies/PrisonRangedGuard.prefab";
+    private const string RiotBrutePrefabPath = "Assets/_Project/Prefabs/Enemies/RiotBruteMiniboss.prefab";
     private const string MinibossPrefabPath = "Assets/_Project/Prefabs/Enemies/PrototypeMiniboss.prefab";
     private const string BossPrefabPath = "Assets/_Project/Prefabs/Boss/Experiment01Boss.prefab";
+    private const string WardenBossPrefabPath = "Assets/_Project/Prefabs/Boss/WardenBoss.prefab";
     private const string EnemyProjectilePrefabPath = "Assets/_Project/Prefabs/Projectiles/EnemyProjectile.prefab";
+    private const string SecurityLaserPrefabPath = "Assets/_Project/Prefabs/Hazards/SecurityLaser.prefab";
+    private const string KeycardPickupPrefabPath = "Assets/_Project/Prefabs/Prison/KeycardPickup.prefab";
+    private const string LockedGatePrefabPath = "Assets/_Project/Prefabs/Prison/LockedGate.prefab";
     private const string RewardPrefabPath = "Assets/_Project/Prefabs/Pickups/PrototypeReward.prefab";
     private const string HealthPickupPrefabPath = "Assets/_Project/Prefabs/Pickups/HealthPickup.prefab";
     private const string AmmoPickupPrefabPath = "Assets/_Project/Prefabs/Pickups/AmmoPickup.prefab";
@@ -73,6 +81,18 @@ public static class PrototypeSceneBuilder
     private const string ShopHealthSpritePath = GeneratedArtFolder + "/ShopHealth_Prototype.png";
     private const string ShopAmmoSpritePath = GeneratedArtFolder + "/ShopAmmo_Prototype.png";
     private const string ShopWeaponSpritePath = GeneratedArtFolder + "/ShopWeapon_Prototype.png";
+    private const string PrisonPlayerStartMarkerSpritePath = GeneratedArtFolder + "/Prison_PlayerStartMarker.png";
+    private const string PrisonWallSpritePath = GeneratedArtFolder + "/PrisonWall.png";
+    private const string PrisonBarsSpritePath = GeneratedArtFolder + "/PrisonBars.png";
+    private const string PrisonFloorSpritePath = GeneratedArtFolder + "/PrisonFloor.png";
+    private const string PrisonGuardSpritePath = GeneratedArtFolder + "/PrisonGuard.png";
+    private const string PrisonRangedGuardSpritePath = GeneratedArtFolder + "/PrisonRangedGuard.png";
+    private const string PrisonBruteMinibossSpritePath = GeneratedArtFolder + "/PrisonBruteMiniboss.png";
+    private const string WardenBossSpritePath = GeneratedArtFolder + "/WardenBoss.png";
+    private const string KeycardSpritePath = GeneratedArtFolder + "/Keycard.png";
+    private const string LockedGateSpritePath = GeneratedArtFolder + "/LockedGate.png";
+    private const string SecurityLaserSpritePath = GeneratedArtFolder + "/SecurityLaser.png";
+    private const string PrisonCoverSpritePath = GeneratedArtFolder + "/PrisonCover.png";
     private const string PlayerTag = "Player";
     private const string GeneratedAudioFolder = "Assets/_Project/Audio/Generated";
     private const string ShootAudioPath = GeneratedAudioFolder + "/Shoot.wav";
@@ -84,6 +104,8 @@ public static class PrototypeSceneBuilder
     private const string BossPhaseAudioPath = GeneratedAudioFolder + "/BossPhase.wav";
     private const string VictoryAudioPath = GeneratedAudioFolder + "/Victory.wav";
     private const string GameOverAudioPath = GeneratedAudioFolder + "/GameOver.wav";
+    private const string LaserAudioPath = GeneratedAudioFolder + "/Laser.wav";
+    private const string KeycardAudioPath = GeneratedAudioFolder + "/Keycard.wav";
 
     private static readonly string[] RequiredFolders =
     {
@@ -99,6 +121,8 @@ public static class PrototypeSceneBuilder
         "Assets/_Project/Prefabs/Boss",
         "Assets/_Project/Prefabs/Projectiles",
         "Assets/_Project/Prefabs/Environment",
+        "Assets/_Project/Prefabs/Hazards",
+        "Assets/_Project/Prefabs/Prison",
         "Assets/_Project/Prefabs/UI",
         "Assets/_Project/Prefabs/Pickups",
         "Assets/_Project/Prefabs/Loot",
@@ -119,6 +143,8 @@ public static class PrototypeSceneBuilder
         "Assets/_Project/Scripts/Feedback",
         "Assets/_Project/Scripts/Level",
         "Assets/_Project/Scripts/Loot",
+        "Assets/_Project/Scripts/Hazards",
+        "Assets/_Project/Scripts/Prison",
         "Assets/_Project/Scripts/Projectiles",
         "Assets/_Project/Scripts/Resources",
         "Assets/_Project/Scripts/Shop",
@@ -979,6 +1005,178 @@ public static class PrototypeSceneBuilder
         Debug.Log($"Created Prototype 1.0 final demo scene at {FinalDemoScenePath}.");
     }
 
+    [MenuItem("Tools/Cod Evadare/Create Prototype 2.0 Prison Level")]
+    public static void CreatePrototypePrisonLevel()
+    {
+        if (!Application.isBatchMode && !EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo())
+        {
+            return;
+        }
+
+        CreateRequiredFolders();
+        GeneratePlaceholderSprites();
+        GeneratePlaceholderAudio();
+        EnsureTag(PlayerTag);
+
+        Scene scene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
+        SceneManager.SetActiveScene(scene);
+
+        Sprite playerSprite = AssetDatabase.LoadAssetAtPath<Sprite>(PlayerSpritePath);
+        Sprite bulletSprite = AssetDatabase.LoadAssetAtPath<Sprite>(BulletSpritePath);
+        Sprite enemyProjectileSprite = AssetDatabase.LoadAssetAtPath<Sprite>(EnemyProjectileSpritePath);
+        Sprite prisonWallSprite = AssetDatabase.LoadAssetAtPath<Sprite>(PrisonWallSpritePath);
+        Sprite prisonBarsSprite = AssetDatabase.LoadAssetAtPath<Sprite>(PrisonBarsSpritePath);
+        Sprite prisonGuardSprite = AssetDatabase.LoadAssetAtPath<Sprite>(PrisonGuardSpritePath);
+        Sprite prisonRangedGuardSprite = AssetDatabase.LoadAssetAtPath<Sprite>(PrisonRangedGuardSpritePath);
+        Sprite prisonBruteSprite = AssetDatabase.LoadAssetAtPath<Sprite>(PrisonBruteMinibossSpritePath);
+        Sprite wardenSprite = AssetDatabase.LoadAssetAtPath<Sprite>(WardenBossSpritePath);
+        Sprite keycardSprite = AssetDatabase.LoadAssetAtPath<Sprite>(KeycardSpritePath);
+        Sprite lockedGateSprite = AssetDatabase.LoadAssetAtPath<Sprite>(LockedGateSpritePath);
+        Sprite securityLaserSprite = AssetDatabase.LoadAssetAtPath<Sprite>(SecurityLaserSpritePath);
+        Sprite prisonCoverSprite = AssetDatabase.LoadAssetAtPath<Sprite>(PrisonCoverSpritePath);
+        Sprite healthPickupSprite = AssetDatabase.LoadAssetAtPath<Sprite>(HealthPickupSpritePath);
+        Sprite ammoPickupSprite = AssetDatabase.LoadAssetAtPath<Sprite>(AmmoPickupSpritePath);
+        Sprite moneyPickupSprite = AssetDatabase.LoadAssetAtPath<Sprite>(MoneyPickupSpritePath);
+        Sprite weaponPickupSprite = AssetDatabase.LoadAssetAtPath<Sprite>(WeaponPickupSpritePath);
+        Sprite shopHealthSprite = AssetDatabase.LoadAssetAtPath<Sprite>(ShopHealthSpritePath);
+        Sprite shopAmmoSprite = AssetDatabase.LoadAssetAtPath<Sprite>(ShopAmmoSpritePath);
+        Sprite shopWeaponSprite = AssetDatabase.LoadAssetAtPath<Sprite>(ShopWeaponSpritePath);
+
+        GameObject root = new GameObject("Prototype_PrisonLevel");
+        GameObject cameraObject = CreateCamera(root.transform);
+        SimpleCameraShake2D cameraShake = cameraObject.AddComponent<SimpleCameraShake2D>();
+        AssignFloat(cameraShake, "defaultDuration", 0.12f);
+        AssignFloat(cameraShake, "defaultMagnitude", 0.12f);
+        CreateLighting(root.transform);
+
+        GameObject player = CreatePlayer(root.transform, playerSprite, out Transform firePoint, out PlayerShooting2D playerShooting);
+        player.transform.position = new Vector3(-28f, 0f, 0f);
+        SpriteFlash2D playerFlash = player.AddComponent<SpriteFlash2D>();
+        AssignObjectReference(playerFlash, "spriteRenderer", player.GetComponent<SpriteRenderer>());
+
+        PlayerHealth2D playerHealth = player.AddComponent<PlayerHealth2D>();
+        AssignInt(playerHealth, "maxHealth", 6);
+        AssignFloat(playerHealth, "invincibilityDuration", 0.75f);
+        AssignBool(playerHealth, "destroyOnDeath", false);
+
+        PlayerResources2D playerResources = player.AddComponent<PlayerResources2D>();
+        AssignInt(playerResources, "startingAmmo", 90);
+        AssignInt(playerResources, "maxAmmo", 150);
+        AssignInt(playerResources, "startingMoney", 40);
+
+        PlayerBuffs2D playerBuffs = player.AddComponent<PlayerBuffs2D>();
+        PlayerKeyring2D playerKeyring = player.AddComponent<PlayerKeyring2D>();
+        AssignInt(playerKeyring, "startingKeycards", 0);
+
+        GameObject bulletPrefab = GetOrCreateBulletPrefab(bulletSprite);
+        WeaponDefinition2D pistol = CreateWeaponDefinition(PistolWeaponPath, "Pistol", WeaponRarity2D.Common, bulletPrefab, 0.2f, 12, 1, 1f, 1, 12f, 2f, 1, 0f);
+        WeaponDefinition2D smg = CreateWeaponDefinition(SMGWeaponPath, "SMG", WeaponRarity2D.Rare, bulletPrefab, 0.08f, 24, 1, 1.2f, 1, 13f, 2f, 1, 3f);
+        WeaponDefinition2D shotgun = CreateWeaponDefinition(ShotgunWeaponPath, "Shotgun", WeaponRarity2D.Epic, bulletPrefab, 0.55f, 6, 1, 1.4f, 1, 11f, 1.2f, 5, 35f);
+
+        AssignObjectReference(playerShooting, "firePoint", firePoint);
+        AssignObjectReference(playerShooting, "bulletPrefab", bulletPrefab);
+        AssignBool(playerShooting, "useAmmo", true);
+        AssignObjectReference(playerShooting, "playerResources", playerResources);
+        AssignObjectReference(playerShooting, "startingWeapon", pistol);
+        AssignObjectReference(playerShooting, "equippedWeapon", pistol);
+
+        CameraFollow2D cameraFollow = cameraObject.GetComponent<CameraFollow2D>();
+        AssignObjectReference(cameraFollow, "target", player.transform);
+
+        GameObject enemyProjectilePrefab = CreateEnemyProjectilePrefab(enemyProjectileSprite);
+        GameObject prisonGuardPrefab = CreatePrisonGuardPrefab(prisonGuardSprite);
+        GameObject prisonRangedGuardPrefab = CreatePrisonRangedGuardPrefab(prisonRangedGuardSprite, enemyProjectilePrefab);
+        GameObject riotBrutePrefab = CreateRiotBrutePrefab(prisonBruteSprite);
+        GameObject wardenBossPrefab = CreateWardenBossPrefab(wardenSprite, enemyProjectilePrefab);
+        GameObject keycardPickupPrefab = CreateKeycardPickupPrefab(keycardSprite);
+        GameObject lockedGatePrefab = CreateLockedGatePrefab(lockedGateSprite);
+        GameObject securityLaserPrefab = CreateSecurityLaserPrefab(securityLaserSprite);
+
+        GameObject healthPickup = CreateResourcePickupPrefab("HealthPickup", HealthPickupPrefabPath, healthPickupSprite, ResourcePickupType.Health, 2);
+        GameObject ammoPickup = CreateResourcePickupPrefab("AmmoPickup", AmmoPickupPrefabPath, ammoPickupSprite, ResourcePickupType.Ammo, 25);
+        GameObject moneyPickup = CreateResourcePickupPrefab("MoneyPickup", MoneyPickupPrefabPath, moneyPickupSprite, ResourcePickupType.Money, 25);
+        GameObject shotgunPickup = CreateWeaponPickupPrefab("ShotgunPickup", ShotgunPickupPrefabPath, weaponPickupSprite, shotgun);
+
+        ShopItemDefinition2D healthShopItem = CreateShopItemDefinition(ShopHealthDefinitionPath, "Health +2", ShopItemType2D.Health, 25, 2, null, shopHealthSprite);
+        ShopItemDefinition2D ammoShopItem = CreateShopItemDefinition(ShopAmmoDefinitionPath, "Ammo +20", ShopItemType2D.Ammo, 20, 20, null, shopAmmoSprite);
+        ShopItemDefinition2D weaponShopItem = CreateShopItemDefinition(ShopShotgunDefinitionPath, "SMG", ShopItemType2D.Weapon, 70, 0, smg, shopWeaponSprite);
+        GameObject healthShopPrefab = CreateShopItemPrefab("ShopItem_Health", ShopHealthPrefabPath, shopHealthSprite, healthShopItem);
+        GameObject ammoShopPrefab = CreateShopItemPrefab("ShopItem_Ammo", ShopAmmoPrefabPath, shopAmmoSprite, ammoShopItem);
+        GameObject weaponShopPrefab = CreateShopItemPrefab("ShopItem_Weapon", ShopShotgunPrefabPath, shopWeaponSprite, weaponShopItem);
+
+        BuffDefinition2D[] buffPool = CreatePrototypeBuffDefinitions();
+        GameObject gameOverPanel = CreateFullLaboratoryUI(
+            root.transform,
+            playerHealth,
+            playerResources,
+            playerShooting,
+            playerBuffs,
+            out ObjectiveUI2D objectiveUI,
+            out ShopUI2D shopUI,
+            out GameObject choicePanel,
+            out Button[] choiceButtons,
+            out Text[] choiceTexts,
+            out GameObject victoryPanel,
+            out Text victoryText);
+
+        AddPrisonKeycardUI(root.transform, playerKeyring);
+        AddFinalDemoUiOverlays(root.transform, out GameObject pausePanel, out DemoMessageUI2D demoMessageUI);
+        Text gatePromptText = root.transform.Find("UI/Canvas/DemoMessageText")?.GetComponent<Text>();
+
+        CreatePrisonGameSystems(
+            root.transform,
+            playerHealth,
+            gameOverPanel,
+            playerBuffs,
+            buffPool,
+            choicePanel,
+            choiceButtons,
+            choiceTexts,
+            objectiveUI,
+            victoryPanel,
+            victoryText,
+            pausePanel,
+            demoMessageUI,
+            out BuffChoiceController2D buffChoiceController,
+            out LevelEndController2D levelEndController);
+
+        CreatePrisonStartCell(root.transform, prisonWallSprite, prisonBarsSprite, objectiveUI);
+        CreatePrisonGuardRoom(root.transform, -18f, prisonWallSprite, prisonBarsSprite, prisonGuardPrefab, prisonRangedGuardPrefab, new[] { keycardPickupPrefab, ammoPickup, moneyPickup }, objectiveUI);
+        CreatePrisonLockedGateArea(root.transform, -9f, lockedGatePrefab, gatePromptText, objectiveUI);
+        CreatePrisonShopArea(root.transform, -1f, prisonWallSprite, shopUI, objectiveUI, healthShopPrefab, ammoShopPrefab, weaponShopPrefab);
+        CreatePrisonYard(root.transform, 11f, prisonWallSprite, prisonCoverSprite, securityLaserPrefab, prisonGuardPrefab, prisonRangedGuardPrefab, new[] { healthPickup, ammoPickup, moneyPickup, shotgunPickup }, objectiveUI);
+        CreatePrisonMinibossRoom(root.transform, 23f, prisonWallSprite, riotBrutePrefab, buffChoiceController, objectiveUI);
+        CreatePrisonBossRoom(root.transform, 38f, prisonWallSprite, prisonCoverSprite, securityLaserPrefab, wardenBossPrefab, levelEndController, objectiveUI);
+        CreateEventSystem(root.transform);
+
+        EditorSceneManager.SaveScene(scene, PrisonLevelScenePath);
+        AddSceneToBuildSettings(PrisonLevelScenePath);
+
+        if (File.Exists(ToAbsoluteAssetPath(MainMenuScenePath)))
+        {
+            AddSceneToBuildSettingsFirst(MainMenuScenePath);
+        }
+
+        AssetDatabase.SaveAssets();
+        AssetDatabase.Refresh();
+
+        Debug.Log($"Created Prototype 2.0 prison level at {PrisonLevelScenePath}.");
+    }
+
+    [MenuItem("Tools/Cod Evadare/Update Main Menu With Level 2")]
+    public static void UpdateMainMenuWithLevel2()
+    {
+        CreateMainMenuScene();
+
+        if (File.Exists(ToAbsoluteAssetPath(PrisonLevelScenePath)))
+        {
+            AddSceneToBuildSettings(PrisonLevelScenePath);
+            return;
+        }
+
+        Debug.LogWarning($"Main menu was updated, but {PrisonLevelScenePath} does not exist yet. Run Tools/Cod Evadare/Create Prototype 2.0 Prison Level before using the Level 2 button.");
+    }
+
     private static void CreateRequiredFolders()
     {
         foreach (string folder in RequiredFolders)
@@ -1011,6 +1209,18 @@ public static class PrototypeSceneBuilder
         WriteSpriteTexture(ShopHealthSpritePath, 64, CreateShopHealthPixel);
         WriteSpriteTexture(ShopAmmoSpritePath, 64, CreateShopAmmoPixel);
         WriteSpriteTexture(ShopWeaponSpritePath, 64, CreateShopWeaponPixel);
+        WriteSpriteTexture(PrisonPlayerStartMarkerSpritePath, 64, CreatePrisonPlayerStartMarkerPixel);
+        WriteSpriteTexture(PrisonWallSpritePath, 64, CreatePrisonWallPixel);
+        WriteSpriteTexture(PrisonBarsSpritePath, 64, CreatePrisonBarsPixel);
+        WriteSpriteTexture(PrisonFloorSpritePath, 64, CreatePrisonFloorPixel);
+        WriteSpriteTexture(PrisonGuardSpritePath, 64, CreatePrisonGuardPixel);
+        WriteSpriteTexture(PrisonRangedGuardSpritePath, 64, CreatePrisonRangedGuardPixel);
+        WriteSpriteTexture(PrisonBruteMinibossSpritePath, 64, CreatePrisonBruteMinibossPixel);
+        WriteSpriteTexture(WardenBossSpritePath, 64, CreateWardenBossPixel);
+        WriteSpriteTexture(KeycardSpritePath, 64, CreateKeycardPixel);
+        WriteSpriteTexture(LockedGateSpritePath, 64, CreateLockedGatePixel);
+        WriteSpriteTexture(SecurityLaserSpritePath, 64, CreateSecurityLaserPixel);
+        WriteSpriteTexture(PrisonCoverSpritePath, 64, CreatePrisonCoverPixel);
     }
 
     private static void GeneratePlaceholderAudio()
@@ -1024,6 +1234,8 @@ public static class PrototypeSceneBuilder
         WriteSineWave(BossPhaseAudioPath, 90f, 0.35f, 0.45f);
         WriteSineWave(VictoryAudioPath, 660f, 0.45f, 0.35f);
         WriteSineWave(GameOverAudioPath, 110f, 0.45f, 0.45f);
+        WriteSineWave(LaserAudioPath, 1320f, 0.08f, 0.28f);
+        WriteSineWave(KeycardAudioPath, 980f, 0.12f, 0.32f);
 
         AssetDatabase.Refresh(ImportAssetOptions.ForceSynchronousImport);
     }
@@ -1172,16 +1384,22 @@ public static class PrototypeSceneBuilder
         controllerObject.transform.SetParent(menuSystems.transform);
         MainMenuController2D controller = controllerObject.AddComponent<MainMenuController2D>();
         AssignString(controller, "demoSceneName", "Prototype_FinalDemo");
+        AssignString(controller, "demoScenePath", FinalDemoScenePath);
+        AssignString(controller, "prisonSceneName", "Prototype_PrisonLevel");
+        AssignString(controller, "prisonScenePath", PrisonLevelScenePath);
         AssignObjectReference(controller, "mainPanel", mainPanel);
         AssignObjectReference(controller, "controlsPanel", controlsPanel);
 
-        Button playButton = CreateMenuButton(mainPanel.transform, "PlayButton", "Play Demo", new Vector2(0f, -15f));
+        Button playButton = CreateMenuButton(mainPanel.transform, "PlayButton", "Play Demo", new Vector2(0f, 22f));
         UnityEventTools.AddPersistentListener(playButton.onClick, controller.PlayDemo);
 
-        Button controlsButton = CreateMenuButton(mainPanel.transform, "ControlsButton", "Controls", new Vector2(0f, -90f));
+        Button prisonButton = CreateMenuButton(mainPanel.transform, "PrisonButton", "Play Level 2: Prison", new Vector2(0f, -48f));
+        UnityEventTools.AddPersistentListener(prisonButton.onClick, controller.PlayPrisonLevel);
+
+        Button controlsButton = CreateMenuButton(mainPanel.transform, "ControlsButton", "Controls", new Vector2(0f, -118f));
         UnityEventTools.AddPersistentListener(controlsButton.onClick, controller.ShowControls);
 
-        Button quitButton = CreateMenuButton(mainPanel.transform, "QuitButton", "Quit", new Vector2(0f, -165f));
+        Button quitButton = CreateMenuButton(mainPanel.transform, "QuitButton", "Quit", new Vector2(0f, -188f));
         UnityEventTools.AddPersistentListener(quitButton.onClick, controller.QuitGame);
 
         GameObject controlsTitleObject = CreateRectObject("ControlsTitleText", controlsPanel.transform);
@@ -1508,6 +1726,273 @@ public static class PrototypeSceneBuilder
         }
 
         return prefab;
+    }
+
+    private static GameObject CreatePrisonGuardPrefab(Sprite sprite)
+    {
+        GameObject guard = new GameObject("PrisonGuard");
+        guard.transform.localScale = new Vector3(0.85f, 0.85f, 1f);
+
+        SpriteRenderer spriteRenderer = guard.AddComponent<SpriteRenderer>();
+        spriteRenderer.sprite = sprite;
+        spriteRenderer.sortingOrder = 10;
+
+        Rigidbody2D body = guard.AddComponent<Rigidbody2D>();
+        body.gravityScale = 0f;
+        body.interpolation = RigidbodyInterpolation2D.Interpolate;
+        body.freezeRotation = true;
+
+        guard.AddComponent<BoxCollider2D>();
+
+        EnemyHealth health = guard.AddComponent<EnemyHealth>();
+        AssignInt(health, "maxHealth", 3);
+
+        SimpleEnemyChaser2D chaser = guard.AddComponent<SimpleEnemyChaser2D>();
+        AssignFloat(chaser, "moveSpeed", 1.6f);
+        AssignFloat(chaser, "stopDistance", 1f);
+
+        EnemyContactDamage2D contactDamage = guard.AddComponent<EnemyContactDamage2D>();
+        AssignInt(contactDamage, "damage", 1);
+        AssignFloat(contactDamage, "damageCooldown", 1f);
+
+        SpriteFlash2D flash = guard.AddComponent<SpriteFlash2D>();
+        AssignObjectReference(flash, "spriteRenderer", spriteRenderer);
+
+        GameObject prefab = PrefabUtility.SaveAsPrefabAsset(guard, PrisonGuardPrefabPath);
+        UnityEngine.Object.DestroyImmediate(guard);
+        return prefab != null ? prefab : AssetDatabase.LoadAssetAtPath<GameObject>(PrisonGuardPrefabPath);
+    }
+
+    private static GameObject CreatePrisonRangedGuardPrefab(Sprite sprite, GameObject enemyProjectilePrefab)
+    {
+        GameObject guard = new GameObject("PrisonRangedGuard");
+        guard.transform.localScale = new Vector3(0.85f, 0.85f, 1f);
+
+        SpriteRenderer spriteRenderer = guard.AddComponent<SpriteRenderer>();
+        spriteRenderer.sprite = sprite;
+        spriteRenderer.sortingOrder = 10;
+
+        Rigidbody2D body = guard.AddComponent<Rigidbody2D>();
+        body.gravityScale = 0f;
+        body.interpolation = RigidbodyInterpolation2D.Interpolate;
+        body.freezeRotation = true;
+
+        guard.AddComponent<BoxCollider2D>();
+
+        EnemyHealth health = guard.AddComponent<EnemyHealth>();
+        AssignInt(health, "maxHealth", 4);
+
+        GameObject projectileSpawnPoint = new GameObject("ProjectileSpawnPoint");
+        projectileSpawnPoint.transform.SetParent(guard.transform);
+        projectileSpawnPoint.transform.localPosition = new Vector3(0.55f, 0f, 0f);
+        projectileSpawnPoint.transform.localRotation = Quaternion.identity;
+        projectileSpawnPoint.transform.localScale = Vector3.one;
+
+        RangedEnemyShooter2D shooter = guard.AddComponent<RangedEnemyShooter2D>();
+        AssignObjectReference(shooter, "projectileSpawnPoint", projectileSpawnPoint.transform);
+        AssignObjectReference(shooter, "enemyProjectilePrefab", enemyProjectilePrefab);
+        AssignFloat(shooter, "moveSpeed", 1.2f);
+        AssignFloat(shooter, "preferredDistance", 4f);
+        AssignFloat(shooter, "minimumDistance", 2f);
+        AssignFloat(shooter, "attackInterval", 1.2f);
+        AssignInt(shooter, "damage", 1);
+        AssignFloat(shooter, "projectileSpeed", 7f);
+        AssignFloat(shooter, "projectileLifetime", 3f);
+        AssignBool(shooter, "activateOnStart", true);
+
+        EnemyContactDamage2D contactDamage = guard.AddComponent<EnemyContactDamage2D>();
+        AssignInt(contactDamage, "damage", 1);
+        AssignFloat(contactDamage, "damageCooldown", 1.25f);
+
+        SpriteFlash2D flash = guard.AddComponent<SpriteFlash2D>();
+        AssignObjectReference(flash, "spriteRenderer", spriteRenderer);
+
+        GameObject prefab = PrefabUtility.SaveAsPrefabAsset(guard, PrisonRangedGuardPrefabPath);
+        UnityEngine.Object.DestroyImmediate(guard);
+        return prefab != null ? prefab : AssetDatabase.LoadAssetAtPath<GameObject>(PrisonRangedGuardPrefabPath);
+    }
+
+    private static GameObject CreateRiotBrutePrefab(Sprite sprite)
+    {
+        GameObject brute = new GameObject("RiotBruteMiniboss");
+        brute.transform.localScale = new Vector3(1.5f, 1.5f, 1f);
+
+        SpriteRenderer spriteRenderer = brute.AddComponent<SpriteRenderer>();
+        spriteRenderer.sprite = sprite;
+        spriteRenderer.sortingOrder = 10;
+
+        Rigidbody2D body = brute.AddComponent<Rigidbody2D>();
+        body.gravityScale = 0f;
+        body.interpolation = RigidbodyInterpolation2D.Interpolate;
+        body.freezeRotation = true;
+
+        brute.AddComponent<BoxCollider2D>();
+
+        EnemyHealth health = brute.AddComponent<EnemyHealth>();
+        AssignInt(health, "maxHealth", 22);
+
+        SimpleEnemyChaser2D chaser = brute.AddComponent<SimpleEnemyChaser2D>();
+        AssignFloat(chaser, "moveSpeed", 1.2f);
+        AssignFloat(chaser, "stopDistance", 1.1f);
+
+        EnemyContactDamage2D contactDamage = brute.AddComponent<EnemyContactDamage2D>();
+        AssignInt(contactDamage, "damage", 2);
+        AssignFloat(contactDamage, "damageCooldown", 1.2f);
+
+        MinibossMarker2D marker = brute.AddComponent<MinibossMarker2D>();
+        AssignString(marker, "minibossName", "Riot Brute");
+
+        SpriteFlash2D flash = brute.AddComponent<SpriteFlash2D>();
+        AssignObjectReference(flash, "spriteRenderer", spriteRenderer);
+
+        GameObject prefab = PrefabUtility.SaveAsPrefabAsset(brute, RiotBrutePrefabPath);
+        UnityEngine.Object.DestroyImmediate(brute);
+        return prefab != null ? prefab : AssetDatabase.LoadAssetAtPath<GameObject>(RiotBrutePrefabPath);
+    }
+
+    private static GameObject CreateWardenBossPrefab(Sprite sprite, GameObject enemyProjectilePrefab)
+    {
+        GameObject boss = new GameObject("The Warden");
+        boss.transform.localScale = new Vector3(2f, 2f, 1f);
+
+        SpriteRenderer spriteRenderer = boss.AddComponent<SpriteRenderer>();
+        spriteRenderer.sprite = sprite;
+        spriteRenderer.sortingOrder = 10;
+
+        Rigidbody2D body = boss.AddComponent<Rigidbody2D>();
+        body.gravityScale = 0f;
+        body.interpolation = RigidbodyInterpolation2D.Interpolate;
+        body.freezeRotation = true;
+
+        CircleCollider2D collider = boss.AddComponent<CircleCollider2D>();
+        collider.radius = 0.52f;
+
+        EnemyHealth health = boss.AddComponent<EnemyHealth>();
+        AssignInt(health, "maxHealth", 60);
+
+        EnemyContactDamage2D contactDamage = boss.AddComponent<EnemyContactDamage2D>();
+        AssignInt(contactDamage, "damage", 1);
+        AssignFloat(contactDamage, "damageCooldown", 1f);
+
+        GameObject projectileSpawnPoint = new GameObject("ProjectileSpawnPoint");
+        projectileSpawnPoint.transform.SetParent(boss.transform);
+        projectileSpawnPoint.transform.localPosition = new Vector3(0.8f, 0f, 0f);
+        projectileSpawnPoint.transform.localRotation = Quaternion.identity;
+        projectileSpawnPoint.transform.localScale = Vector3.one;
+
+        BossAttackController2D attackController = boss.AddComponent<BossAttackController2D>();
+        AssignString(attackController, "bossName", "The Warden");
+        AssignObjectReference(attackController, "projectileSpawnPoint", projectileSpawnPoint.transform);
+        AssignObjectReference(attackController, "enemyProjectilePrefab", enemyProjectilePrefab);
+        AssignFloat(attackController, "moveSpeed", 1f);
+        AssignFloat(attackController, "stopDistance", 4f);
+        AssignFloat(attackController, "attackInterval", 1.4f);
+        AssignFloat(attackController, "phaseTwoHealthPercent", 0.5f);
+        AssignFloat(attackController, "phaseTwoAttackIntervalMultiplier", 0.6f);
+        AssignInt(attackController, "aimedShotDamage", 1);
+        AssignInt(attackController, "radialShotDamage", 1);
+        AssignFloat(attackController, "projectileSpeed", 7f);
+        AssignFloat(attackController, "projectileLifetime", 4f);
+        AssignInt(attackController, "phaseOneRadialProjectiles", 8);
+        AssignInt(attackController, "phaseTwoRadialProjectiles", 16);
+        AssignBool(attackController, "activateOnStart", true);
+
+        BossMarker2D marker = boss.AddComponent<BossMarker2D>();
+        AssignString(marker, "bossName", "The Warden");
+
+        SpriteFlash2D flash = boss.AddComponent<SpriteFlash2D>();
+        AssignObjectReference(flash, "spriteRenderer", spriteRenderer);
+
+        GameObject prefab = PrefabUtility.SaveAsPrefabAsset(boss, WardenBossPrefabPath);
+        UnityEngine.Object.DestroyImmediate(boss);
+        return prefab != null ? prefab : AssetDatabase.LoadAssetAtPath<GameObject>(WardenBossPrefabPath);
+    }
+
+    private static GameObject CreateKeycardPickupPrefab(Sprite sprite)
+    {
+        GameObject keycard = new GameObject("KeycardPickup");
+        keycard.transform.localScale = new Vector3(0.45f, 0.45f, 1f);
+
+        SpriteRenderer spriteRenderer = keycard.AddComponent<SpriteRenderer>();
+        spriteRenderer.sprite = sprite;
+        spriteRenderer.sortingOrder = 15;
+
+        CircleCollider2D collider = keycard.AddComponent<CircleCollider2D>();
+        collider.isTrigger = true;
+
+        KeycardPickup2D pickup = keycard.AddComponent<KeycardPickup2D>();
+        AssignInt(pickup, "keycardAmount", 1);
+        AssignBool(pickup, "destroyOnPickup", true);
+
+        keycard.AddComponent<PickupBob2D>();
+
+        GameObject prefab = PrefabUtility.SaveAsPrefabAsset(keycard, KeycardPickupPrefabPath);
+        UnityEngine.Object.DestroyImmediate(keycard);
+        return prefab != null ? prefab : AssetDatabase.LoadAssetAtPath<GameObject>(KeycardPickupPrefabPath);
+    }
+
+    private static GameObject CreateLockedGatePrefab(Sprite sprite)
+    {
+        GameObject gate = new GameObject("LockedGate");
+        gate.transform.localScale = new Vector3(0.55f, 2.4f, 1f);
+
+        SpriteRenderer spriteRenderer = gate.AddComponent<SpriteRenderer>();
+        spriteRenderer.sprite = sprite;
+        spriteRenderer.sortingOrder = 8;
+
+        BoxCollider2D blockingCollider = gate.AddComponent<BoxCollider2D>();
+        blockingCollider.isTrigger = false;
+        blockingCollider.size = new Vector2(1f, 1f);
+
+        BoxCollider2D promptCollider = gate.AddComponent<BoxCollider2D>();
+        promptCollider.isTrigger = true;
+        promptCollider.size = new Vector2(4f, 1.5f);
+
+        GameObject promptTrigger = new GameObject("GatePromptTrigger");
+        promptTrigger.transform.SetParent(gate.transform);
+        promptTrigger.transform.localPosition = Vector3.zero;
+        promptTrigger.transform.localRotation = Quaternion.identity;
+        promptTrigger.transform.localScale = Vector3.one;
+
+        LockedGate2D lockedGate = gate.AddComponent<LockedGate2D>();
+        AssignInt(lockedGate, "requiredKeycards", 1);
+        AssignBool(lockedGate, "consumeKeycard", true);
+        AssignEnumByName(lockedGate, "interactKey", nameof(KeyCode.E));
+        AssignObjectReference(lockedGate, "spriteRenderer", spriteRenderer);
+        AssignObjectReference(lockedGate, "gateCollider", blockingCollider);
+        AssignString(lockedGate, "lockedMessage", "Requires keycard");
+        AssignString(lockedGate, "openMessage", "Gate opened");
+
+        GameObject prefab = PrefabUtility.SaveAsPrefabAsset(gate, LockedGatePrefabPath);
+        UnityEngine.Object.DestroyImmediate(gate);
+        return prefab != null ? prefab : AssetDatabase.LoadAssetAtPath<GameObject>(LockedGatePrefabPath);
+    }
+
+    private static GameObject CreateSecurityLaserPrefab(Sprite sprite)
+    {
+        GameObject laser = new GameObject("SecurityLaser");
+        laser.transform.localScale = new Vector3(0.25f, 2.8f, 1f);
+
+        SpriteRenderer spriteRenderer = laser.AddComponent<SpriteRenderer>();
+        spriteRenderer.sprite = sprite;
+        spriteRenderer.sortingOrder = 6;
+
+        BoxCollider2D collider = laser.AddComponent<BoxCollider2D>();
+        collider.isTrigger = true;
+
+        SecurityLaserHazard2D hazard = laser.AddComponent<SecurityLaserHazard2D>();
+        AssignInt(hazard, "damage", 1);
+        AssignFloat(hazard, "damageCooldown", 0.75f);
+        AssignBool(hazard, "startsActive", true);
+        AssignBool(hazard, "toggles", true);
+        AssignFloat(hazard, "activeDuration", 2f);
+        AssignFloat(hazard, "inactiveDuration", 1.5f);
+        AssignObjectReference(hazard, "spriteRenderer", spriteRenderer);
+        AssignObjectReference(hazard, "hazardCollider", collider);
+
+        GameObject prefab = PrefabUtility.SaveAsPrefabAsset(laser, SecurityLaserPrefabPath);
+        UnityEngine.Object.DestroyImmediate(laser);
+        return prefab != null ? prefab : AssetDatabase.LoadAssetAtPath<GameObject>(SecurityLaserPrefabPath);
     }
 
     private static GameObject CreateRewardPrefab(Sprite sprite)
@@ -2355,6 +2840,406 @@ public static class PrototypeSceneBuilder
 
         CameraZone2D zone = zoneObject.AddComponent<CameraZone2D>();
         AssignFloat(zone, "orthographicSize", orthographicSize);
+    }
+
+    private static void CreatePrisonStartCell(Transform parent, Sprite wallSprite, Sprite barsSprite, ObjectiveUI2D objectiveUI)
+    {
+        GameObject startCell = new GameObject("Start_Cell");
+        startCell.transform.SetParent(parent);
+        startCell.transform.position = new Vector3(-28f, 0f, 0f);
+
+        GameObject walls = new GameObject("Walls");
+        walls.transform.SetParent(startCell.transform);
+        CreateWall(walls.transform, "CellWall_Top", wallSprite, new Vector3(-28f, 3f, 0f), new Vector3(7.5f, 0.35f, 1f));
+        CreateWall(walls.transform, "CellWall_Bottom", wallSprite, new Vector3(-28f, -3f, 0f), new Vector3(7.5f, 0.35f, 1f));
+        CreateWall(walls.transform, "CellWall_Left", wallSprite, new Vector3(-31.8f, 0f, 0f), new Vector3(0.35f, 6.2f, 1f));
+
+        GameObject cellBars = new GameObject("CellBars");
+        cellBars.transform.SetParent(startCell.transform);
+        CreateWallSegment(cellBars.transform, "CellBars_Upper", barsSprite, new Vector3(-24.4f, 2.15f, 0f), new Vector3(0.24f, 1.75f, 1f));
+        CreateWallSegment(cellBars.transform, "CellBars_Lower", barsSprite, new Vector3(-24.4f, -2.15f, 0f), new Vector3(0.24f, 1.75f, 1f));
+
+        CreateObjectiveTrigger(
+            startCell.transform,
+            "ObjectiveTrigger_Start",
+            new Vector3(-28f, 0f, 0f),
+            new Vector2(7f, 5.4f),
+            objectiveUI,
+            "Escape the Prison",
+            "WASD move | Mouse aim | Left click shoot | R reload | E interact | Esc pause",
+            false);
+    }
+
+    private static void CreatePrisonGuardRoom(
+        Transform parent,
+        float centerX,
+        Sprite wallSprite,
+        Sprite barsSprite,
+        GameObject guardPrefab,
+        GameObject rangedGuardPrefab,
+        GameObject[] lootPrefabs,
+        ObjectiveUI2D objectiveUI)
+    {
+        GameObject room = new GameObject("Guard_Room_01");
+        room.transform.SetParent(parent);
+        room.transform.position = new Vector3(centerX, 0f, 0f);
+
+        CreateFullRoomWalls(room.transform, wallSprite, centerX, 6.5f, 4f, out DoorController2D leftDoor, out DoorController2D rightDoor);
+
+        GameObject cellBars = new GameObject("CellBars");
+        cellBars.transform.SetParent(room.transform);
+        CreateWallSegment(cellBars.transform, "Bars_01", barsSprite, new Vector3(centerX - 3.3f, 2.2f, 0f), new Vector3(0.18f, 1.5f, 1f));
+        CreateWallSegment(cellBars.transform, "Bars_02", barsSprite, new Vector3(centerX - 3.3f, -2.2f, 0f), new Vector3(0.18f, 1.5f, 1f));
+
+        EnemySpawner2D enemySpawner = CreatePrisonMixedEnemySpawner(
+            room.transform,
+            new[] { guardPrefab, guardPrefab, rangedGuardPrefab },
+            new[]
+            {
+                new Vector3(centerX - 1.8f, 1.4f, 0f),
+                new Vector3(centerX + 0.2f, -1.2f, 0f),
+                new Vector3(centerX + 2.2f, 1.1f, 0f)
+            },
+            new[] { "SpawnPoint_01", "SpawnPoint_02", "SpawnPoint_RangedGuard" });
+
+        RoomLootSpawner2D lootSpawner = CreateNamedLootSpawner(
+            room.transform,
+            lootPrefabs,
+            new[]
+            {
+                new Vector3(centerX + 2.8f, 1.2f, 0f),
+                new Vector3(centerX + 3.4f, 0f, 0f),
+                new Vector3(centerX + 2.8f, -1.2f, 0f)
+            },
+            new[] { "LootSpawnPoint_Keycard", "LootSpawnPoint_Ammo", "LootSpawnPoint_Money" });
+
+        RoomController2D roomController = room.AddComponent<RoomController2D>();
+        AssignObjectReferenceArray(roomController, "doors", new[] { leftDoor, rightDoor });
+        AssignObjectReference(roomController, "enemySpawner", enemySpawner);
+        AssignObjectReference(roomController, "lootSpawner", lootSpawner);
+        AssignObjectReference(roomController, "objectiveUI", objectiveUI);
+        AssignString(roomController, "objectiveOnActivate", "Clear the guard room");
+        AssignString(roomController, "objectiveOnClear", "Collect the keycard and open the prison gate");
+        AssignFloat(roomController, "doorCloseDelay", 0.6f);
+
+        CreateFullRoomTrigger(room.transform, centerX, 11.6f, 6.8f, roomController);
+        CreateCameraZone(room.transform, new Vector3(centerX, 0f, 0f), new Vector2(13f, 8.2f), 7f);
+    }
+
+    private static void CreatePrisonLockedGateArea(Transform parent, float centerX, GameObject lockedGatePrefab, Text gatePromptText, ObjectiveUI2D objectiveUI)
+    {
+        GameObject area = new GameObject("LockedGate_Area");
+        area.transform.SetParent(parent);
+        area.transform.position = new Vector3(centerX, 0f, 0f);
+
+        GameObject gate = InstantiatePrefab(lockedGatePrefab, area.transform, "LockedGate", new Vector3(centerX, 0f, 0f));
+        LockedGate2D lockedGate = gate != null ? gate.GetComponent<LockedGate2D>() : null;
+
+        if (lockedGate != null)
+        {
+            AssignObjectReference(lockedGate, "optionalPromptText", gatePromptText);
+        }
+
+        CreateObjectiveTrigger(
+            area.transform,
+            "ObjectiveTrigger_LockedGate",
+            new Vector3(centerX, 0f, 0f),
+            new Vector2(5f, 5f),
+            objectiveUI,
+            "Open the locked gate",
+            "Press E near the gate if you have a keycard",
+            false);
+    }
+
+    private static void CreatePrisonShopArea(
+        Transform parent,
+        float centerX,
+        Sprite wallSprite,
+        ShopUI2D shopUI,
+        ObjectiveUI2D objectiveUI,
+        GameObject healthShopPrefab,
+        GameObject ammoShopPrefab,
+        GameObject weaponShopPrefab)
+    {
+        GameObject shopArea = new GameObject("Armory_Shop");
+        shopArea.transform.SetParent(parent);
+        shopArea.transform.position = new Vector3(centerX, 0f, 0f);
+
+        BoxCollider2D shopAreaTrigger = shopArea.AddComponent<BoxCollider2D>();
+        shopAreaTrigger.isTrigger = true;
+        shopAreaTrigger.size = new Vector2(7.4f, 5.4f);
+
+        shopArea.AddComponent<ShopArea2D>();
+
+        GameObject shopWalls = new GameObject("ShopWalls");
+        shopWalls.transform.SetParent(shopArea.transform);
+        CreateWall(shopWalls.transform, "ShopWall_Top", wallSprite, new Vector3(centerX, 3f, 0f), new Vector3(8.2f, 0.35f, 1f));
+        CreateWall(shopWalls.transform, "ShopWall_Bottom", wallSprite, new Vector3(centerX, -3f, 0f), new Vector3(8.2f, 0.35f, 1f));
+        CreateWall(shopWalls.transform, "ShopWall_Left_Upper", wallSprite, new Vector3(centerX - 4f, 2f, 0f), new Vector3(0.35f, 2f, 1f));
+        CreateWall(shopWalls.transform, "ShopWall_Left_Lower", wallSprite, new Vector3(centerX - 4f, -2f, 0f), new Vector3(0.35f, 2f, 1f));
+        CreateWall(shopWalls.transform, "ShopWall_Right_Upper", wallSprite, new Vector3(centerX + 4f, 2f, 0f), new Vector3(0.35f, 2f, 1f));
+        CreateWall(shopWalls.transform, "ShopWall_Right_Lower", wallSprite, new Vector3(centerX + 4f, -2f, 0f), new Vector3(0.35f, 2f, 1f));
+
+        InstantiateShopItem(shopArea.transform, healthShopPrefab, "ShopItem_Health", new Vector3(centerX - 1.4f, 1.2f, 0f), shopUI);
+        InstantiateShopItem(shopArea.transform, ammoShopPrefab, "ShopItem_Ammo", new Vector3(centerX, 0f, 0f), shopUI);
+        InstantiateShopItem(shopArea.transform, weaponShopPrefab, "ShopItem_Weapon", new Vector3(centerX + 1.4f, -1.2f, 0f), shopUI);
+
+        CreateObjectiveTrigger(
+            shopArea.transform,
+            "ObjectiveTrigger_ArmoryShop",
+            new Vector3(centerX, 0f, 0f),
+            new Vector2(7.4f, 5.4f),
+            objectiveUI,
+            "Armory: buy supplies if needed",
+            "Press E near an item to buy it",
+            false);
+    }
+
+    private static void CreatePrisonYard(
+        Transform parent,
+        float centerX,
+        Sprite wallSprite,
+        Sprite coverSprite,
+        GameObject securityLaserPrefab,
+        GameObject guardPrefab,
+        GameObject rangedGuardPrefab,
+        GameObject[] lootPrefabs,
+        ObjectiveUI2D objectiveUI)
+    {
+        GameObject room = new GameObject("Prison_Yard");
+        room.transform.SetParent(parent);
+        room.transform.position = new Vector3(centerX, 0f, 0f);
+
+        CreateFullRoomWalls(room.transform, wallSprite, centerX, 6.5f, 4f, out DoorController2D leftDoor, out DoorController2D rightDoor);
+        CreatePrisonCover(room.transform, coverSprite, centerX, new[]
+        {
+            new Vector3(centerX - 2.3f, 1.8f, 0f),
+            new Vector3(centerX - 2.3f, -1.8f, 0f),
+            new Vector3(centerX + 2.2f, 1.2f, 0f),
+            new Vector3(centerX + 2.2f, -1.2f, 0f)
+        });
+        CreatePrisonLasers(room.transform, securityLaserPrefab, new[]
+        {
+            new Vector3(centerX - 0.4f, 2.2f, 0f),
+            new Vector3(centerX + 0.8f, -2.2f, 0f)
+        });
+
+        EnemySpawner2D enemySpawner = CreatePrisonMixedEnemySpawner(
+            room.transform,
+            new[] { guardPrefab, guardPrefab, rangedGuardPrefab, rangedGuardPrefab },
+            new[]
+            {
+                new Vector3(centerX - 2.2f, 1.3f, 0f),
+                new Vector3(centerX - 1f, -1.6f, 0f),
+                new Vector3(centerX + 1.7f, 1.6f, 0f),
+                new Vector3(centerX + 2.4f, -1.3f, 0f)
+            },
+            new[] { "SpawnPoint_01", "SpawnPoint_02", "SpawnPoint_03", "SpawnPoint_RangedGuard" });
+
+        RoomLootSpawner2D lootSpawner = CreateNamedLootSpawner(
+            room.transform,
+            lootPrefabs,
+            new[]
+            {
+                new Vector3(centerX + 2.6f, 1.5f, 0f),
+                new Vector3(centerX + 3.3f, 0.5f, 0f),
+                new Vector3(centerX + 3.3f, -0.5f, 0f),
+                new Vector3(centerX + 2.6f, -1.5f, 0f)
+            },
+            new[] { "LootSpawnPoint_Health", "LootSpawnPoint_Ammo", "LootSpawnPoint_Money", "LootSpawnPoint_Weapon" });
+
+        RoomController2D roomController = room.AddComponent<RoomController2D>();
+        AssignObjectReferenceArray(roomController, "doors", new[] { leftDoor, rightDoor });
+        AssignObjectReference(roomController, "enemySpawner", enemySpawner);
+        AssignObjectReference(roomController, "lootSpawner", lootSpawner);
+        AssignObjectReference(roomController, "objectiveUI", objectiveUI);
+        AssignString(roomController, "objectiveOnActivate", "Clear the prison yard");
+        AssignString(roomController, "objectiveOnClear", "Proceed to the riot miniboss");
+        AssignFloat(roomController, "doorCloseDelay", 0.6f);
+
+        CreateFullRoomTrigger(room.transform, centerX, 11.6f, 6.8f, roomController);
+        CreateCameraZone(room.transform, new Vector3(centerX, 0f, 0f), new Vector2(13f, 8.2f), 7f);
+    }
+
+    private static void CreatePrisonMinibossRoom(
+        Transform parent,
+        float centerX,
+        Sprite wallSprite,
+        GameObject minibossPrefab,
+        BuffChoiceController2D buffChoiceController,
+        ObjectiveUI2D objectiveUI)
+    {
+        GameObject room = new GameObject("Miniboss_Room");
+        room.transform.SetParent(parent);
+        room.transform.position = new Vector3(centerX, 0f, 0f);
+
+        CreateFullRoomWalls(room.transform, wallSprite, centerX, 5f, 4f, out DoorController2D leftDoor, out DoorController2D rightDoor);
+        EnemySpawner2D enemySpawner = CreatePrisonMixedEnemySpawner(
+            room.transform,
+            new[] { minibossPrefab },
+            new[] { new Vector3(centerX + 1f, 0f, 0f) },
+            new[] { "SpawnPoint_Miniboss" });
+
+        RoomController2D roomController = room.AddComponent<RoomController2D>();
+        AssignObjectReferenceArray(roomController, "doors", new[] { leftDoor, rightDoor });
+        AssignObjectReference(roomController, "enemySpawner", enemySpawner);
+        AssignObjectReference(roomController, "buffChoiceController", buffChoiceController);
+        AssignBool(roomController, "showBuffChoiceOnClear", true);
+        AssignObjectReference(roomController, "objectiveUI", objectiveUI);
+        AssignString(roomController, "objectiveOnActivate", "Defeat Riot Brute");
+        AssignString(roomController, "objectiveOnClear", "Choose a buff, then confront the Warden");
+        AssignFloat(roomController, "doorCloseDelay", 0.6f);
+
+        CreateFullRoomTrigger(room.transform, centerX, 8.8f, 6.8f, roomController);
+        CreateCameraZone(room.transform, new Vector3(centerX, 0f, 0f), new Vector2(10f, 8.2f), 7f);
+    }
+
+    private static void CreatePrisonBossRoom(
+        Transform parent,
+        float centerX,
+        Sprite wallSprite,
+        Sprite coverSprite,
+        GameObject securityLaserPrefab,
+        GameObject bossPrefab,
+        LevelEndController2D levelEndController,
+        ObjectiveUI2D objectiveUI)
+    {
+        GameObject room = new GameObject("Warden_Boss_Room");
+        room.transform.SetParent(parent);
+        room.transform.position = new Vector3(centerX, 0f, 0f);
+
+        CreateFullRoomWalls(room.transform, wallSprite, centerX, 9f, 5f, out DoorController2D leftDoor, out DoorController2D rightDoor);
+        CreatePrisonCover(room.transform, coverSprite, centerX, new[]
+        {
+            new Vector3(centerX - 3f, 2f, 0f),
+            new Vector3(centerX - 3f, -2f, 0f),
+            new Vector3(centerX + 1.7f, 2f, 0f),
+            new Vector3(centerX + 1.7f, -2f, 0f)
+        });
+        CreatePrisonLasers(room.transform, securityLaserPrefab, new[]
+        {
+            new Vector3(centerX - 5.4f, 0f, 0f),
+            new Vector3(centerX + 5.4f, 0f, 0f)
+        });
+
+        EnemySpawner2D enemySpawner = CreatePrisonMixedEnemySpawner(
+            room.transform,
+            new[] { bossPrefab },
+            new[] { new Vector3(centerX + 2f, 0f, 0f) },
+            new[] { "SpawnPoint_Boss" });
+
+        RoomController2D roomController = room.AddComponent<RoomController2D>();
+        AssignObjectReferenceArray(roomController, "doors", new[] { leftDoor, rightDoor });
+        AssignObjectReference(roomController, "enemySpawner", enemySpawner);
+        AssignObjectReference(roomController, "levelEndController", levelEndController);
+        AssignBool(roomController, "showVictoryOnClear", true);
+        AssignString(roomController, "victoryMessage", "PRISON ESCAPED");
+        AssignObjectReference(roomController, "objectiveUI", objectiveUI);
+        AssignString(roomController, "objectiveOnActivate", "Defeat the Warden");
+        AssignString(roomController, "objectiveOnClear", "Prison escaped");
+        AssignFloat(roomController, "doorCloseDelay", 0.6f);
+
+        CreateFullRoomTrigger(room.transform, centerX, 16.8f, 8.6f, roomController);
+        CreateCameraZone(room.transform, new Vector3(centerX, 0f, 0f), new Vector2(17.4f, 9.2f), 8f);
+    }
+
+    private static EnemySpawner2D CreatePrisonMixedEnemySpawner(Transform parent, GameObject[] enemyPrefabs, Vector3[] spawnPositions, string[] spawnNames)
+    {
+        GameObject spawnerObject = new GameObject("EnemySpawner");
+        spawnerObject.transform.SetParent(parent);
+
+        Transform[] spawnPoints = new Transform[spawnPositions.Length];
+
+        for (int i = 0; i < spawnPositions.Length; i++)
+        {
+            string spawnName = spawnNames != null && i < spawnNames.Length && !string.IsNullOrWhiteSpace(spawnNames[i])
+                ? spawnNames[i]
+                : $"SpawnPoint_{i + 1:00}";
+
+            spawnPoints[i] = CreateMarker(spawnerObject.transform, spawnName, spawnPositions[i]);
+        }
+
+        EnemySpawner2D spawner = spawnerObject.AddComponent<EnemySpawner2D>();
+        AssignObjectReference(spawner, "enemyPrefab", enemyPrefabs != null && enemyPrefabs.Length > 0 ? enemyPrefabs[0] : null);
+        AssignObjectReferenceArray(spawner, "enemyPrefabs", enemyPrefabs);
+        AssignObjectReferenceArray(spawner, "spawnPoints", spawnPoints);
+        AssignInt(spawner, "enemyCount", enemyPrefabs != null ? enemyPrefabs.Length : 0);
+
+        return spawner;
+    }
+
+    private static RoomLootSpawner2D CreateNamedLootSpawner(Transform parent, GameObject[] lootPrefabs, Vector3[] lootPositions, string[] spawnNames)
+    {
+        GameObject lootSpawnerObject = new GameObject("LootSpawner");
+        lootSpawnerObject.transform.SetParent(parent);
+
+        Transform[] spawnPoints = new Transform[lootPositions.Length];
+
+        for (int i = 0; i < lootPositions.Length; i++)
+        {
+            string spawnName = spawnNames != null && i < spawnNames.Length && !string.IsNullOrWhiteSpace(spawnNames[i])
+                ? spawnNames[i]
+                : $"LootSpawnPoint_{i + 1:00}";
+
+            spawnPoints[i] = CreateMarker(lootSpawnerObject.transform, spawnName, lootPositions[i]);
+        }
+
+        RoomLootSpawner2D lootSpawner = lootSpawnerObject.AddComponent<RoomLootSpawner2D>();
+        AssignObjectReferenceArray(lootSpawner, "lootPrefabs", lootPrefabs);
+        AssignObjectReferenceArray(lootSpawner, "spawnPoints", spawnPoints);
+        AssignBool(lootSpawner, "spawnAll", true);
+        AssignInt(lootSpawner, "randomSpawnCount", lootPrefabs != null ? lootPrefabs.Length : 0);
+
+        return lootSpawner;
+    }
+
+    private static void CreatePrisonCover(Transform parent, Sprite sprite, float centerX, Vector3[] positions)
+    {
+        GameObject coverRoot = new GameObject("Cover");
+        coverRoot.transform.SetParent(parent);
+
+        for (int i = 0; i < positions.Length; i++)
+        {
+            CreateCoverObject(coverRoot.transform, $"Cover_{i + 1:00}", sprite, positions[i]);
+        }
+    }
+
+    private static void CreatePrisonLasers(Transform parent, GameObject securityLaserPrefab, Vector3[] positions)
+    {
+        GameObject lasersRoot = new GameObject("SecurityLasers");
+        lasersRoot.transform.SetParent(parent);
+
+        for (int i = 0; i < positions.Length; i++)
+        {
+            GameObject laser = InstantiatePrefab(securityLaserPrefab, lasersRoot.transform, $"Laser_{i + 1:00}", positions[i]);
+
+            if (laser != null && i % 2 == 1)
+            {
+                laser.transform.rotation = Quaternion.Euler(0f, 0f, 90f);
+            }
+        }
+    }
+
+    private static GameObject InstantiatePrefab(GameObject prefab, Transform parent, string fallbackName, Vector3 position)
+    {
+        if (prefab == null)
+        {
+            GameObject fallback = new GameObject(fallbackName);
+            fallback.transform.SetParent(parent);
+            fallback.transform.position = position;
+            return fallback;
+        }
+
+        GameObject instance = PrefabUtility.InstantiatePrefab(prefab, parent) as GameObject;
+
+        if (instance == null)
+        {
+            instance = UnityEngine.Object.Instantiate(prefab, position, Quaternion.identity, parent);
+        }
+
+        instance.name = fallbackName;
+        instance.transform.position = position;
+        return instance;
     }
 
     private static void CreateWallWithDoorGap(Transform parent, string name, Sprite sprite, float x)
@@ -3745,6 +4630,61 @@ public static class PrototypeSceneBuilder
         return gameOverPanel;
     }
 
+    private static void AddPrisonKeycardUI(Transform root, PlayerKeyring2D playerKeyring)
+    {
+        Transform resourcePanelTransform = root.Find("UI/Canvas/ResourcePanel");
+
+        if (resourcePanelTransform == null)
+        {
+            Debug.LogWarning("Could not add keycard UI because ResourcePanel was not found.");
+            return;
+        }
+
+        RectTransform resourcePanelRect = resourcePanelTransform.GetComponent<RectTransform>();
+
+        if (resourcePanelRect != null)
+        {
+            resourcePanelRect.sizeDelta = new Vector2(470f, 148f);
+        }
+
+        RepositionResourceText(resourcePanelTransform, "AmmoText", new Vector2(0f, -8f), new Vector2(0f, 1f), new Vector2(1f, 1f), new Vector2(0.5f, 1f));
+        RepositionResourceText(resourcePanelTransform, "MoneyText", Vector2.zero, new Vector2(0f, 0.72f), new Vector2(1f, 0.72f), new Vector2(0.5f, 0.5f));
+        RepositionResourceText(resourcePanelTransform, "WeaponText", Vector2.zero, new Vector2(0f, 0.47f), new Vector2(1f, 0.47f), new Vector2(0.5f, 0.5f));
+        RepositionResourceText(resourcePanelTransform, "BuffStatusText", Vector2.zero, new Vector2(0f, 0.23f), new Vector2(1f, 0.23f), new Vector2(0.5f, 0.5f));
+
+        GameObject keycardTextObject = CreateRectObject("KeycardText", resourcePanelTransform);
+        SetRectTransform(keycardTextObject.GetComponent<RectTransform>(), new Vector2(0f, 0f), new Vector2(1f, 0f), new Vector2(0.5f, 0f), new Vector2(0f, 8f), new Vector2(-16f, 24f));
+
+        Text keycardText = keycardTextObject.AddComponent<Text>();
+        keycardText.font = GetBuiltinUIFont();
+        keycardText.text = "Keycards: 0";
+        keycardText.fontSize = 16;
+        keycardText.alignment = TextAnchor.MiddleLeft;
+        keycardText.color = Color.white;
+        keycardText.raycastTarget = false;
+
+        KeycardUI2D keycardUI = resourcePanelTransform.gameObject.AddComponent<KeycardUI2D>();
+        AssignObjectReference(keycardUI, "playerKeyring", playerKeyring);
+        AssignObjectReference(keycardUI, "keycardText", keycardText);
+    }
+
+    private static void RepositionResourceText(Transform resourcePanelTransform, string childName, Vector2 anchoredPosition, Vector2 anchorMin, Vector2 anchorMax, Vector2 pivot)
+    {
+        Transform child = resourcePanelTransform.Find(childName);
+
+        if (child == null)
+        {
+            return;
+        }
+
+        RectTransform rectTransform = child.GetComponent<RectTransform>();
+
+        if (rectTransform != null)
+        {
+            SetRectTransform(rectTransform, anchorMin, anchorMax, pivot, anchoredPosition, new Vector2(-16f, 24f));
+        }
+    }
+
     private static void AddFinalDemoUiOverlays(Transform root, out GameObject pausePanel, out DemoMessageUI2D demoMessageUI)
     {
         Transform canvasTransform = root.Find("UI/Canvas");
@@ -4054,6 +4994,106 @@ public static class PrototypeSceneBuilder
         AssignObjectReference(audioManager, "gameOverClip", AssetDatabase.LoadAssetAtPath<AudioClip>(GameOverAudioPath));
         AssignFloat(audioManager, "volume", 0.6f);
 
+        _ = demoMessageUI;
+    }
+
+    private static void CreatePrisonGameSystems(
+        Transform parent,
+        PlayerHealth2D playerHealth,
+        GameObject gameOverPanel,
+        PlayerBuffs2D playerBuffs,
+        BuffDefinition2D[] buffPool,
+        GameObject choicePanel,
+        Button[] choiceButtons,
+        Text[] choiceTexts,
+        ObjectiveUI2D objectiveUI,
+        GameObject victoryPanel,
+        Text victoryText,
+        GameObject pausePanel,
+        DemoMessageUI2D demoMessageUI,
+        out BuffChoiceController2D buffChoiceController,
+        out LevelEndController2D levelEndController)
+    {
+        GameObject gameSystems = new GameObject("GameSystems");
+        gameSystems.transform.SetParent(parent);
+
+        GameObject gameOverControllerObject = new GameObject("GameOverController");
+        gameOverControllerObject.transform.SetParent(gameSystems.transform);
+
+        GameOverController2D gameOverController = gameOverControllerObject.AddComponent<GameOverController2D>();
+        AssignObjectReference(gameOverController, "playerHealth", playerHealth);
+        AssignObjectReference(gameOverController, "gameOverPanel", gameOverPanel);
+        AssignString(gameOverController, "restartKey", "r");
+
+        GameObject levelEndControllerObject = new GameObject("LevelEndController");
+        levelEndControllerObject.transform.SetParent(gameSystems.transform);
+
+        levelEndController = levelEndControllerObject.AddComponent<LevelEndController2D>();
+        AssignObjectReference(levelEndController, "victoryPanel", victoryPanel);
+        AssignObjectReference(levelEndController, "victoryText", victoryText);
+        AssignString(levelEndController, "restartKey", "r");
+        AssignBool(levelEndController, "pauseOnVictory", true);
+
+        if (victoryText != null)
+        {
+            victoryText.text = "PRISON ESCAPED\nPress R to restart";
+        }
+
+        GameObject levelFlowControllerObject = new GameObject("LevelFlowController");
+        levelFlowControllerObject.transform.SetParent(gameSystems.transform);
+
+        LevelFlowController2D levelFlowController = levelFlowControllerObject.AddComponent<LevelFlowController2D>();
+        AssignObjectReference(levelFlowController, "objectiveUI", objectiveUI);
+        AssignObjectReference(levelFlowController, "levelEndController", levelEndController);
+        AssignString(levelFlowController, "levelName", "Prison Escape");
+        AssignString(levelFlowController, "startingObjective", "Escape the Prison");
+        AssignString(levelFlowController, "controlsHint", "WASD move | Mouse aim | Left click shoot | R reload | E interact | Esc pause");
+
+        GameObject buffChoiceControllerObject = new GameObject("BuffChoiceController");
+        buffChoiceControllerObject.transform.SetParent(gameSystems.transform);
+
+        buffChoiceController = buffChoiceControllerObject.AddComponent<BuffChoiceController2D>();
+        AssignObjectReference(buffChoiceController, "playerBuffs", playerBuffs);
+        AssignObjectReferenceArray(buffChoiceController, "buffPool", buffPool);
+        AssignObjectReference(buffChoiceController, "choicePanel", choicePanel);
+        AssignObjectReferenceArray(buffChoiceController, "choiceButtons", choiceButtons);
+        AssignObjectReferenceArray(buffChoiceController, "choiceTexts", choiceTexts);
+        AssignBool(buffChoiceController, "pauseGameWhileChoosing", true);
+        AssignInt(buffChoiceController, "choicesToShow", 3);
+
+        GameObject pauseControllerObject = new GameObject("PauseMenuController");
+        pauseControllerObject.transform.SetParent(gameSystems.transform);
+
+        PauseMenuController2D pauseController = pauseControllerObject.AddComponent<PauseMenuController2D>();
+        AssignObjectReference(pauseController, "pausePanel", pausePanel);
+        AssignString(pauseController, "mainMenuSceneName", "MainMenu");
+        AssignEnumByName(pauseController, "pauseKey", nameof(KeyCode.Escape));
+        WirePauseButton(pausePanel, "ResumeButton", pauseController.Resume);
+        WirePauseButton(pausePanel, "RestartButton", pauseController.RestartScene);
+        WirePauseButton(pausePanel, "MainMenuButton", pauseController.ReturnToMainMenu);
+
+        GameObject audioObject = new GameObject("DemoAudioManager");
+        audioObject.transform.SetParent(gameSystems.transform);
+
+        AudioSource audioSource = audioObject.AddComponent<AudioSource>();
+        DemoAudioManager2D audioManager = audioObject.AddComponent<DemoAudioManager2D>();
+        AssignObjectReference(audioManager, "sfxSource", audioSource);
+        AssignObjectReference(audioManager, "shootClip", AssetDatabase.LoadAssetAtPath<AudioClip>(ShootAudioPath));
+        AssignObjectReference(audioManager, "hitClip", AssetDatabase.LoadAssetAtPath<AudioClip>(HitAudioPath));
+        AssignObjectReference(audioManager, "pickupClip", AssetDatabase.LoadAssetAtPath<AudioClip>(PickupAudioPath));
+        AssignObjectReference(audioManager, "doorClip", AssetDatabase.LoadAssetAtPath<AudioClip>(DoorAudioPath));
+        AssignObjectReference(audioManager, "shopClip", AssetDatabase.LoadAssetAtPath<AudioClip>(ShopAudioPath));
+        AssignObjectReference(audioManager, "buffClip", AssetDatabase.LoadAssetAtPath<AudioClip>(BuffAudioPath));
+        AssignObjectReference(audioManager, "bossPhaseClip", AssetDatabase.LoadAssetAtPath<AudioClip>(BossPhaseAudioPath));
+        AssignObjectReference(audioManager, "victoryClip", AssetDatabase.LoadAssetAtPath<AudioClip>(VictoryAudioPath));
+        AssignObjectReference(audioManager, "gameOverClip", AssetDatabase.LoadAssetAtPath<AudioClip>(GameOverAudioPath));
+        AssignObjectReference(audioManager, "laserClip", AssetDatabase.LoadAssetAtPath<AudioClip>(LaserAudioPath));
+        AssignObjectReference(audioManager, "keycardClip", AssetDatabase.LoadAssetAtPath<AudioClip>(KeycardAudioPath));
+        AssignFloat(audioManager, "volume", 0.6f);
+
+        GameObject demoMessageObject = new GameObject("DemoMessageUI");
+        demoMessageObject.transform.SetParent(gameSystems.transform);
+        _ = demoMessageObject;
         _ = demoMessageUI;
     }
 
@@ -4521,6 +5561,247 @@ public static class PrototypeSceneBuilder
         bool weapon = (x >= 16 && x < 50 && y >= 35 && y < 41) || (x >= 24 && x < 33 && y >= 18 && y < 36);
         bool priceDot = x >= 45 && x < 51 && y >= 12 && y < 18;
         return weapon || priceDot ? Color.white : basePixel;
+    }
+
+    private static Color CreatePrisonPlayerStartMarkerPixel(int x, int y, int size)
+    {
+        float center = size * 0.5f;
+        float distance = Mathf.Abs(x + 0.5f - center) + Mathf.Abs(y + 0.5f - center);
+
+        if (distance > size * 0.36f)
+        {
+            return Color.clear;
+        }
+
+        return distance > size * 0.29f
+            ? new Color(0.08f, 0.1f, 0.14f, 1f)
+            : new Color(0.38f, 0.55f, 0.7f, 1f);
+    }
+
+    private static Color CreatePrisonWallPixel(int x, int y, int size)
+    {
+        bool border = x < 4 || y < 4 || x >= size - 4 || y >= size - 4;
+        bool seam = x % 18 < 2 || y % 18 < 2;
+        bool stripe = (x * 2 + y) % 20 < 10;
+
+        if (border)
+        {
+            return new Color(0.04f, 0.06f, 0.08f, 1f);
+        }
+
+        if (seam)
+        {
+            return new Color(0.12f, 0.16f, 0.2f, 1f);
+        }
+
+        return stripe
+            ? new Color(0.25f, 0.31f, 0.36f, 1f)
+            : new Color(0.18f, 0.24f, 0.3f, 1f);
+    }
+
+    private static Color CreatePrisonBarsPixel(int x, int y, int size)
+    {
+        bool verticalBar = x % 16 < 5;
+        bool horizontalRivet = y < 7 || y >= size - 7 || Mathf.Abs(y - size * 0.5f) < 3f;
+
+        if (!verticalBar && !horizontalRivet)
+        {
+            return Color.clear;
+        }
+
+        bool highlight = verticalBar && x % 16 == 1;
+        return highlight
+            ? new Color(0.58f, 0.68f, 0.74f, 1f)
+            : new Color(0.25f, 0.35f, 0.42f, 1f);
+    }
+
+    private static Color CreatePrisonFloorPixel(int x, int y, int size)
+    {
+        bool tileLine = x % 16 == 0 || y % 16 == 0;
+
+        if (tileLine)
+        {
+            return new Color(0.1f, 0.13f, 0.16f, 1f);
+        }
+
+        return (x + y) % 18 < 9
+            ? new Color(0.16f, 0.2f, 0.23f, 1f)
+            : new Color(0.13f, 0.17f, 0.2f, 1f);
+    }
+
+    private static Color CreatePrisonGuardPixel(int x, int y, int size)
+    {
+        Color basePixel = CirclePixel(x, y, size, new Color(0.25f, 0.38f, 0.54f, 1f), new Color(0.05f, 0.08f, 0.12f, 1f));
+
+        if (basePixel.a <= 0f)
+        {
+            return basePixel;
+        }
+
+        bool visor = y > size * 0.54f && y < size * 0.62f && x > size * 0.25f && x < size * 0.75f;
+        bool badge = x > size * 0.58f && x < size * 0.68f && y > size * 0.34f && y < size * 0.46f;
+
+        if (visor)
+        {
+            return new Color(0.06f, 0.08f, 0.1f, 1f);
+        }
+
+        return badge ? new Color(0.95f, 0.78f, 0.16f, 1f) : basePixel;
+    }
+
+    private static Color CreatePrisonRangedGuardPixel(int x, int y, int size)
+    {
+        Color basePixel = CirclePixel(x, y, size, new Color(0.18f, 0.48f, 0.52f, 1f), new Color(0.03f, 0.09f, 0.11f, 1f));
+
+        if (basePixel.a <= 0f)
+        {
+            return basePixel;
+        }
+
+        bool rifle = x > size * 0.58f && x < size * 0.92f && y > size * 0.45f && y < size * 0.55f;
+        bool scope = x > size * 0.45f && x < size * 0.58f && y > size * 0.56f && y < size * 0.64f;
+
+        if (rifle || scope)
+        {
+            return new Color(0.04f, 0.04f, 0.05f, 1f);
+        }
+
+        return basePixel;
+    }
+
+    private static Color CreatePrisonBruteMinibossPixel(int x, int y, int size)
+    {
+        Color basePixel = CirclePixel(x, y, size, new Color(0.7f, 0.28f, 0.12f, 1f), new Color(0.16f, 0.05f, 0.02f, 1f));
+
+        if (basePixel.a <= 0f)
+        {
+            return basePixel;
+        }
+
+        float center = size * 0.5f;
+        bool stripe = Mathf.Abs(x + 0.5f - center) < size * 0.09f || Mathf.Abs(y + 0.5f - center) < size * 0.09f;
+        bool shoulder = y > size * 0.58f && Mathf.Abs(x + 0.5f - center) > size * 0.24f;
+
+        if (stripe)
+        {
+            return new Color(0.95f, 0.88f, 0.18f, 1f);
+        }
+
+        return shoulder ? new Color(0.1f, 0.12f, 0.14f, 1f) : basePixel;
+    }
+
+    private static Color CreateWardenBossPixel(int x, int y, int size)
+    {
+        Color basePixel = CirclePixel(x, y, size, new Color(0.12f, 0.16f, 0.28f, 1f), new Color(0.02f, 0.03f, 0.06f, 1f));
+
+        if (basePixel.a <= 0f)
+        {
+            return basePixel;
+        }
+
+        float center = size * 0.5f;
+        float dx = Mathf.Abs(x + 0.5f - center);
+        bool cap = y > size * 0.62f && dx < size * 0.34f;
+        bool badge = dx < size * 0.1f && y > size * 0.36f && y < size * 0.52f;
+        bool eyes = y > size * 0.52f && y < size * 0.58f && dx > size * 0.1f && dx < size * 0.24f;
+
+        if (cap)
+        {
+            return new Color(0.04f, 0.06f, 0.12f, 1f);
+        }
+
+        if (badge)
+        {
+            return new Color(0.95f, 0.78f, 0.14f, 1f);
+        }
+
+        return eyes ? new Color(0.9f, 0.12f, 0.1f, 1f) : basePixel;
+    }
+
+    private static Color CreateKeycardPixel(int x, int y, int size)
+    {
+        bool body = x >= 10 && x < size - 10 && y >= 18 && y < size - 18;
+
+        if (!body)
+        {
+            return Color.clear;
+        }
+
+        bool border = x < 14 || x >= size - 14 || y < 22 || y >= size - 22;
+        bool chip = x >= 18 && x < 29 && y >= 29 && y < 40;
+        bool stripe = x >= 34 && x < size - 16 && y >= 34 && y < 39;
+
+        if (border)
+        {
+            return new Color(0.1f, 0.16f, 0.18f, 1f);
+        }
+
+        if (chip)
+        {
+            return new Color(0.95f, 0.78f, 0.18f, 1f);
+        }
+
+        return stripe ? Color.white : new Color(0.12f, 0.82f, 0.92f, 1f);
+    }
+
+    private static Color CreateLockedGatePixel(int x, int y, int size)
+    {
+        bool verticalBar = x % 14 < 5;
+        bool frame = x < 7 || x >= size - 7 || y < 7 || y >= size - 7;
+        bool lockBody = x >= 25 && x < 39 && y >= 24 && y < 38;
+
+        if (lockBody)
+        {
+            return new Color(0.95f, 0.72f, 0.08f, 1f);
+        }
+
+        if (frame || verticalBar)
+        {
+            return new Color(0.34f, 0.44f, 0.5f, 1f);
+        }
+
+        return Color.clear;
+    }
+
+    private static Color CreateSecurityLaserPixel(int x, int y, int size)
+    {
+        float center = size * 0.5f;
+        bool core = Mathf.Abs(x + 0.5f - center) < size * 0.08f;
+        bool glow = Mathf.Abs(x + 0.5f - center) < size * 0.18f;
+        bool emitter = y < 7 || y >= size - 7;
+
+        if (emitter)
+        {
+            return new Color(0.18f, 0.2f, 0.22f, 1f);
+        }
+
+        if (core)
+        {
+            return new Color(1f, 0.08f, 0.06f, 1f);
+        }
+
+        return glow ? new Color(1f, 0.05f, 0.05f, 0.45f) : Color.clear;
+    }
+
+    private static Color CreatePrisonCoverPixel(int x, int y, int size)
+    {
+        bool body = x >= 8 && x < size - 8 && y >= 8 && y < size - 8;
+        bool border = x < 12 || y < 12 || x >= size - 12 || y >= size - 12;
+        bool warningStripe = body && ((x + y) % 18 < 7);
+
+        if (!body)
+        {
+            return Color.clear;
+        }
+
+        if (border)
+        {
+            return new Color(0.05f, 0.08f, 0.1f, 1f);
+        }
+
+        return warningStripe
+            ? new Color(0.52f, 0.58f, 0.18f, 1f)
+            : new Color(0.22f, 0.28f, 0.3f, 1f);
     }
 
     private static Color CirclePixel(int x, int y, int size, Color fill, Color outline)

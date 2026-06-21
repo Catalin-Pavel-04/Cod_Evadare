@@ -6,6 +6,9 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
+    path: Assets/_Project/Scenes/MainMenu.unity
+    guid: 09ed356a5fa70eb429e999af14bb5627
+  - enabled: 1
     path: Assets/Scenes/SampleScene.unity
     guid: 8c9cfa26abfee488c85f1582747f6a02
   - enabled: 1
@@ -38,4 +41,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/_Project/Scenes/Prototype_FinalDemo.unity
     guid: 67cb695baa6099243bf6cc24cc6a0172
+  - enabled: 1
+    path: Assets/_Project/Scenes/Prototype_PrisonLevel.unity
+    guid: e4bce64cfe72c4248b0efdeabae0cb97
   m_configObjects: {}
