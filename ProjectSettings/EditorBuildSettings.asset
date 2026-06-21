@@ -32,4 +32,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/_Project/Scenes/Prototype_BossFight.unity
     guid: 2d98e10f6dd01154bbe971516bfabfae
+  - enabled: 1
+    path: Assets/_Project/Scenes/Prototype_FullLaboratoryLevel.unity
+    guid: 9e5fc42b4a3de214a909d0db86072bc4
   m_configObjects: {}

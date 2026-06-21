@@ -20,6 +20,7 @@ public static class PrototypeSceneBuilder
     private const string ShopScenePath = "Assets/_Project/Scenes/Prototype_Shop.unity";
     private const string MinibossBuffScenePath = "Assets/_Project/Scenes/Prototype_MinibossBuffs.unity";
     private const string BossFightScenePath = "Assets/_Project/Scenes/Prototype_BossFight.unity";
+    private const string FullLaboratoryLevelScenePath = "Assets/_Project/Scenes/Prototype_FullLaboratoryLevel.unity";
     private const string BulletPrefabPath = "Assets/_Project/Prefabs/Weapons/Bullet.prefab";
     private const string EnemyPrefabPath = "Assets/_Project/Prefabs/Enemies/TestEnemy.prefab";
     private const string MinibossPrefabPath = "Assets/_Project/Prefabs/Enemies/PrototypeMiniboss.prefab";
@@ -100,6 +101,7 @@ public static class PrototypeSceneBuilder
         "Assets/_Project/Scripts/Boss",
         "Assets/_Project/Scripts/Core",
         "Assets/_Project/Scripts/Environment",
+        "Assets/_Project/Scripts/Level",
         "Assets/_Project/Scripts/Loot",
         "Assets/_Project/Scripts/Projectiles",
         "Assets/_Project/Scripts/Resources",
@@ -634,6 +636,158 @@ public static class PrototypeSceneBuilder
         AssetDatabase.Refresh();
 
         Debug.Log($"Created Prototype 0.8 boss fight scene at {BossFightScenePath}.");
+    }
+
+    [MenuItem("Tools/Cod Evadare/Create Prototype 0.9 Full Laboratory Level")]
+    public static void CreatePrototypeFullLaboratoryLevel()
+    {
+        if (!Application.isBatchMode && !EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo())
+        {
+            return;
+        }
+
+        CreateRequiredFolders();
+        GeneratePlaceholderSprites();
+        EnsureTag(PlayerTag);
+
+        Scene scene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
+        SceneManager.SetActiveScene(scene);
+
+        Sprite playerSprite = AssetDatabase.LoadAssetAtPath<Sprite>(PlayerSpritePath);
+        Sprite enemySprite = AssetDatabase.LoadAssetAtPath<Sprite>(EnemySpritePath);
+        Sprite minibossSprite = AssetDatabase.LoadAssetAtPath<Sprite>(MinibossSpritePath);
+        Sprite bossSprite = AssetDatabase.LoadAssetAtPath<Sprite>(BossSpritePath);
+        Sprite bulletSprite = AssetDatabase.LoadAssetAtPath<Sprite>(BulletSpritePath);
+        Sprite enemyProjectileSprite = AssetDatabase.LoadAssetAtPath<Sprite>(EnemyProjectileSpritePath);
+        Sprite wallSprite = AssetDatabase.LoadAssetAtPath<Sprite>(WallSpritePath);
+        Sprite bossWallSprite = AssetDatabase.LoadAssetAtPath<Sprite>(BossArenaWallSpritePath);
+        Sprite coverSprite = AssetDatabase.LoadAssetAtPath<Sprite>(CoverSpritePath);
+        Sprite healthPickupSprite = AssetDatabase.LoadAssetAtPath<Sprite>(HealthPickupSpritePath);
+        Sprite ammoPickupSprite = AssetDatabase.LoadAssetAtPath<Sprite>(AmmoPickupSpritePath);
+        Sprite moneyPickupSprite = AssetDatabase.LoadAssetAtPath<Sprite>(MoneyPickupSpritePath);
+        Sprite weaponPickupSprite = AssetDatabase.LoadAssetAtPath<Sprite>(WeaponPickupSpritePath);
+        Sprite shopHealthSprite = AssetDatabase.LoadAssetAtPath<Sprite>(ShopHealthSpritePath);
+        Sprite shopAmmoSprite = AssetDatabase.LoadAssetAtPath<Sprite>(ShopAmmoSpritePath);
+        Sprite shopWeaponSprite = AssetDatabase.LoadAssetAtPath<Sprite>(ShopWeaponSpritePath);
+
+        GameObject root = new GameObject("Prototype_FullLaboratoryLevel");
+        GameObject cameraObject = CreateCamera(root.transform);
+        CreateLighting(root.transform);
+
+        GameObject player = CreatePlayer(root.transform, playerSprite, out Transform firePoint, out PlayerShooting2D playerShooting);
+        player.transform.position = new Vector3(-24f, 0f, 0f);
+
+        PlayerHealth2D playerHealth = player.AddComponent<PlayerHealth2D>();
+        AssignInt(playerHealth, "maxHealth", 6);
+        AssignFloat(playerHealth, "invincibilityDuration", 0.75f);
+        AssignBool(playerHealth, "destroyOnDeath", false);
+
+        PlayerResources2D playerResources = player.AddComponent<PlayerResources2D>();
+        AssignInt(playerResources, "startingAmmo", 90);
+        AssignInt(playerResources, "maxAmmo", 150);
+        AssignInt(playerResources, "startingMoney", 50);
+
+        PlayerBuffs2D playerBuffs = player.AddComponent<PlayerBuffs2D>();
+
+        GameObject bulletPrefab = GetOrCreateBulletPrefab(bulletSprite);
+        WeaponDefinition2D pistol = CreateWeaponDefinition(PistolWeaponPath, "Pistol", WeaponRarity2D.Common, bulletPrefab, 0.2f, 12, 1, 1f, 1, 12f, 2f, 1, 0f);
+        CreateWeaponDefinition(SMGWeaponPath, "SMG", WeaponRarity2D.Rare, bulletPrefab, 0.08f, 24, 1, 1.2f, 1, 13f, 2f, 1, 3f);
+        WeaponDefinition2D shotgun = CreateWeaponDefinition(ShotgunWeaponPath, "Shotgun", WeaponRarity2D.Epic, bulletPrefab, 0.55f, 6, 1, 1.4f, 1, 11f, 1.2f, 5, 35f);
+
+        AssignObjectReference(playerShooting, "firePoint", firePoint);
+        AssignObjectReference(playerShooting, "bulletPrefab", bulletPrefab);
+        AssignBool(playerShooting, "useAmmo", true);
+        AssignObjectReference(playerShooting, "playerResources", playerResources);
+        AssignObjectReference(playerShooting, "startingWeapon", pistol);
+        AssignObjectReference(playerShooting, "equippedWeapon", pistol);
+
+        CameraFollow2D cameraFollow = cameraObject.GetComponent<CameraFollow2D>();
+        AssignObjectReference(cameraFollow, "target", player.transform);
+
+        GameObject enemyPrefab = CreateEnemyPrefab(enemySprite);
+        GameObject minibossPrefab = CreateMinibossPrefab(minibossSprite);
+        GameObject enemyProjectilePrefab = CreateEnemyProjectilePrefab(enemyProjectileSprite);
+        GameObject bossPrefab = CreateBossPrefab(bossSprite, enemyProjectilePrefab);
+
+        GameObject healthPickup = CreateResourcePickupPrefab("HealthPickup", HealthPickupPrefabPath, healthPickupSprite, ResourcePickupType.Health, 2);
+        GameObject ammoPickup = CreateResourcePickupPrefab("AmmoPickup", AmmoPickupPrefabPath, ammoPickupSprite, ResourcePickupType.Ammo, 25);
+        GameObject moneyPickup = CreateResourcePickupPrefab("MoneyPickup", MoneyPickupPrefabPath, moneyPickupSprite, ResourcePickupType.Money, 25);
+        GameObject shotgunPickup = CreateWeaponPickupPrefab("ShotgunPickup", ShotgunPickupPrefabPath, weaponPickupSprite, shotgun);
+
+        ShopItemDefinition2D healthShopItem = CreateShopItemDefinition(ShopHealthDefinitionPath, "Health +2", ShopItemType2D.Health, 25, 2, null, shopHealthSprite);
+        ShopItemDefinition2D ammoShopItem = CreateShopItemDefinition(ShopAmmoDefinitionPath, "Ammo +15", ShopItemType2D.Ammo, 20, 15, null, shopAmmoSprite);
+        ShopItemDefinition2D shotgunShopItem = CreateShopItemDefinition(ShopShotgunDefinitionPath, "Shotgun", ShopItemType2D.Weapon, 75, 0, shotgun, shopWeaponSprite);
+        GameObject healthShopPrefab = CreateShopItemPrefab("ShopItem_Health", ShopHealthPrefabPath, shopHealthSprite, healthShopItem);
+        GameObject ammoShopPrefab = CreateShopItemPrefab("ShopItem_Ammo", ShopAmmoPrefabPath, shopAmmoSprite, ammoShopItem);
+        GameObject shotgunShopPrefab = CreateShopItemPrefab("ShopItem_Weapon", ShopShotgunPrefabPath, shopWeaponSprite, shotgunShopItem);
+
+        BuffDefinition2D[] buffPool = CreatePrototypeBuffDefinitions();
+        GameObject gameOverPanel = CreateFullLaboratoryUI(
+            root.transform,
+            playerHealth,
+            playerResources,
+            playerShooting,
+            playerBuffs,
+            out ObjectiveUI2D objectiveUI,
+            out ShopUI2D shopUI,
+            out GameObject choicePanel,
+            out Button[] choiceButtons,
+            out Text[] choiceTexts,
+            out GameObject victoryPanel,
+            out Text victoryText);
+
+        CreateFullLaboratoryGameSystems(
+            root.transform,
+            playerHealth,
+            gameOverPanel,
+            playerBuffs,
+            buffPool,
+            choicePanel,
+            choiceButtons,
+            choiceTexts,
+            objectiveUI,
+            victoryPanel,
+            victoryText,
+            out BuffChoiceController2D buffChoiceController,
+            out LevelEndController2D levelEndController);
+
+        CreateStartArea(root.transform, objectiveUI);
+        CreateFullCombatRoom(
+            root.transform,
+            "Combat_Room_01",
+            -16f,
+            wallSprite,
+            enemyPrefab,
+            3,
+            new[] { healthPickup, ammoPickup, moneyPickup },
+            objectiveUI,
+            "Clear the first laboratory chamber",
+            "Collect supplies, then move to the shop");
+
+        CreateFullShopArea(root.transform, -5f, wallSprite, shopUI, objectiveUI, healthShopPrefab, ammoShopPrefab, shotgunShopPrefab);
+
+        CreateFullCombatRoom(
+            root.transform,
+            "Combat_Room_02",
+            7f,
+            wallSprite,
+            enemyPrefab,
+            4,
+            new[] { healthPickup, ammoPickup, moneyPickup, shotgunPickup },
+            objectiveUI,
+            "Clear the second laboratory chamber",
+            "Proceed to the miniboss room");
+
+        CreateFullMinibossRoom(root.transform, 19f, wallSprite, minibossPrefab, buffChoiceController, objectiveUI);
+        CreateFullBossRoom(root.transform, 34f, bossWallSprite, coverSprite, bossPrefab, levelEndController, objectiveUI);
+        CreateEventSystem(root.transform);
+
+        EditorSceneManager.SaveScene(scene, FullLaboratoryLevelScenePath);
+        AddSceneToBuildSettings(FullLaboratoryLevelScenePath);
+        AssetDatabase.SaveAssets();
+        AssetDatabase.Refresh();
+
+        Debug.Log($"Created Prototype 0.9 full laboratory level at {FullLaboratoryLevelScenePath}.");
     }
 
     private static void CreateRequiredFolders()
@@ -1448,6 +1602,351 @@ public static class PrototypeSceneBuilder
 
         RoomTrigger2D trigger = triggerObject.AddComponent<RoomTrigger2D>();
         AssignObjectReference(trigger, "roomController", roomController);
+    }
+
+    private static void CreateStartArea(Transform parent, ObjectiveUI2D objectiveUI)
+    {
+        GameObject startArea = new GameObject("Start_Area");
+        startArea.transform.SetParent(parent);
+        startArea.transform.position = new Vector3(-24f, 0f, 0f);
+
+        CreateObjectiveTrigger(
+            startArea.transform,
+            "ObjectiveTrigger_Start",
+            new Vector3(-24f, 0f, 0f),
+            new Vector2(5f, 5f),
+            objectiveUI,
+            "Escape the Laboratory",
+            "WASD move | Mouse aim | Left click shoot | R reload | E interact",
+            false);
+    }
+
+    private static void CreateFullCombatRoom(
+        Transform parent,
+        string roomName,
+        float centerX,
+        Sprite wallSprite,
+        GameObject enemyPrefab,
+        int enemyCount,
+        GameObject[] lootPrefabs,
+        ObjectiveUI2D objectiveUI,
+        string objectiveOnActivate,
+        string objectiveOnClear)
+    {
+        GameObject room = new GameObject(roomName);
+        room.transform.SetParent(parent);
+        room.transform.position = new Vector3(centerX, 0f, 0f);
+
+        CreateFullRoomWalls(room.transform, wallSprite, centerX, 6.5f, 4f, out DoorController2D leftDoor, out DoorController2D rightDoor);
+
+        Vector3[] spawnPositions = enemyCount > 3
+            ? new[]
+            {
+                new Vector3(centerX - 1.8f, 1.5f, 0f),
+                new Vector3(centerX + 0.2f, 0.2f, 0f),
+                new Vector3(centerX + 1.9f, -1.4f, 0f),
+                new Vector3(centerX + 2.4f, 1.4f, 0f)
+            }
+            : new[]
+            {
+                new Vector3(centerX - 1.6f, 1.4f, 0f),
+                new Vector3(centerX + 0.8f, 0f, 0f),
+                new Vector3(centerX - 1.6f, -1.4f, 0f)
+            };
+
+        EnemySpawner2D enemySpawner = CreateFullEnemySpawner(room.transform, enemyPrefab, spawnPositions, enemyCount);
+
+        Vector3[] lootPositions = lootPrefabs != null && lootPrefabs.Length > 3
+            ? new[]
+            {
+                new Vector3(centerX + 2.6f, 1.3f, 0f),
+                new Vector3(centerX + 3.3f, 0.45f, 0f),
+                new Vector3(centerX + 3.3f, -0.45f, 0f),
+                new Vector3(centerX + 2.6f, -1.3f, 0f)
+            }
+            : new[]
+            {
+                new Vector3(centerX + 2.8f, 1.1f, 0f),
+                new Vector3(centerX + 3.5f, 0f, 0f),
+                new Vector3(centerX + 2.8f, -1.1f, 0f)
+            };
+
+        RoomLootSpawner2D lootSpawner = CreateFullLootSpawner(room.transform, lootPrefabs, lootPositions);
+
+        RoomController2D roomController = room.AddComponent<RoomController2D>();
+        AssignObjectReferenceArray(roomController, "doors", new[] { leftDoor, rightDoor });
+        AssignObjectReference(roomController, "enemySpawner", enemySpawner);
+        AssignObjectReference(roomController, "lootSpawner", lootSpawner);
+        AssignObjectReference(roomController, "objectiveUI", objectiveUI);
+        AssignString(roomController, "objectiveOnActivate", objectiveOnActivate);
+        AssignString(roomController, "objectiveOnClear", objectiveOnClear);
+        AssignFloat(roomController, "doorCloseDelay", 0.5f);
+
+        CreateFullRoomTrigger(room.transform, centerX, 11.6f, 6.8f, roomController);
+    }
+
+    private static void CreateFullShopArea(
+        Transform parent,
+        float centerX,
+        Sprite wallSprite,
+        ShopUI2D shopUI,
+        ObjectiveUI2D objectiveUI,
+        GameObject healthShopPrefab,
+        GameObject ammoShopPrefab,
+        GameObject weaponShopPrefab)
+    {
+        GameObject shopArea = new GameObject("Shop_Area");
+        shopArea.transform.SetParent(parent);
+        shopArea.transform.position = new Vector3(centerX, 0f, 0f);
+
+        BoxCollider2D shopAreaTrigger = shopArea.AddComponent<BoxCollider2D>();
+        shopAreaTrigger.isTrigger = true;
+        shopAreaTrigger.size = new Vector2(7.4f, 5.4f);
+
+        shopArea.AddComponent<ShopArea2D>();
+
+        GameObject shopWalls = new GameObject("ShopWalls");
+        shopWalls.transform.SetParent(shopArea.transform);
+
+        CreateWall(shopWalls.transform, "ShopWall_Top", wallSprite, new Vector3(centerX, 3f, 0f), new Vector3(8.2f, 0.35f, 1f));
+        CreateWall(shopWalls.transform, "ShopWall_Bottom", wallSprite, new Vector3(centerX, -3f, 0f), new Vector3(8.2f, 0.35f, 1f));
+        CreateWall(shopWalls.transform, "ShopWall_Left_Upper", wallSprite, new Vector3(centerX - 4f, 2f, 0f), new Vector3(0.35f, 2f, 1f));
+        CreateWall(shopWalls.transform, "ShopWall_Left_Lower", wallSprite, new Vector3(centerX - 4f, -2f, 0f), new Vector3(0.35f, 2f, 1f));
+        CreateWall(shopWalls.transform, "ShopWall_Right_Upper", wallSprite, new Vector3(centerX + 4f, 2f, 0f), new Vector3(0.35f, 2f, 1f));
+        CreateWall(shopWalls.transform, "ShopWall_Right_Lower", wallSprite, new Vector3(centerX + 4f, -2f, 0f), new Vector3(0.35f, 2f, 1f));
+
+        InstantiateShopItem(shopArea.transform, healthShopPrefab, "ShopItem_Health", new Vector3(centerX - 1.4f, 1.2f, 0f), shopUI);
+        InstantiateShopItem(shopArea.transform, ammoShopPrefab, "ShopItem_Ammo", new Vector3(centerX, 0f, 0f), shopUI);
+        InstantiateShopItem(shopArea.transform, weaponShopPrefab, "ShopItem_Weapon", new Vector3(centerX + 1.4f, -1.2f, 0f), shopUI);
+
+        CreateObjectiveTrigger(
+            shopArea.transform,
+            "ObjectiveTrigger_Shop",
+            new Vector3(centerX, 0f, 0f),
+            new Vector2(7.4f, 5.4f),
+            objectiveUI,
+            "Shop: buy supplies or a weapon",
+            "Press E near an item to buy it",
+            false);
+    }
+
+    private static void CreateFullMinibossRoom(
+        Transform parent,
+        float centerX,
+        Sprite wallSprite,
+        GameObject minibossPrefab,
+        BuffChoiceController2D buffChoiceController,
+        ObjectiveUI2D objectiveUI)
+    {
+        GameObject room = new GameObject("Miniboss_Room");
+        room.transform.SetParent(parent);
+        room.transform.position = new Vector3(centerX, 0f, 0f);
+
+        CreateFullRoomWalls(room.transform, wallSprite, centerX, 5f, 4f, out DoorController2D leftDoor, out DoorController2D rightDoor);
+        EnemySpawner2D enemySpawner = CreateFullEnemySpawner(
+            room.transform,
+            minibossPrefab,
+            new[] { new Vector3(centerX + 1f, 0f, 0f) },
+            1,
+            new[] { "SpawnPoint_Miniboss" });
+
+        RoomController2D roomController = room.AddComponent<RoomController2D>();
+        AssignObjectReferenceArray(roomController, "doors", new[] { leftDoor, rightDoor });
+        AssignObjectReference(roomController, "enemySpawner", enemySpawner);
+        AssignObjectReference(roomController, "buffChoiceController", buffChoiceController);
+        AssignBool(roomController, "showBuffChoiceOnClear", true);
+        AssignObjectReference(roomController, "objectiveUI", objectiveUI);
+        AssignString(roomController, "objectiveOnActivate", "Defeat the miniboss");
+        AssignString(roomController, "objectiveOnClear", "Choose a buff, then enter the boss arena");
+        AssignFloat(roomController, "doorCloseDelay", 0.5f);
+
+        CreateFullRoomTrigger(room.transform, centerX, 8.8f, 6.8f, roomController);
+    }
+
+    private static void CreateFullBossRoom(
+        Transform parent,
+        float centerX,
+        Sprite wallSprite,
+        Sprite coverSprite,
+        GameObject bossPrefab,
+        LevelEndController2D levelEndController,
+        ObjectiveUI2D objectiveUI)
+    {
+        GameObject room = new GameObject("Boss_Room");
+        room.transform.SetParent(parent);
+        room.transform.position = new Vector3(centerX, 0f, 0f);
+
+        CreateFullRoomWalls(room.transform, wallSprite, centerX, 9f, 5f, out DoorController2D leftDoor, out DoorController2D rightDoor);
+        CreateFullBossCover(room.transform, coverSprite, centerX);
+
+        EnemySpawner2D enemySpawner = CreateFullEnemySpawner(
+            room.transform,
+            bossPrefab,
+            new[] { new Vector3(centerX + 2f, 0f, 0f) },
+            1,
+            new[] { "SpawnPoint_Boss" });
+
+        RoomController2D roomController = room.AddComponent<RoomController2D>();
+        AssignObjectReferenceArray(roomController, "doors", new[] { leftDoor, rightDoor });
+        AssignObjectReference(roomController, "enemySpawner", enemySpawner);
+        AssignObjectReference(roomController, "levelEndController", levelEndController);
+        AssignBool(roomController, "showVictoryOnClear", true);
+        AssignString(roomController, "victoryMessage", "LABORATORY CLEARED");
+        AssignObjectReference(roomController, "objectiveUI", objectiveUI);
+        AssignString(roomController, "objectiveOnActivate", "Defeat Experiment-01");
+        AssignString(roomController, "objectiveOnClear", "Laboratory cleared");
+        AssignFloat(roomController, "doorCloseDelay", 0.5f);
+
+        CreateFullRoomTrigger(room.transform, centerX, 16.8f, 8.6f, roomController);
+        CreateCameraZone(room.transform, new Vector3(centerX, 0f, 0f), new Vector2(17.4f, 9.2f), 8f);
+    }
+
+    private static void CreateFullRoomWalls(Transform parent, Sprite sprite, float centerX, float halfWidth, float halfHeight, out DoorController2D leftDoor, out DoorController2D rightDoor)
+    {
+        GameObject walls = new GameObject("Walls");
+        walls.transform.SetParent(parent);
+
+        CreateWall(walls.transform, "Wall_Top", sprite, new Vector3(centerX, halfHeight, 0f), new Vector3(halfWidth * 2f + 0.5f, 0.4f, 1f));
+        CreateWall(walls.transform, "Wall_Bottom", sprite, new Vector3(centerX, -halfHeight, 0f), new Vector3(halfWidth * 2f + 0.5f, 0.4f, 1f));
+        CreateFullWallWithDoorGap(walls.transform, "Wall_Left", sprite, centerX - halfWidth, halfHeight);
+        CreateFullWallWithDoorGap(walls.transform, "Wall_Right", sprite, centerX + halfWidth, halfHeight);
+
+        GameObject doors = new GameObject("Doors");
+        doors.transform.SetParent(parent);
+
+        leftDoor = CreateDoor(doors.transform, "Door_Left", sprite, new Vector3(centerX - halfWidth, 0f, 0f));
+        rightDoor = CreateDoor(doors.transform, "Door_Right", sprite, new Vector3(centerX + halfWidth, 0f, 0f));
+    }
+
+    private static void CreateFullWallWithDoorGap(Transform parent, string name, Sprite sprite, float x, float halfHeight)
+    {
+        GameObject wall = new GameObject(name);
+        wall.transform.SetParent(parent);
+
+        const float doorHalfHeight = 1.4f;
+        float segmentHeight = Mathf.Max(0.1f, halfHeight - doorHalfHeight);
+        float segmentCenterY = doorHalfHeight + segmentHeight * 0.5f;
+
+        CreateWallSegment(wall.transform, name + "_Upper", sprite, new Vector3(x, segmentCenterY, 0f), new Vector3(0.4f, segmentHeight, 1f));
+        CreateWallSegment(wall.transform, name + "_Lower", sprite, new Vector3(x, -segmentCenterY, 0f), new Vector3(0.4f, segmentHeight, 1f));
+    }
+
+    private static EnemySpawner2D CreateFullEnemySpawner(Transform parent, GameObject enemyPrefab, Vector3[] spawnPositions, int enemyCount, string[] spawnNames = null)
+    {
+        GameObject spawnerObject = new GameObject("EnemySpawner");
+        spawnerObject.transform.SetParent(parent);
+
+        Transform[] spawnPoints = new Transform[spawnPositions.Length];
+
+        for (int i = 0; i < spawnPositions.Length; i++)
+        {
+            string spawnName = spawnNames != null && i < spawnNames.Length && !string.IsNullOrWhiteSpace(spawnNames[i])
+                ? spawnNames[i]
+                : $"SpawnPoint_{i + 1:00}";
+
+            spawnPoints[i] = CreateMarker(spawnerObject.transform, spawnName, spawnPositions[i]);
+        }
+
+        EnemySpawner2D spawner = spawnerObject.AddComponent<EnemySpawner2D>();
+        AssignObjectReference(spawner, "enemyPrefab", enemyPrefab);
+        AssignObjectReferenceArray(spawner, "spawnPoints", spawnPoints);
+        AssignInt(spawner, "enemyCount", enemyCount);
+
+        return spawner;
+    }
+
+    private static RoomLootSpawner2D CreateFullLootSpawner(Transform parent, GameObject[] lootPrefabs, Vector3[] lootPositions)
+    {
+        GameObject lootSpawnerObject = new GameObject("LootSpawner");
+        lootSpawnerObject.transform.SetParent(parent);
+
+        string[] names =
+        {
+            "LootSpawnPoint_Health",
+            "LootSpawnPoint_Ammo",
+            "LootSpawnPoint_Money",
+            "LootSpawnPoint_Weapon"
+        };
+
+        Transform[] spawnPoints = new Transform[lootPositions.Length];
+
+        for (int i = 0; i < lootPositions.Length; i++)
+        {
+            string spawnName = i < names.Length ? names[i] : $"LootSpawnPoint_{i + 1:00}";
+            spawnPoints[i] = CreateMarker(lootSpawnerObject.transform, spawnName, lootPositions[i]);
+        }
+
+        RoomLootSpawner2D lootSpawner = lootSpawnerObject.AddComponent<RoomLootSpawner2D>();
+        AssignObjectReferenceArray(lootSpawner, "lootPrefabs", lootPrefabs);
+        AssignObjectReferenceArray(lootSpawner, "spawnPoints", spawnPoints);
+        AssignBool(lootSpawner, "spawnAll", true);
+        AssignInt(lootSpawner, "randomSpawnCount", lootPrefabs != null ? lootPrefabs.Length : 0);
+
+        return lootSpawner;
+    }
+
+    private static void CreateFullRoomTrigger(Transform parent, float centerX, float width, float height, RoomController2D roomController)
+    {
+        GameObject triggerObject = new GameObject("RoomTrigger");
+        triggerObject.transform.SetParent(parent);
+        triggerObject.transform.position = new Vector3(centerX, 0f, 0f);
+
+        BoxCollider2D triggerCollider = triggerObject.AddComponent<BoxCollider2D>();
+        triggerCollider.isTrigger = true;
+        triggerCollider.size = new Vector2(width, height);
+
+        RoomTrigger2D trigger = triggerObject.AddComponent<RoomTrigger2D>();
+        AssignObjectReference(trigger, "roomController", roomController);
+    }
+
+    private static void CreateObjectiveTrigger(
+        Transform parent,
+        string name,
+        Vector3 position,
+        Vector2 size,
+        ObjectiveUI2D objectiveUI,
+        string objectiveMessage,
+        string hintMessage,
+        bool triggerOnce)
+    {
+        GameObject triggerObject = new GameObject(name);
+        triggerObject.transform.SetParent(parent);
+        triggerObject.transform.position = position;
+
+        BoxCollider2D triggerCollider = triggerObject.AddComponent<BoxCollider2D>();
+        triggerCollider.isTrigger = true;
+        triggerCollider.size = size;
+
+        ObjectiveTrigger2D trigger = triggerObject.AddComponent<ObjectiveTrigger2D>();
+        AssignObjectReference(trigger, "objectiveUI", objectiveUI);
+        AssignString(trigger, "objectiveMessage", objectiveMessage);
+        AssignString(trigger, "hintMessage", hintMessage);
+        AssignBool(trigger, "triggerOnce", triggerOnce);
+    }
+
+    private static void CreateFullBossCover(Transform parent, Sprite sprite, float centerX)
+    {
+        GameObject coverRoot = new GameObject("Cover");
+        coverRoot.transform.SetParent(parent);
+
+        CreateCoverObject(coverRoot.transform, "Cover_01", sprite, new Vector3(centerX - 3f, 2f, 0f));
+        CreateCoverObject(coverRoot.transform, "Cover_02", sprite, new Vector3(centerX - 3f, -2f, 0f));
+        CreateCoverObject(coverRoot.transform, "Cover_03", sprite, new Vector3(centerX + 2f, 2f, 0f));
+        CreateCoverObject(coverRoot.transform, "Cover_04", sprite, new Vector3(centerX + 2f, -2f, 0f));
+    }
+
+    private static void CreateCameraZone(Transform parent, Vector3 position, Vector2 size, float orthographicSize)
+    {
+        GameObject zoneObject = new GameObject("CameraZone");
+        zoneObject.transform.SetParent(parent);
+        zoneObject.transform.position = position;
+
+        BoxCollider2D collider = zoneObject.AddComponent<BoxCollider2D>();
+        collider.isTrigger = true;
+        collider.size = size;
+
+        CameraZone2D zone = zoneObject.AddComponent<CameraZone2D>();
+        AssignFloat(zone, "orthographicSize", orthographicSize);
     }
 
     private static void CreateWallWithDoorGap(Transform parent, string name, Sprite sprite, float x)
@@ -2531,6 +3030,313 @@ public static class PrototypeSceneBuilder
         return gameOverPanel;
     }
 
+    private static GameObject CreateFullLaboratoryUI(
+        Transform parent,
+        PlayerHealth2D playerHealth,
+        PlayerResources2D playerResources,
+        PlayerShooting2D playerShooting,
+        PlayerBuffs2D playerBuffs,
+        out ObjectiveUI2D objectiveUI,
+        out ShopUI2D shopUI,
+        out GameObject choicePanel,
+        out Button[] choiceButtons,
+        out Text[] choiceTexts,
+        out GameObject victoryPanel,
+        out Text victoryText)
+    {
+        GameObject ui = new GameObject("UI");
+        ui.transform.SetParent(parent);
+
+        GameObject canvasObject = new GameObject("Canvas", typeof(RectTransform), typeof(Canvas), typeof(CanvasScaler), typeof(GraphicRaycaster));
+        canvasObject.transform.SetParent(ui.transform);
+
+        Canvas canvas = canvasObject.GetComponent<Canvas>();
+        canvas.renderMode = RenderMode.ScreenSpaceOverlay;
+
+        CanvasScaler canvasScaler = canvasObject.GetComponent<CanvasScaler>();
+        canvasScaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
+        canvasScaler.referenceResolution = new Vector2(1280f, 720f);
+        canvasScaler.matchWidthOrHeight = 0.5f;
+
+        GameObject objectivePanel = CreateRectObject("ObjectivePanel", canvasObject.transform);
+        SetRectTransform(objectivePanel.GetComponent<RectTransform>(), new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -18f), new Vector2(520f, 72f));
+
+        Image objectivePanelImage = objectivePanel.AddComponent<Image>();
+        objectivePanelImage.color = new Color(0f, 0f, 0f, 0.65f);
+
+        GameObject objectiveTextObject = CreateRectObject("ObjectiveText", objectivePanel.transform);
+        SetRectTransform(objectiveTextObject.GetComponent<RectTransform>(), new Vector2(0f, 1f), new Vector2(1f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -8f), new Vector2(-20f, 30f));
+
+        Text objectiveText = objectiveTextObject.AddComponent<Text>();
+        objectiveText.font = GetBuiltinUIFont();
+        objectiveText.text = "Escape the Laboratory";
+        objectiveText.fontSize = 18;
+        objectiveText.alignment = TextAnchor.MiddleCenter;
+        objectiveText.color = Color.white;
+        objectiveText.raycastTarget = false;
+
+        GameObject hintTextObject = CreateRectObject("HintText", objectivePanel.transform);
+        SetRectTransform(hintTextObject.GetComponent<RectTransform>(), new Vector2(0f, 0f), new Vector2(1f, 0f), new Vector2(0.5f, 0f), new Vector2(0f, 8f), new Vector2(-20f, 28f));
+
+        Text hintText = hintTextObject.AddComponent<Text>();
+        hintText.font = GetBuiltinUIFont();
+        hintText.text = "WASD move | Mouse aim | Left click shoot | R reload | E interact";
+        hintText.fontSize = 14;
+        hintText.alignment = TextAnchor.MiddleCenter;
+        hintText.color = new Color(0.85f, 0.95f, 1f, 1f);
+        hintText.raycastTarget = false;
+
+        objectiveUI = objectivePanel.AddComponent<ObjectiveUI2D>();
+        AssignObjectReference(objectiveUI, "objectiveText", objectiveText);
+        AssignObjectReference(objectiveUI, "hintText", hintText);
+
+        GameObject healthPanel = CreateRectObject("HealthPanel", canvasObject.transform);
+        SetRectTransform(healthPanel.GetComponent<RectTransform>(), new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(24f, -24f), new Vector2(220f, 42f));
+
+        GameObject healthBackground = CreateRectObject("HealthBackground", healthPanel.transform);
+        StretchRectTransform(healthBackground.GetComponent<RectTransform>(), Vector2.zero, Vector2.zero);
+        Image healthBackgroundImage = healthBackground.AddComponent<Image>();
+        healthBackgroundImage.color = new Color(0f, 0f, 0f, 0.65f);
+
+        GameObject healthFillObject = CreateRectObject("HealthFill", healthPanel.transform);
+        StretchRectTransform(healthFillObject.GetComponent<RectTransform>(), new Vector2(4f, 4f), new Vector2(-4f, -4f));
+
+        Image healthFill = healthFillObject.AddComponent<Image>();
+        healthFill.color = new Color(0.18f, 0.85f, 0.32f, 0.9f);
+        healthFill.type = Image.Type.Filled;
+        healthFill.fillMethod = Image.FillMethod.Horizontal;
+        healthFill.fillOrigin = (int)Image.OriginHorizontal.Left;
+        healthFill.fillAmount = 1f;
+
+        GameObject healthTextObject = CreateRectObject("HealthText", healthPanel.transform);
+        StretchRectTransform(healthTextObject.GetComponent<RectTransform>(), Vector2.zero, Vector2.zero);
+
+        Text healthText = healthTextObject.AddComponent<Text>();
+        healthText.font = GetBuiltinUIFont();
+        healthText.text = "HP: 6 / 6";
+        healthText.fontSize = 18;
+        healthText.alignment = TextAnchor.MiddleCenter;
+        healthText.color = Color.white;
+        healthText.raycastTarget = false;
+
+        HealthUI2D healthUI = healthPanel.AddComponent<HealthUI2D>();
+        AssignObjectReference(healthUI, "playerHealth", playerHealth);
+        AssignObjectReference(healthUI, "healthFill", healthFill);
+        AssignObjectReference(healthUI, "healthText", healthText);
+
+        GameObject resourcePanel = CreateRectObject("ResourcePanel", canvasObject.transform);
+        SetRectTransform(resourcePanel.GetComponent<RectTransform>(), new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(24f, -76f), new Vector2(470f, 120f));
+
+        Image resourcePanelImage = resourcePanel.AddComponent<Image>();
+        resourcePanelImage.color = new Color(0f, 0f, 0f, 0.65f);
+
+        GameObject ammoTextObject = CreateRectObject("AmmoText", resourcePanel.transform);
+        SetRectTransform(ammoTextObject.GetComponent<RectTransform>(), new Vector2(0f, 1f), new Vector2(1f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -8f), new Vector2(-16f, 24f));
+
+        Text ammoText = ammoTextObject.AddComponent<Text>();
+        ammoText.font = GetBuiltinUIFont();
+        ammoText.text = "Ammo: 12 / 12 | Reserve: 90 / 150";
+        ammoText.fontSize = 16;
+        ammoText.alignment = TextAnchor.MiddleLeft;
+        ammoText.color = Color.white;
+        ammoText.raycastTarget = false;
+
+        GameObject moneyTextObject = CreateRectObject("MoneyText", resourcePanel.transform);
+        SetRectTransform(moneyTextObject.GetComponent<RectTransform>(), new Vector2(0f, 0.67f), new Vector2(1f, 0.67f), new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(-16f, 24f));
+
+        Text moneyText = moneyTextObject.AddComponent<Text>();
+        moneyText.font = GetBuiltinUIFont();
+        moneyText.text = "Money: 50";
+        moneyText.fontSize = 16;
+        moneyText.alignment = TextAnchor.MiddleLeft;
+        moneyText.color = Color.white;
+        moneyText.raycastTarget = false;
+
+        GameObject weaponTextObject = CreateRectObject("WeaponText", resourcePanel.transform);
+        SetRectTransform(weaponTextObject.GetComponent<RectTransform>(), new Vector2(0f, 0.34f), new Vector2(1f, 0.34f), new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(-16f, 24f));
+
+        Text weaponText = weaponTextObject.AddComponent<Text>();
+        weaponText.font = GetBuiltinUIFont();
+        weaponText.text = "Weapon: Pistol [Common]";
+        weaponText.fontSize = 16;
+        weaponText.alignment = TextAnchor.MiddleLeft;
+        weaponText.color = Color.white;
+        weaponText.raycastTarget = false;
+
+        GameObject buffStatusTextObject = CreateRectObject("BuffStatusText", resourcePanel.transform);
+        SetRectTransform(buffStatusTextObject.GetComponent<RectTransform>(), new Vector2(0f, 0f), new Vector2(1f, 0f), new Vector2(0.5f, 0f), new Vector2(0f, 8f), new Vector2(-16f, 24f));
+
+        Text buffStatusText = buffStatusTextObject.AddComponent<Text>();
+        buffStatusText.font = GetBuiltinUIFont();
+        buffStatusText.text = "Buffs: none";
+        buffStatusText.fontSize = 16;
+        buffStatusText.alignment = TextAnchor.MiddleLeft;
+        buffStatusText.color = Color.white;
+        buffStatusText.raycastTarget = false;
+
+        ResourceUI2D resourceUI = resourcePanel.AddComponent<ResourceUI2D>();
+        AssignObjectReference(resourceUI, "playerResources", playerResources);
+        AssignObjectReference(resourceUI, "playerShooting", playerShooting);
+        AssignObjectReference(resourceUI, "ammoText", ammoText);
+        AssignObjectReference(resourceUI, "moneyText", moneyText);
+
+        WeaponUI2D weaponUI = resourcePanel.AddComponent<WeaponUI2D>();
+        AssignObjectReference(weaponUI, "playerShooting", playerShooting);
+        AssignObjectReference(weaponUI, "weaponText", weaponText);
+
+        BuffStatusUI2D buffStatusUI = resourcePanel.AddComponent<BuffStatusUI2D>();
+        AssignObjectReference(buffStatusUI, "playerBuffs", playerBuffs);
+        AssignObjectReference(buffStatusUI, "buffStatusText", buffStatusText);
+
+        GameObject shopPanel = CreateRectObject("ShopPanel", canvasObject.transform);
+        SetRectTransform(shopPanel.GetComponent<RectTransform>(), new Vector2(0.5f, 0f), new Vector2(0.5f, 0f), new Vector2(0.5f, 0f), new Vector2(0f, 36f), new Vector2(520f, 74f));
+
+        Image shopPanelImage = shopPanel.AddComponent<Image>();
+        shopPanelImage.color = new Color(0f, 0f, 0f, 0.78f);
+
+        GameObject shopPromptTextObject = CreateRectObject("ShopPromptText", shopPanel.transform);
+        SetRectTransform(shopPromptTextObject.GetComponent<RectTransform>(), new Vector2(0f, 1f), new Vector2(1f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -8f), new Vector2(-24f, 28f));
+
+        Text shopPromptText = shopPromptTextObject.AddComponent<Text>();
+        shopPromptText.font = GetBuiltinUIFont();
+        shopPromptText.text = string.Empty;
+        shopPromptText.fontSize = 17;
+        shopPromptText.alignment = TextAnchor.MiddleCenter;
+        shopPromptText.color = Color.white;
+        shopPromptText.raycastTarget = false;
+
+        GameObject shopMessageTextObject = CreateRectObject("ShopMessageText", shopPanel.transform);
+        SetRectTransform(shopMessageTextObject.GetComponent<RectTransform>(), new Vector2(0f, 0f), new Vector2(1f, 0f), new Vector2(0.5f, 0f), new Vector2(0f, 8f), new Vector2(-24f, 28f));
+
+        Text shopMessageText = shopMessageTextObject.AddComponent<Text>();
+        shopMessageText.font = GetBuiltinUIFont();
+        shopMessageText.text = string.Empty;
+        shopMessageText.fontSize = 17;
+        shopMessageText.alignment = TextAnchor.MiddleCenter;
+        shopMessageText.color = new Color(1f, 0.86f, 0.2f, 1f);
+        shopMessageText.raycastTarget = false;
+
+        shopUI = canvasObject.AddComponent<ShopUI2D>();
+        AssignObjectReference(shopUI, "shopPanel", shopPanel);
+        AssignObjectReference(shopUI, "promptText", shopPromptText);
+        AssignObjectReference(shopUI, "messageText", shopMessageText);
+        AssignFloat(shopUI, "messageDuration", 2f);
+        shopPanel.SetActive(false);
+
+        choicePanel = CreateRectObject("BuffChoicePanel", canvasObject.transform);
+        SetRectTransform(choicePanel.GetComponent<RectTransform>(), new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(620f, 330f));
+
+        Image choicePanelImage = choicePanel.AddComponent<Image>();
+        choicePanelImage.color = new Color(0f, 0f, 0f, 0.86f);
+
+        GameObject buffTitleObject = CreateRectObject("BuffTitleText", choicePanel.transform);
+        SetRectTransform(buffTitleObject.GetComponent<RectTransform>(), new Vector2(0f, 1f), new Vector2(1f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -18f), new Vector2(-32f, 42f));
+
+        Text buffTitleText = buffTitleObject.AddComponent<Text>();
+        buffTitleText.font = GetBuiltinUIFont();
+        buffTitleText.text = "Choose a Buff";
+        buffTitleText.fontSize = 26;
+        buffTitleText.alignment = TextAnchor.MiddleCenter;
+        buffTitleText.color = Color.white;
+        buffTitleText.raycastTarget = false;
+
+        choiceButtons = new Button[3];
+        choiceTexts = new Text[3];
+        choiceButtons[0] = CreateBuffChoiceButton(choicePanel.transform, "BuffButton_01", new Vector2(0f, 62f), out choiceTexts[0]);
+        choiceButtons[1] = CreateBuffChoiceButton(choicePanel.transform, "BuffButton_02", new Vector2(0f, -28f), out choiceTexts[1]);
+        choiceButtons[2] = CreateBuffChoiceButton(choicePanel.transform, "BuffButton_03", new Vector2(0f, -118f), out choiceTexts[2]);
+        choicePanel.SetActive(false);
+
+        GameObject bossHealthPanel = CreateRectObject("BossHealthPanel", canvasObject.transform);
+        SetRectTransform(bossHealthPanel.GetComponent<RectTransform>(), new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -96f), new Vector2(460f, 66f));
+
+        Image bossPanelBackground = bossHealthPanel.AddComponent<Image>();
+        bossPanelBackground.color = new Color(0f, 0f, 0f, 0.72f);
+
+        GameObject bossNameTextObject = CreateRectObject("BossNameText", bossHealthPanel.transform);
+        SetRectTransform(bossNameTextObject.GetComponent<RectTransform>(), new Vector2(0f, 1f), new Vector2(1f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -6f), new Vector2(-16f, 24f));
+
+        Text bossNameText = bossNameTextObject.AddComponent<Text>();
+        bossNameText.font = GetBuiltinUIFont();
+        bossNameText.text = "Experiment-01";
+        bossNameText.fontSize = 18;
+        bossNameText.alignment = TextAnchor.MiddleCenter;
+        bossNameText.color = Color.white;
+        bossNameText.raycastTarget = false;
+
+        GameObject bossHealthBackground = CreateRectObject("BossHealthBackground", bossHealthPanel.transform);
+        SetRectTransform(bossHealthBackground.GetComponent<RectTransform>(), new Vector2(0f, 0f), new Vector2(1f, 0f), new Vector2(0.5f, 0f), new Vector2(0f, 6f), new Vector2(-20f, 26f));
+
+        Image bossHealthBackgroundImage = bossHealthBackground.AddComponent<Image>();
+        bossHealthBackgroundImage.color = new Color(0.12f, 0.02f, 0.03f, 0.95f);
+
+        GameObject bossHealthFillObject = CreateRectObject("BossHealthFill", bossHealthBackground.transform);
+        StretchRectTransform(bossHealthFillObject.GetComponent<RectTransform>(), new Vector2(3f, 3f), new Vector2(-3f, -3f));
+
+        Image bossHealthFill = bossHealthFillObject.AddComponent<Image>();
+        bossHealthFill.color = new Color(0.9f, 0.14f, 0.18f, 0.95f);
+        bossHealthFill.type = Image.Type.Filled;
+        bossHealthFill.fillMethod = Image.FillMethod.Horizontal;
+        bossHealthFill.fillOrigin = (int)Image.OriginHorizontal.Left;
+        bossHealthFill.fillAmount = 1f;
+
+        GameObject bossHealthTextObject = CreateRectObject("BossHealthText", bossHealthBackground.transform);
+        StretchRectTransform(bossHealthTextObject.GetComponent<RectTransform>(), Vector2.zero, Vector2.zero);
+
+        Text bossHealthText = bossHealthTextObject.AddComponent<Text>();
+        bossHealthText.font = GetBuiltinUIFont();
+        bossHealthText.text = "HP: 50 / 50";
+        bossHealthText.fontSize = 15;
+        bossHealthText.alignment = TextAnchor.MiddleCenter;
+        bossHealthText.color = Color.white;
+        bossHealthText.raycastTarget = false;
+
+        BossHealthUI2D bossHealthUI = bossHealthPanel.AddComponent<BossHealthUI2D>();
+        AssignObjectReference(bossHealthUI, "bossPanel", bossHealthPanel);
+        AssignObjectReference(bossHealthUI, "healthFill", bossHealthFill);
+        AssignObjectReference(bossHealthUI, "healthText", bossHealthText);
+        AssignObjectReference(bossHealthUI, "bossNameText", bossNameText);
+        bossHealthPanel.SetActive(false);
+
+        GameObject gameOverPanel = CreateRectObject("GameOverPanel", canvasObject.transform);
+        SetRectTransform(gameOverPanel.GetComponent<RectTransform>(), new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(360f, 160f));
+
+        Image gameOverBackground = gameOverPanel.AddComponent<Image>();
+        gameOverBackground.color = new Color(0f, 0f, 0f, 0.82f);
+
+        GameObject gameOverTextObject = CreateRectObject("GameOverText", gameOverPanel.transform);
+        StretchRectTransform(gameOverTextObject.GetComponent<RectTransform>(), new Vector2(16f, 16f), new Vector2(-16f, -16f));
+
+        Text gameOverText = gameOverTextObject.AddComponent<Text>();
+        gameOverText.font = GetBuiltinUIFont();
+        gameOverText.text = "GAME OVER\nPress R to restart";
+        gameOverText.fontSize = 30;
+        gameOverText.alignment = TextAnchor.MiddleCenter;
+        gameOverText.color = Color.white;
+        gameOverText.raycastTarget = false;
+        gameOverPanel.SetActive(false);
+
+        victoryPanel = CreateRectObject("VictoryPanel", canvasObject.transform);
+        SetRectTransform(victoryPanel.GetComponent<RectTransform>(), new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(460f, 180f));
+
+        Image victoryBackground = victoryPanel.AddComponent<Image>();
+        victoryBackground.color = new Color(0f, 0f, 0f, 0.84f);
+
+        GameObject victoryTextObject = CreateRectObject("VictoryText", victoryPanel.transform);
+        StretchRectTransform(victoryTextObject.GetComponent<RectTransform>(), new Vector2(18f, 18f), new Vector2(-18f, -18f));
+
+        victoryText = victoryTextObject.AddComponent<Text>();
+        victoryText.font = GetBuiltinUIFont();
+        victoryText.text = "LABORATORY CLEARED\nPress R to restart";
+        victoryText.fontSize = 30;
+        victoryText.alignment = TextAnchor.MiddleCenter;
+        victoryText.color = Color.white;
+        victoryText.raycastTarget = false;
+        victoryPanel.SetActive(false);
+
+        return gameOverPanel;
+    }
+
     private static Button CreateBuffChoiceButton(Transform parent, string name, Vector2 anchoredPosition, out Text buttonText)
     {
         GameObject buttonObject = CreateRectObject(name, parent);
@@ -2645,6 +3451,64 @@ public static class PrototypeSceneBuilder
         AssignBool(levelEndController, "pauseOnVictory", true);
 
         return levelEndController;
+    }
+
+    private static void CreateFullLaboratoryGameSystems(
+        Transform parent,
+        PlayerHealth2D playerHealth,
+        GameObject gameOverPanel,
+        PlayerBuffs2D playerBuffs,
+        BuffDefinition2D[] buffPool,
+        GameObject choicePanel,
+        Button[] choiceButtons,
+        Text[] choiceTexts,
+        ObjectiveUI2D objectiveUI,
+        GameObject victoryPanel,
+        Text victoryText,
+        out BuffChoiceController2D buffChoiceController,
+        out LevelEndController2D levelEndController)
+    {
+        GameObject gameSystems = new GameObject("GameSystems");
+        gameSystems.transform.SetParent(parent);
+
+        GameObject gameOverControllerObject = new GameObject("GameOverController");
+        gameOverControllerObject.transform.SetParent(gameSystems.transform);
+
+        GameOverController2D gameOverController = gameOverControllerObject.AddComponent<GameOverController2D>();
+        AssignObjectReference(gameOverController, "playerHealth", playerHealth);
+        AssignObjectReference(gameOverController, "gameOverPanel", gameOverPanel);
+        AssignString(gameOverController, "restartKey", "r");
+
+        GameObject levelEndControllerObject = new GameObject("LevelEndController");
+        levelEndControllerObject.transform.SetParent(gameSystems.transform);
+
+        levelEndController = levelEndControllerObject.AddComponent<LevelEndController2D>();
+        AssignObjectReference(levelEndController, "victoryPanel", victoryPanel);
+        AssignObjectReference(levelEndController, "victoryText", victoryText);
+        AssignString(levelEndController, "restartKey", "r");
+        AssignBool(levelEndController, "pauseOnVictory", true);
+
+        GameObject levelFlowControllerObject = new GameObject("LevelFlowController");
+        levelFlowControllerObject.transform.SetParent(gameSystems.transform);
+
+        LevelFlowController2D levelFlowController = levelFlowControllerObject.AddComponent<LevelFlowController2D>();
+        AssignObjectReference(levelFlowController, "objectiveUI", objectiveUI);
+        AssignObjectReference(levelFlowController, "levelEndController", levelEndController);
+        AssignString(levelFlowController, "levelName", "Laboratory");
+        AssignString(levelFlowController, "startingObjective", "Escape the Laboratory");
+        AssignString(levelFlowController, "controlsHint", "WASD move | Mouse aim | Left click shoot | R reload | E interact");
+
+        GameObject buffChoiceControllerObject = new GameObject("BuffChoiceController");
+        buffChoiceControllerObject.transform.SetParent(gameSystems.transform);
+
+        buffChoiceController = buffChoiceControllerObject.AddComponent<BuffChoiceController2D>();
+        AssignObjectReference(buffChoiceController, "playerBuffs", playerBuffs);
+        AssignObjectReferenceArray(buffChoiceController, "buffPool", buffPool);
+        AssignObjectReference(buffChoiceController, "choicePanel", choicePanel);
+        AssignObjectReferenceArray(buffChoiceController, "choiceButtons", choiceButtons);
+        AssignObjectReferenceArray(buffChoiceController, "choiceTexts", choiceTexts);
+        AssignBool(buffChoiceController, "pauseGameWhileChoosing", true);
+        AssignInt(buffChoiceController, "choicesToShow", 3);
     }
 
     private static GameObject CreateRectObject(string name, Transform parent)

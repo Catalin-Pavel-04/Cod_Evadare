@@ -134,5 +134,5 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   pickupType: 1
-  amount: 10
+  amount: 25
   destroyOnCollect: 1

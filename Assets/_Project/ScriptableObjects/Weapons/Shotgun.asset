@@ -13,14 +13,14 @@ MonoBehaviour:
   m_Name: Shotgun
   m_EditorClassIdentifier: 
   weaponName: Shotgun
-  rarity: 2
+  rarity: 3
   bulletPrefab: {fileID: 8109097552232962844, guid: d6b20b6d17beec840891ffc9c01db3ef, type: 3}
   fireCooldown: 0.55
   magazineSize: 6
   ammoPerShot: 1
-  reloadDuration: 1.35
+  reloadDuration: 1.4
   projectileDamage: 1
   projectileSpeed: 11
-  projectileLifetime: 1.3
+  projectileLifetime: 1.2
   projectilesPerShot: 5
-  spreadAngle: 32
+  spreadAngle: 35

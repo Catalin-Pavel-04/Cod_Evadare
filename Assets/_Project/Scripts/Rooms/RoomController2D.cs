@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -22,11 +23,20 @@ public class RoomController2D : MonoBehaviour
     [SerializeField] private LevelEndController2D levelEndController;
     [SerializeField] private bool showVictoryOnClear;
     [SerializeField] private string victoryMessage = "LABORATORY CLEARED";
+    [SerializeField] private ObjectiveUI2D objectiveUI;
+    [SerializeField] private string objectiveOnActivate;
+    [SerializeField] private string objectiveOnClear;
 
     private readonly List<EnemyHealth> spawnedEnemies = new List<EnemyHealth>();
     private RoomState state = RoomState.Inactive;
     private bool rewardSpawned;
     private bool hasSpawnedEnemies;
+
+    public event Action<RoomController2D> RoomActivated;
+    public event Action<RoomController2D> RoomCleared;
+
+    public bool IsActive => state == RoomState.Active;
+    public bool IsCleared => state == RoomState.Cleared;
 
     public void ActivateRoom()
     {
@@ -38,6 +48,8 @@ public class RoomController2D : MonoBehaviour
 
         state = RoomState.Active;
         Debug.Log($"Room '{name}' activated. Doors close in {doorCloseDelay:0.##} seconds.", this);
+        UpdateObjective(objectiveOnActivate);
+        RoomActivated?.Invoke(this);
 
         if (doorCloseDelay > 0f)
         {
@@ -155,6 +167,18 @@ public class RoomController2D : MonoBehaviour
         SpawnClearReward();
         ShowBuffChoicesIfNeeded();
         ShowVictoryIfNeeded();
+        UpdateObjective(objectiveOnClear);
+        RoomCleared?.Invoke(this);
+    }
+
+    private void UpdateObjective(string objective)
+    {
+        if (objectiveUI == null || string.IsNullOrWhiteSpace(objective))
+        {
+            return;
+        }
+
+        objectiveUI.SetObjective(objective);
     }
 
     private void ShowBuffChoicesIfNeeded()
