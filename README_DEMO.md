@@ -13,6 +13,7 @@ Use the Unity editor menu:
 - `Tools/Cod Evadare/Create Main Menu Scene`
 - `Tools/Cod Evadare/Create Prototype 1.0 Final Demo`
 - `Tools/Cod Evadare/Create Prototype 2.0 Prison Level`
+- `Tools/Cod Evadare/Create Prototype 2.1 Balanced Prison Level`
 - `Tools/Cod Evadare/Update Main Menu With Level 2`
 
 Main scene:
@@ -26,10 +27,11 @@ Level 1 scene:
 Level 2 scene:
 
 - `Assets/_Project/Scenes/Prototype_PrisonLevel.unity`
+- `Assets/_Project/Scenes/Prototype_PrisonLevel_Balanced.unity`
 
 ## Play From Main Menu
 
-Open `Assets/_Project/Scenes/MainMenu.unity`, press Play, then select `Play Demo` for Level 1 or `Play Level 2: Prison` for Level 2.
+Open `Assets/_Project/Scenes/MainMenu.unity`, press Play, then select `Play Demo` for Level 1, `Play Level 2: Prison` for the original Level 2, or `Play Level 2: Prison Balanced` for Prototype 2.1.
 
 ## Controls
 
@@ -58,8 +60,8 @@ Level 2: Prison Escape
 
 - Keycard pickup and keycard UI
 - Locked gate opened with E near the gate
-- Ranged prison guards using enemy projectiles
-- Security laser hazards that toggle on and off
+- Ranged prison guards using enemy projectiles and aim telegraphs
+- Security laser hazards with inactive, warning, and active states
 - Armory shop
 - Riot Brute miniboss and buff choice
 - The Warden boss fight with boss health UI and `PRISON ESCAPED` victory flow

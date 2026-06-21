@@ -11,6 +11,8 @@ public class MainMenuController2D : MonoBehaviour
     [SerializeField] private string demoScenePath = "Assets/_Project/Scenes/Prototype_FinalDemo.unity";
     [SerializeField] private string prisonSceneName = "Prototype_PrisonLevel";
     [SerializeField] private string prisonScenePath = "Assets/_Project/Scenes/Prototype_PrisonLevel.unity";
+    [SerializeField] private string balancedPrisonSceneName = "Prototype_PrisonLevel_Balanced";
+    [SerializeField] private string balancedPrisonScenePath = "Assets/_Project/Scenes/Prototype_PrisonLevel_Balanced.unity";
     [SerializeField] private GameObject mainPanel;
     [SerializeField] private GameObject controlsPanel;
 
@@ -28,6 +30,11 @@ public class MainMenuController2D : MonoBehaviour
     public void PlayPrisonLevel()
     {
         LoadScene(prisonSceneName, prisonScenePath);
+    }
+
+    public void PlayBalancedPrisonLevel()
+    {
+        LoadScene(balancedPrisonSceneName, balancedPrisonScenePath);
     }
 
     public void LoadSceneByName(string sceneName)
@@ -60,7 +67,7 @@ public class MainMenuController2D : MonoBehaviour
 #endif
 
         Debug.LogWarning(
-            $"Scene '{sceneName}' is not available. Run Tools/Cod Evadare/Create Prototype 2.0 Prison Level, then Tools/Cod Evadare/Update Main Menu With Level 2.",
+            $"Scene '{sceneName}' is not available. Generate it from the Tools/Cod Evadare menu and make sure it is in Build Settings.",
             this);
     }
 

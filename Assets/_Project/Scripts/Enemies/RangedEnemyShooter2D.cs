@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody2D))]
@@ -14,10 +15,14 @@ public class RangedEnemyShooter2D : MonoBehaviour
     [SerializeField] private float projectileSpeed = 7f;
     [SerializeField] private float projectileLifetime = 3f;
     [SerializeField] private bool activateOnStart = true;
+    [SerializeField] private float aimTelegraphDuration = 0.25f;
+    [SerializeField] private LineRenderer aimLine;
+    [SerializeField] private bool useAimTelegraph = true;
 
     private Rigidbody2D body;
     private EnemyHealth enemyHealth;
     private bool isActive;
+    private bool isTelegraphing;
     private bool loggedMissingProjectilePrefab;
     private float nextAttackTime;
 
@@ -27,6 +32,7 @@ public class RangedEnemyShooter2D : MonoBehaviour
         body.gravityScale = 0f;
         body.freezeRotation = true;
         enemyHealth = GetComponent<EnemyHealth>();
+        HideAimLine();
     }
 
     private void Start()
@@ -34,6 +40,7 @@ public class RangedEnemyShooter2D : MonoBehaviour
         FindTargetIfMissing();
         isActive = activateOnStart;
         nextAttackTime = Time.time + Mathf.Max(0.1f, attackInterval);
+        HideAimLine();
     }
 
     private void Update()
@@ -45,8 +52,14 @@ public class RangedEnemyShooter2D : MonoBehaviour
 
         FindTargetIfMissing();
 
-        if (target == null || Time.time < nextAttackTime)
+        if (target == null || isTelegraphing || Time.time < nextAttackTime)
         {
+            return;
+        }
+
+        if (useAimTelegraph && aimTelegraphDuration > 0f)
+        {
+            StartCoroutine(AimTelegraphRoutine());
             return;
         }
 
@@ -92,6 +105,35 @@ public class RangedEnemyShooter2D : MonoBehaviour
         body.MovePosition(nextPosition);
     }
 
+    private IEnumerator AimTelegraphRoutine()
+    {
+        isTelegraphing = true;
+        float endTime = Time.time + Mathf.Max(0f, aimTelegraphDuration);
+
+        while (Time.time < endTime)
+        {
+            if (!isActive || IsDead() || target == null)
+            {
+                HideAimLine();
+                isTelegraphing = false;
+                yield break;
+            }
+
+            ShowAimLine();
+            yield return null;
+        }
+
+        HideAimLine();
+
+        if (isActive && !IsDead() && target != null)
+        {
+            ShootAtTarget();
+        }
+
+        nextAttackTime = Time.time + Mathf.Max(0.05f, attackInterval);
+        isTelegraphing = false;
+    }
+
     private void ShootAtTarget()
     {
         if (enemyProjectilePrefab == null)
@@ -129,6 +171,30 @@ public class RangedEnemyShooter2D : MonoBehaviour
         projectile.Fire(direction);
     }
 
+    private void ShowAimLine()
+    {
+        if (aimLine == null)
+        {
+            return;
+        }
+
+        Vector3 spawnPosition = projectileSpawnPoint != null ? projectileSpawnPoint.position : transform.position;
+        Vector3 targetPosition = target != null ? target.position : spawnPosition + transform.right;
+
+        aimLine.enabled = true;
+        aimLine.positionCount = 2;
+        aimLine.SetPosition(0, spawnPosition);
+        aimLine.SetPosition(1, targetPosition);
+    }
+
+    private void HideAimLine()
+    {
+        if (aimLine != null)
+        {
+            aimLine.enabled = false;
+        }
+    }
+
     private void FindTargetIfMissing()
     {
         if (target != null)
@@ -158,5 +224,6 @@ public class RangedEnemyShooter2D : MonoBehaviour
         damage = Mathf.Max(0, damage);
         projectileSpeed = Mathf.Max(0f, projectileSpeed);
         projectileLifetime = Mathf.Max(0.01f, projectileLifetime);
+        aimTelegraphDuration = Mathf.Max(0f, aimTelegraphDuration);
     }
 }

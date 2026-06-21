@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -9,17 +10,24 @@ public class LockedGate2D : MonoBehaviour
     [SerializeField] private SpriteRenderer spriteRenderer;
     [SerializeField] private Collider2D gateCollider;
     [SerializeField] private Text optionalPromptText;
+    [SerializeField] private Text feedbackText;
+    [SerializeField] private float feedbackDuration = 2f;
+    [SerializeField] private GameObject lockedVisual;
+    [SerializeField] private GameObject openVisual;
     [SerializeField] private string lockedMessage = "Requires keycard";
     [SerializeField] private string openMessage = "Gate opened";
 
     private GameObject nearbyPlayer;
     private bool isOpen;
     private bool loggedMissingKeyring;
+    private Coroutine feedbackRoutine;
 
     private void Awake()
     {
         CacheComponents();
+        SetOpenVisual(false);
         HidePrompt();
+        HideFeedback();
     }
 
     private void Update()
@@ -56,6 +64,8 @@ public class LockedGate2D : MonoBehaviour
         }
 
         HidePrompt();
+        ShowFeedback(openMessage);
+        SetOpenVisual(true);
         PlayDoorFeedback();
         Debug.Log(openMessage, this);
     }
@@ -78,6 +88,7 @@ public class LockedGate2D : MonoBehaviour
             }
 
             ShowPrompt(lockedMessage);
+            ShowFeedback(lockedMessage);
             return;
         }
 
@@ -86,6 +97,7 @@ public class LockedGate2D : MonoBehaviour
         if (!keyring.HasKeycard(clampedRequired))
         {
             ShowPrompt(lockedMessage);
+            ShowFeedback(lockedMessage);
             Debug.Log(lockedMessage, this);
             return;
         }
@@ -93,6 +105,7 @@ public class LockedGate2D : MonoBehaviour
         if (consumeKeycard && !keyring.TrySpendKeycard(clampedRequired))
         {
             ShowPrompt(lockedMessage);
+            ShowFeedback(lockedMessage);
             Debug.Log(lockedMessage, this);
             return;
         }
@@ -149,6 +162,19 @@ public class LockedGate2D : MonoBehaviour
         }
     }
 
+    private void SetOpenVisual(bool open)
+    {
+        if (lockedVisual != null)
+        {
+            lockedVisual.SetActive(!open);
+        }
+
+        if (openVisual != null)
+        {
+            openVisual.SetActive(open);
+        }
+    }
+
     private void ShowPrompt(string message)
     {
         if (optionalPromptText == null)
@@ -169,6 +195,68 @@ public class LockedGate2D : MonoBehaviour
         }
     }
 
+    private void ShowFeedback(string message)
+    {
+        Text targetText = feedbackText != null ? feedbackText : optionalPromptText;
+        ShowObjectiveHint(message);
+
+        if (targetText == null)
+        {
+            Debug.Log(message, this);
+            return;
+        }
+
+        if (feedbackRoutine != null)
+        {
+            StopCoroutine(feedbackRoutine);
+        }
+
+        targetText.gameObject.SetActive(true);
+        targetText.text = message ?? string.Empty;
+        feedbackRoutine = StartCoroutine(ClearFeedbackAfterDelay(targetText));
+    }
+
+    private IEnumerator ClearFeedbackAfterDelay(Text targetText)
+    {
+        yield return new WaitForSeconds(Mathf.Max(0f, feedbackDuration));
+
+        if (targetText == null)
+        {
+            yield break;
+        }
+
+        if (!isOpen && nearbyPlayer != null && targetText == optionalPromptText)
+        {
+            ShowPrompt("Press E to open gate");
+        }
+        else
+        {
+            targetText.text = string.Empty;
+            targetText.gameObject.SetActive(false);
+        }
+
+        feedbackRoutine = null;
+    }
+
+    private void HideFeedback()
+    {
+        if (feedbackText != null)
+        {
+            feedbackText.text = string.Empty;
+            feedbackText.gameObject.SetActive(false);
+        }
+    }
+
+    private void ShowObjectiveHint(string message)
+    {
+        ObjectiveUI2D objectiveUI = FindObjectOfType<ObjectiveUI2D>();
+
+        if (objectiveUI != null)
+        {
+            objectiveUI.ShowTemporaryHint(message, feedbackDuration);
+        }
+    }
+
     private void PlayDoorFeedback()
     {
         DemoAudioManager2D audioManager = FindObjectOfType<DemoAudioManager2D>();
@@ -182,5 +270,6 @@ public class LockedGate2D : MonoBehaviour
     private void OnValidate()
     {
         requiredKeycards = Mathf.Max(0, requiredKeycards);
+        feedbackDuration = Mathf.Max(0f, feedbackDuration);
     }
 }

@@ -10,22 +10,35 @@ public class SecurityLaserHazard2D : MonoBehaviour
     [SerializeField] private bool toggles = true;
     [SerializeField] private float activeDuration = 2f;
     [SerializeField] private float inactiveDuration = 1.5f;
+    [SerializeField] private float warningDuration = 0.45f;
+    [SerializeField] private Color inactiveColor = new Color(1f, 0.1f, 0.08f, 0.18f);
+    [SerializeField] private Color warningColor = new Color(1f, 0.65f, 0.05f, 0.75f);
+    [SerializeField] private Color activeColor = new Color(1f, 0.1f, 0.08f, 0.95f);
+    [SerializeField] private bool useWarningBeforeActive = true;
     [SerializeField] private SpriteRenderer spriteRenderer;
     [SerializeField] private Collider2D hazardCollider;
 
     private float nextDamageTime;
     private bool isActive;
     private Coroutine toggleRoutine;
+    private static float nextLaserHintTime;
 
     private void Awake()
     {
         CacheComponents();
-        SetActiveState(startsActive);
+
+        if (!toggles)
+        {
+            SetActiveState(startsActive);
+            return;
+        }
+
+        SetInactiveState();
     }
 
     private void OnEnable()
     {
-        if (toggles)
+        if (toggles && toggleRoutine == null)
         {
             toggleRoutine = StartCoroutine(ToggleRoutine());
         }
@@ -71,20 +84,58 @@ public class SecurityLaserHazard2D : MonoBehaviour
 
     private IEnumerator ToggleRoutine()
     {
-        if (!startsActive)
-        {
-            SetActiveState(false);
-            yield return new WaitForSeconds(Mathf.Max(0.05f, inactiveDuration));
-        }
-
         while (true)
         {
+            SetInactiveState();
+            yield return new WaitForSeconds(Mathf.Max(0.05f, inactiveDuration));
+
+            if (useWarningBeforeActive && warningDuration > 0f)
+            {
+                SetWarningState();
+                yield return new WaitForSeconds(Mathf.Max(0.01f, warningDuration));
+            }
+
             SetActiveState(true);
             yield return new WaitForSeconds(Mathf.Max(0.05f, activeDuration));
-
-            SetActiveState(false);
-            yield return new WaitForSeconds(Mathf.Max(0.05f, inactiveDuration));
         }
+    }
+
+    private void SetInactiveState()
+    {
+        isActive = false;
+        CacheComponents();
+
+        if (hazardCollider != null)
+        {
+            hazardCollider.enabled = false;
+            hazardCollider.isTrigger = true;
+        }
+
+        if (spriteRenderer != null)
+        {
+            spriteRenderer.enabled = true;
+            spriteRenderer.color = inactiveColor;
+        }
+    }
+
+    private void SetWarningState()
+    {
+        isActive = false;
+        CacheComponents();
+
+        if (hazardCollider != null)
+        {
+            hazardCollider.enabled = false;
+            hazardCollider.isTrigger = true;
+        }
+
+        if (spriteRenderer != null)
+        {
+            spriteRenderer.enabled = true;
+            spriteRenderer.color = warningColor;
+        }
+
+        ShowLaserWarningHint();
     }
 
     private void SetActiveState(bool active)
@@ -101,9 +152,7 @@ public class SecurityLaserHazard2D : MonoBehaviour
         if (spriteRenderer != null)
         {
             spriteRenderer.enabled = true;
-            spriteRenderer.color = active
-                ? new Color(1f, 0.1f, 0.08f, 0.9f)
-                : new Color(1f, 0.1f, 0.08f, 0.22f);
+            spriteRenderer.color = active ? activeColor : inactiveColor;
         }
     }
 
@@ -135,11 +184,28 @@ public class SecurityLaserHazard2D : MonoBehaviour
         }
     }
 
+    private void ShowLaserWarningHint()
+    {
+        if (Time.time < nextLaserHintTime)
+        {
+            return;
+        }
+
+        ObjectiveUI2D objectiveUI = FindObjectOfType<ObjectiveUI2D>();
+
+        if (objectiveUI != null)
+        {
+            objectiveUI.ShowTemporaryHint("Warning: security laser active", 1.25f);
+            nextLaserHintTime = Time.time + 3f;
+        }
+    }
+
     private void OnValidate()
     {
         damage = Mathf.Max(0, damage);
         damageCooldown = Mathf.Max(0f, damageCooldown);
         activeDuration = Mathf.Max(0.05f, activeDuration);
         inactiveDuration = Mathf.Max(0.05f, inactiveDuration);
+        warningDuration = Mathf.Max(0f, warningDuration);
     }
 }

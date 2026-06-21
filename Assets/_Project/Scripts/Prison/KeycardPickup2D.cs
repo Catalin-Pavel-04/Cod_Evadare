@@ -45,6 +45,7 @@ public class KeycardPickup2D : MonoBehaviour
 
         keyring.AddKeycard(keycardAmount);
         PlayPickupFeedback();
+        ShowObjectiveHint("Keycard collected");
         Debug.Log($"Player collected keycard pickup '{name}' for {Mathf.Max(0, keycardAmount)} keycard(s).", this);
 
         if (destroyOnPickup)
@@ -70,6 +71,16 @@ public class KeycardPickup2D : MonoBehaviour
         if (audioManager != null)
         {
             audioManager.PlayKeycard();
+        }
+    }
+
+    private void ShowObjectiveHint(string message)
+    {
+        ObjectiveUI2D objectiveUI = FindObjectOfType<ObjectiveUI2D>();
+
+        if (objectiveUI != null)
+        {
+            objectiveUI.ShowTemporaryHint(message, 2f);
         }
     }
 

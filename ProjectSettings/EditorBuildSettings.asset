@@ -44,4 +44,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/_Project/Scenes/Prototype_PrisonLevel.unity
     guid: e4bce64cfe72c4248b0efdeabae0cb97
+  - enabled: 1
+    path: Assets/_Project/Scenes/Prototype_PrisonLevel_Balanced.unity
+    guid: c83fafe451f96274bbff8d4abf3309d5
   m_configObjects: {}
