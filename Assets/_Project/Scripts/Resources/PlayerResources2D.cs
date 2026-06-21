@@ -97,6 +97,25 @@ public class PlayerResources2D : MonoBehaviour
         }
     }
 
+    public void AddMaxAmmo(int amount, bool addAmmoToo = true)
+    {
+        int clampedAmount = Mathf.Max(0, amount);
+
+        if (clampedAmount == 0)
+        {
+            return;
+        }
+
+        maxAmmo += clampedAmount;
+
+        if (addAmmoToo)
+        {
+            CurrentAmmo = Mathf.Min(maxAmmo, CurrentAmmo + clampedAmount);
+        }
+
+        ResourcesChanged?.Invoke(CurrentAmmo, maxAmmo, CurrentMoney);
+    }
+
     public void AddMoney(int amount)
     {
         int clampedAmount = Mathf.Max(0, amount);

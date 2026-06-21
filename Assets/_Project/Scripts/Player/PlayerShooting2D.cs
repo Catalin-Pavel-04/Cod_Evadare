@@ -27,6 +27,9 @@ public class PlayerShooting2D : MonoBehaviour
     public bool IsReloading { get; private set; }
     public WeaponDefinition2D EquippedWeapon => equippedWeapon;
     public string CurrentWeaponName => equippedWeapon != null ? equippedWeapon.WeaponName : "Default";
+    public int ProjectileDamageBonus { get; private set; }
+    public float FireRateMultiplier { get; private set; } = 1f;
+    public float ReloadSpeedMultiplier { get; private set; } = 1f;
 
     private float nextFireTime;
     private bool loggedMissingFirePoint;
@@ -75,7 +78,7 @@ public class PlayerShooting2D : MonoBehaviour
             return;
         }
 
-        nextFireTime = Time.time + fireCooldown;
+        nextFireTime = Time.time + GetEffectiveFireCooldown();
         Shoot();
     }
 
@@ -168,11 +171,37 @@ public class PlayerShooting2D : MonoBehaviour
 
             if (equippedWeapon != null)
             {
-                bullet.Configure(equippedWeapon.ProjectileDamage, equippedWeapon.ProjectileSpeed, equippedWeapon.ProjectileLifetime);
+                int totalDamage = equippedWeapon.ProjectileDamage + ProjectileDamageBonus;
+                bullet.Configure(totalDamage, equippedWeapon.ProjectileSpeed, equippedWeapon.ProjectileLifetime);
             }
 
             bullet.Fire(projectileDirection);
         }
+    }
+
+    public void AddProjectileDamageBonus(int amount)
+    {
+        ProjectileDamageBonus += Mathf.Max(0, amount);
+    }
+
+    public void AddFireRateMultiplier(float multiplier)
+    {
+        if (multiplier <= 0f)
+        {
+            return;
+        }
+
+        FireRateMultiplier *= multiplier;
+    }
+
+    public void AddReloadSpeedMultiplier(float multiplier)
+    {
+        if (multiplier <= 0f)
+        {
+            return;
+        }
+
+        ReloadSpeedMultiplier *= multiplier;
     }
 
     private Vector2 GetProjectileDirection(Vector2 centerDirection, int projectileCount, float spread, int projectileIndex)
@@ -288,9 +317,11 @@ public class PlayerShooting2D : MonoBehaviour
         ReloadStateChanged?.Invoke(true);
         Debug.Log("Started reload.", this);
 
-        if (reloadDuration > 0f)
+        float effectiveReloadDuration = GetEffectiveReloadDuration();
+
+        if (effectiveReloadDuration > 0f)
         {
-            yield return new WaitForSeconds(reloadDuration);
+            yield return new WaitForSeconds(effectiveReloadDuration);
         }
 
         int missingAmmo = Mathf.Max(0, magazineSize - currentMagazineAmmo);
@@ -308,6 +339,16 @@ public class PlayerShooting2D : MonoBehaviour
         loggedOutOfAmmo = false;
         ReloadStateChanged?.Invoke(false);
         Debug.Log($"Reload complete. Magazine: {currentMagazineAmmo}/{magazineSize}.", this);
+    }
+
+    private float GetEffectiveFireCooldown()
+    {
+        return fireCooldown / Mathf.Max(0.01f, FireRateMultiplier);
+    }
+
+    private float GetEffectiveReloadDuration()
+    {
+        return reloadDuration / Mathf.Max(0.01f, ReloadSpeedMultiplier);
     }
 
     private void LogNoReserveAmmo()

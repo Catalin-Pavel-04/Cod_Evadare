@@ -6,6 +6,7 @@ using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEditorInternal;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
@@ -17,8 +18,10 @@ public static class PrototypeSceneBuilder
     private const string LootResourcesScenePath = "Assets/_Project/Scenes/Prototype_LootResources.unity";
     private const string WeaponLootScenePath = "Assets/_Project/Scenes/Prototype_WeaponLoot.unity";
     private const string ShopScenePath = "Assets/_Project/Scenes/Prototype_Shop.unity";
+    private const string MinibossBuffScenePath = "Assets/_Project/Scenes/Prototype_MinibossBuffs.unity";
     private const string BulletPrefabPath = "Assets/_Project/Prefabs/Weapons/Bullet.prefab";
     private const string EnemyPrefabPath = "Assets/_Project/Prefabs/Enemies/TestEnemy.prefab";
+    private const string MinibossPrefabPath = "Assets/_Project/Prefabs/Enemies/PrototypeMiniboss.prefab";
     private const string RewardPrefabPath = "Assets/_Project/Prefabs/Pickups/PrototypeReward.prefab";
     private const string HealthPickupPrefabPath = "Assets/_Project/Prefabs/Pickups/HealthPickup.prefab";
     private const string AmmoPickupPrefabPath = "Assets/_Project/Prefabs/Pickups/AmmoPickup.prefab";
@@ -34,9 +37,18 @@ public static class PrototypeSceneBuilder
     private const string ShopHealthDefinitionPath = "Assets/_Project/ScriptableObjects/Shop/Shop_HealthSmall.asset";
     private const string ShopAmmoDefinitionPath = "Assets/_Project/ScriptableObjects/Shop/Shop_AmmoPack.asset";
     private const string ShopShotgunDefinitionPath = "Assets/_Project/ScriptableObjects/Shop/Shop_Shotgun.asset";
+    private const string BuffMaxHealthPath = "Assets/_Project/ScriptableObjects/Buffs/Buff_MaxHealth.asset";
+    private const string BuffHealPath = "Assets/_Project/ScriptableObjects/Buffs/Buff_Heal.asset";
+    private const string BuffMoveSpeedPath = "Assets/_Project/ScriptableObjects/Buffs/Buff_MoveSpeed.asset";
+    private const string BuffFireRatePath = "Assets/_Project/ScriptableObjects/Buffs/Buff_FireRate.asset";
+    private const string BuffDamagePath = "Assets/_Project/ScriptableObjects/Buffs/Buff_Damage.asset";
+    private const string BuffReloadPath = "Assets/_Project/ScriptableObjects/Buffs/Buff_Reload.asset";
+    private const string BuffMaxAmmoPath = "Assets/_Project/ScriptableObjects/Buffs/Buff_MaxAmmo.asset";
+    private const string BuffMoneyPath = "Assets/_Project/ScriptableObjects/Buffs/Buff_Money.asset";
     private const string GeneratedArtFolder = "Assets/_Project/Art/Generated";
     private const string PlayerSpritePath = GeneratedArtFolder + "/Player_Prototype.png";
     private const string EnemySpritePath = GeneratedArtFolder + "/Enemy_Prototype.png";
+    private const string MinibossSpritePath = GeneratedArtFolder + "/Miniboss_Prototype.png";
     private const string BulletSpritePath = GeneratedArtFolder + "/Bullet_Prototype.png";
     private const string WallSpritePath = GeneratedArtFolder + "/Wall_Prototype.png";
     private const string RewardSpritePath = GeneratedArtFolder + "/Reward_Prototype.png";
@@ -65,13 +77,16 @@ public static class PrototypeSceneBuilder
         "Assets/_Project/Prefabs/Enemies",
         "Assets/_Project/Prefabs/Pickups",
         "Assets/_Project/Prefabs/Loot",
+        "Assets/_Project/Prefabs/Buffs",
         "Assets/_Project/Prefabs/Rooms",
         "Assets/_Project/Prefabs/Shop",
         "Assets/_Project/Scenes",
         "Assets/_Project/ScriptableObjects",
         "Assets/_Project/ScriptableObjects/Weapons",
         "Assets/_Project/ScriptableObjects/Shop",
+        "Assets/_Project/ScriptableObjects/Buffs",
         "Assets/_Project/Scripts",
+        "Assets/_Project/Scripts/Buffs",
         "Assets/_Project/Scripts/Core",
         "Assets/_Project/Scripts/Loot",
         "Assets/_Project/Scripts/Resources",
@@ -468,6 +483,74 @@ public static class PrototypeSceneBuilder
         Debug.Log($"Created Prototype 0.6 shop scene at {ShopScenePath}.");
     }
 
+    [MenuItem("Tools/Cod Evadare/Create Prototype 0.7 Miniboss Buff Scene")]
+    public static void CreatePrototypeMinibossBuffScene()
+    {
+        if (!Application.isBatchMode && !EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo())
+        {
+            return;
+        }
+
+        CreateRequiredFolders();
+        GeneratePlaceholderSprites();
+        EnsureTag(PlayerTag);
+
+        Scene scene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
+        SceneManager.SetActiveScene(scene);
+
+        Sprite playerSprite = AssetDatabase.LoadAssetAtPath<Sprite>(PlayerSpritePath);
+        Sprite minibossSprite = AssetDatabase.LoadAssetAtPath<Sprite>(MinibossSpritePath);
+        Sprite bulletSprite = AssetDatabase.LoadAssetAtPath<Sprite>(BulletSpritePath);
+        Sprite wallSprite = AssetDatabase.LoadAssetAtPath<Sprite>(WallSpritePath);
+
+        GameObject root = new GameObject("Prototype_MinibossBuffs");
+        GameObject cameraObject = CreateCamera(root.transform);
+        CreateLighting(root.transform);
+
+        GameObject player = CreatePlayer(root.transform, playerSprite, out Transform firePoint, out PlayerShooting2D playerShooting);
+        player.transform.position = new Vector3(-4.5f, 0f, 0f);
+
+        PlayerHealth2D playerHealth = player.AddComponent<PlayerHealth2D>();
+        AssignInt(playerHealth, "maxHealth", 5);
+        AssignFloat(playerHealth, "invincibilityDuration", 0.75f);
+        AssignBool(playerHealth, "destroyOnDeath", false);
+
+        PlayerResources2D playerResources = player.AddComponent<PlayerResources2D>();
+        AssignInt(playerResources, "startingAmmo", 60);
+        AssignInt(playerResources, "maxAmmo", 120);
+        AssignInt(playerResources, "startingMoney", 50);
+
+        PlayerBuffs2D playerBuffs = player.AddComponent<PlayerBuffs2D>();
+
+        GameObject bulletPrefab = GetOrCreateBulletPrefab(bulletSprite);
+        WeaponDefinition2D pistol = CreateWeaponDefinition(PistolWeaponPath, "Pistol", WeaponRarity2D.Common, bulletPrefab, 0.2f, 12, 1, 1f, 1, 12f, 2f, 1, 0f);
+
+        AssignObjectReference(playerShooting, "firePoint", firePoint);
+        AssignObjectReference(playerShooting, "bulletPrefab", bulletPrefab);
+        AssignBool(playerShooting, "useAmmo", true);
+        AssignObjectReference(playerShooting, "playerResources", playerResources);
+        AssignObjectReference(playerShooting, "startingWeapon", pistol);
+        AssignObjectReference(playerShooting, "equippedWeapon", pistol);
+
+        CameraFollow2D cameraFollow = cameraObject.GetComponent<CameraFollow2D>();
+        AssignObjectReference(cameraFollow, "target", player.transform);
+
+        BuffDefinition2D[] buffPool = CreatePrototypeBuffDefinitions();
+        GameObject gameOverPanel = CreateMinibossBuffUI(root.transform, playerHealth, playerResources, playerShooting, playerBuffs, out GameObject choicePanel, out Button[] choiceButtons, out Text[] choiceTexts);
+        BuffChoiceController2D buffChoiceController = CreateMinibossGameSystems(root.transform, playerHealth, gameOverPanel, playerBuffs, buffPool, choicePanel, choiceButtons, choiceTexts);
+
+        GameObject minibossPrefab = CreateMinibossPrefab(minibossSprite);
+        CreateMinibossRoom(root.transform, wallSprite, minibossPrefab, buffChoiceController);
+        CreateEventSystem(root.transform);
+
+        EditorSceneManager.SaveScene(scene, MinibossBuffScenePath);
+        AddSceneToBuildSettings(MinibossBuffScenePath);
+        AssetDatabase.SaveAssets();
+        AssetDatabase.Refresh();
+
+        Debug.Log($"Created Prototype 0.7 miniboss buff scene at {MinibossBuffScenePath}.");
+    }
+
     private static void CreateRequiredFolders()
     {
         foreach (string folder in RequiredFolders)
@@ -482,6 +565,7 @@ public static class PrototypeSceneBuilder
     {
         WriteSpriteTexture(PlayerSpritePath, 64, CreatePlayerPixel);
         WriteSpriteTexture(EnemySpritePath, 64, CreateEnemyPixel);
+        WriteSpriteTexture(MinibossSpritePath, 64, CreateMinibossPixel);
         WriteSpriteTexture(BulletSpritePath, 32, CreateBulletPixel);
         WriteSpriteTexture(WallSpritePath, 64, CreateWallPixel);
         WriteSpriteTexture(RewardSpritePath, 64, CreateRewardPixel);
@@ -649,6 +733,47 @@ public static class PrototypeSceneBuilder
         return prefab;
     }
 
+    private static GameObject CreateMinibossPrefab(Sprite sprite)
+    {
+        GameObject miniboss = new GameObject("PrototypeMiniboss");
+        miniboss.transform.localScale = new Vector3(1.5f, 1.5f, 1f);
+
+        SpriteRenderer spriteRenderer = miniboss.AddComponent<SpriteRenderer>();
+        spriteRenderer.sprite = sprite;
+        spriteRenderer.sortingOrder = 10;
+
+        Rigidbody2D body = miniboss.AddComponent<Rigidbody2D>();
+        body.gravityScale = 0f;
+        body.interpolation = RigidbodyInterpolation2D.Interpolate;
+        body.freezeRotation = true;
+
+        miniboss.AddComponent<BoxCollider2D>();
+
+        EnemyHealth health = miniboss.AddComponent<EnemyHealth>();
+        AssignInt(health, "maxHealth", 15);
+
+        SimpleEnemyChaser2D chaser = miniboss.AddComponent<SimpleEnemyChaser2D>();
+        AssignFloat(chaser, "moveSpeed", 1.1f);
+        AssignFloat(chaser, "stopDistance", 1f);
+
+        EnemyContactDamage2D contactDamage = miniboss.AddComponent<EnemyContactDamage2D>();
+        AssignInt(contactDamage, "damage", 1);
+        AssignFloat(contactDamage, "damageCooldown", 1f);
+
+        MinibossMarker2D marker = miniboss.AddComponent<MinibossMarker2D>();
+        AssignString(marker, "minibossName", "Prototype Miniboss");
+
+        GameObject prefab = PrefabUtility.SaveAsPrefabAsset(miniboss, MinibossPrefabPath);
+        UnityEngine.Object.DestroyImmediate(miniboss);
+
+        if (prefab == null)
+        {
+            prefab = AssetDatabase.LoadAssetAtPath<GameObject>(MinibossPrefabPath);
+        }
+
+        return prefab;
+    }
+
     private static GameObject CreateRewardPrefab(Sprite sprite)
     {
         GameObject reward = new GameObject("PrototypeReward");
@@ -742,6 +867,50 @@ public static class PrototypeSceneBuilder
         EditorUtility.SetDirty(weapon);
         AssetDatabase.SaveAssets();
         return weapon;
+    }
+
+    private static BuffDefinition2D[] CreatePrototypeBuffDefinitions()
+    {
+        return new[]
+        {
+            CreateBuffDefinition(BuffMaxHealthPath, "Thick Skin", "+1 Max HP", BuffType2D.MaxHealth, 1, 1f, null),
+            CreateBuffDefinition(BuffHealPath, "Emergency Medkit", "Heal 2 HP", BuffType2D.Heal, 2, 1f, null),
+            CreateBuffDefinition(BuffMoveSpeedPath, "Adrenaline", "+15% Move Speed", BuffType2D.MoveSpeedMultiplier, 0, 1.15f, null),
+            CreateBuffDefinition(BuffFireRatePath, "Trigger Discipline", "+20% Fire Rate", BuffType2D.FireRateMultiplier, 0, 1.2f, null),
+            CreateBuffDefinition(BuffDamagePath, "High Caliber", "+1 Bullet Damage", BuffType2D.DamageBonus, 1, 1f, null),
+            CreateBuffDefinition(BuffReloadPath, "Fast Hands", "+25% Reload Speed", BuffType2D.ReloadSpeedMultiplier, 0, 1.25f, null),
+            CreateBuffDefinition(BuffMaxAmmoPath, "Extra Pockets", "+20 Max Reserve Ammo", BuffType2D.MaxAmmo, 20, 1f, null),
+            CreateBuffDefinition(BuffMoneyPath, "Found Credits", "+50 Money", BuffType2D.MoneyBonus, 50, 1f, null)
+        };
+    }
+
+    private static BuffDefinition2D CreateBuffDefinition(
+        string assetPath,
+        string displayName,
+        string description,
+        BuffType2D buffType,
+        int amount,
+        float multiplier,
+        Sprite icon)
+    {
+        BuffDefinition2D buff = AssetDatabase.LoadAssetAtPath<BuffDefinition2D>(assetPath);
+
+        if (buff == null)
+        {
+            buff = ScriptableObject.CreateInstance<BuffDefinition2D>();
+            AssetDatabase.CreateAsset(buff, assetPath);
+        }
+
+        AssignString(buff, "displayName", displayName);
+        AssignString(buff, "description", description);
+        AssignEnum(buff, "buffType", (int)buffType);
+        AssignInt(buff, "amount", amount);
+        AssignFloat(buff, "multiplier", multiplier);
+        AssignObjectReference(buff, "icon", icon);
+
+        EditorUtility.SetDirty(buff);
+        AssetDatabase.SaveAssets();
+        return buff;
     }
 
     private static GameObject CreateWeaponPickupPrefab(string pickupName, string prefabPath, Sprite sprite, WeaponDefinition2D weapon)
@@ -975,6 +1144,25 @@ public static class PrototypeSceneBuilder
         CreateRoomTrigger(room.transform, roomController);
     }
 
+    private static void CreateMinibossRoom(Transform parent, Sprite wallSprite, GameObject minibossPrefab, BuffChoiceController2D buffChoiceController)
+    {
+        GameObject room = new GameObject("Miniboss_Room");
+        room.transform.SetParent(parent);
+
+        CreateRoomLoopWalls(room.transform, wallSprite, out DoorController2D leftDoor, out DoorController2D rightDoor);
+
+        EnemySpawner2D enemySpawner = CreateMinibossSpawner(room.transform, minibossPrefab);
+
+        RoomController2D roomController = room.AddComponent<RoomController2D>();
+        AssignObjectReferenceArray(roomController, "doors", new[] { leftDoor, rightDoor });
+        AssignObjectReference(roomController, "enemySpawner", enemySpawner);
+        AssignObjectReference(roomController, "buffChoiceController", buffChoiceController);
+        AssignBool(roomController, "showBuffChoiceOnClear", true);
+        AssignFloat(roomController, "doorCloseDelay", 0.5f);
+
+        CreateRoomTrigger(room.transform, roomController);
+    }
+
     private static void CreateWallWithDoorGap(Transform parent, string name, Sprite sprite, float x)
     {
         GameObject wall = new GameObject(name);
@@ -1036,6 +1224,24 @@ public static class PrototypeSceneBuilder
         AssignObjectReference(spawner, "enemyPrefab", enemyPrefab);
         AssignObjectReferenceArray(spawner, "spawnPoints", spawnPoints);
         AssignInt(spawner, "enemyCount", 3);
+
+        return spawner;
+    }
+
+    private static EnemySpawner2D CreateMinibossSpawner(Transform parent, GameObject minibossPrefab)
+    {
+        GameObject spawnerObject = new GameObject("EnemySpawner");
+        spawnerObject.transform.SetParent(parent);
+
+        Transform[] spawnPoints =
+        {
+            CreateMarker(spawnerObject.transform, "SpawnPoint_Miniboss", new Vector3(2.5f, 0f, 0f))
+        };
+
+        EnemySpawner2D spawner = spawnerObject.AddComponent<EnemySpawner2D>();
+        AssignObjectReference(spawner, "enemyPrefab", minibossPrefab);
+        AssignObjectReferenceArray(spawner, "spawnPoints", spawnPoints);
+        AssignInt(spawner, "enemyCount", 1);
 
         return spawner;
     }
@@ -1662,6 +1868,243 @@ public static class PrototypeSceneBuilder
         return gameOverPanel;
     }
 
+    private static GameObject CreateMinibossBuffUI(
+        Transform parent,
+        PlayerHealth2D playerHealth,
+        PlayerResources2D playerResources,
+        PlayerShooting2D playerShooting,
+        PlayerBuffs2D playerBuffs,
+        out GameObject choicePanel,
+        out Button[] choiceButtons,
+        out Text[] choiceTexts)
+    {
+        GameObject ui = new GameObject("UI");
+        ui.transform.SetParent(parent);
+
+        GameObject canvasObject = new GameObject("Canvas", typeof(RectTransform), typeof(Canvas), typeof(CanvasScaler), typeof(GraphicRaycaster));
+        canvasObject.transform.SetParent(ui.transform);
+
+        Canvas canvas = canvasObject.GetComponent<Canvas>();
+        canvas.renderMode = RenderMode.ScreenSpaceOverlay;
+
+        CanvasScaler canvasScaler = canvasObject.GetComponent<CanvasScaler>();
+        canvasScaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
+        canvasScaler.referenceResolution = new Vector2(1280f, 720f);
+        canvasScaler.matchWidthOrHeight = 0.5f;
+
+        GameObject healthPanel = CreateRectObject("HealthPanel", canvasObject.transform);
+        SetRectTransform(healthPanel.GetComponent<RectTransform>(), new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(24f, -24f), new Vector2(220f, 42f));
+
+        Image healthPanelImage = healthPanel.AddComponent<Image>();
+        healthPanelImage.color = new Color(0f, 0f, 0f, 0.65f);
+
+        GameObject healthFillObject = CreateRectObject("HealthFill", healthPanel.transform);
+        StretchRectTransform(healthFillObject.GetComponent<RectTransform>(), new Vector2(4f, 4f), new Vector2(-4f, -4f));
+
+        Image healthFill = healthFillObject.AddComponent<Image>();
+        healthFill.color = new Color(0.18f, 0.85f, 0.32f, 0.9f);
+        healthFill.type = Image.Type.Filled;
+        healthFill.fillMethod = Image.FillMethod.Horizontal;
+        healthFill.fillOrigin = (int)Image.OriginHorizontal.Left;
+        healthFill.fillAmount = 1f;
+
+        GameObject healthTextObject = CreateRectObject("HealthText", healthPanel.transform);
+        StretchRectTransform(healthTextObject.GetComponent<RectTransform>(), Vector2.zero, Vector2.zero);
+
+        Text healthText = healthTextObject.AddComponent<Text>();
+        healthText.font = GetBuiltinUIFont();
+        healthText.text = "HP: 5 / 5";
+        healthText.fontSize = 18;
+        healthText.alignment = TextAnchor.MiddleCenter;
+        healthText.color = Color.white;
+        healthText.raycastTarget = false;
+
+        HealthUI2D healthUI = healthPanel.AddComponent<HealthUI2D>();
+        AssignObjectReference(healthUI, "playerHealth", playerHealth);
+        AssignObjectReference(healthUI, "healthFill", healthFill);
+        AssignObjectReference(healthUI, "healthText", healthText);
+
+        GameObject resourcePanel = CreateRectObject("ResourcePanel", canvasObject.transform);
+        SetRectTransform(resourcePanel.GetComponent<RectTransform>(), new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(24f, -76f), new Vector2(460f, 120f));
+
+        Image resourcePanelImage = resourcePanel.AddComponent<Image>();
+        resourcePanelImage.color = new Color(0f, 0f, 0f, 0.65f);
+
+        GameObject ammoTextObject = CreateRectObject("AmmoText", resourcePanel.transform);
+        SetRectTransform(ammoTextObject.GetComponent<RectTransform>(), new Vector2(0f, 1f), new Vector2(1f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -8f), new Vector2(-16f, 24f));
+
+        Text ammoText = ammoTextObject.AddComponent<Text>();
+        ammoText.font = GetBuiltinUIFont();
+        ammoText.text = "Ammo: 12 / 12 | Reserve: 60 / 120";
+        ammoText.fontSize = 16;
+        ammoText.alignment = TextAnchor.MiddleLeft;
+        ammoText.color = Color.white;
+        ammoText.raycastTarget = false;
+
+        GameObject moneyTextObject = CreateRectObject("MoneyText", resourcePanel.transform);
+        SetRectTransform(moneyTextObject.GetComponent<RectTransform>(), new Vector2(0f, 0.67f), new Vector2(1f, 0.67f), new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(-16f, 24f));
+
+        Text moneyText = moneyTextObject.AddComponent<Text>();
+        moneyText.font = GetBuiltinUIFont();
+        moneyText.text = "Money: 50";
+        moneyText.fontSize = 16;
+        moneyText.alignment = TextAnchor.MiddleLeft;
+        moneyText.color = Color.white;
+        moneyText.raycastTarget = false;
+
+        GameObject weaponTextObject = CreateRectObject("WeaponText", resourcePanel.transform);
+        SetRectTransform(weaponTextObject.GetComponent<RectTransform>(), new Vector2(0f, 0.34f), new Vector2(1f, 0.34f), new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(-16f, 24f));
+
+        Text weaponText = weaponTextObject.AddComponent<Text>();
+        weaponText.font = GetBuiltinUIFont();
+        weaponText.text = "Weapon: Pistol [Common]";
+        weaponText.fontSize = 16;
+        weaponText.alignment = TextAnchor.MiddleLeft;
+        weaponText.color = Color.white;
+        weaponText.raycastTarget = false;
+
+        GameObject buffStatusTextObject = CreateRectObject("BuffStatusText", resourcePanel.transform);
+        SetRectTransform(buffStatusTextObject.GetComponent<RectTransform>(), new Vector2(0f, 0f), new Vector2(1f, 0f), new Vector2(0.5f, 0f), new Vector2(0f, 8f), new Vector2(-16f, 24f));
+
+        Text buffStatusText = buffStatusTextObject.AddComponent<Text>();
+        buffStatusText.font = GetBuiltinUIFont();
+        buffStatusText.text = "Buffs: none";
+        buffStatusText.fontSize = 16;
+        buffStatusText.alignment = TextAnchor.MiddleLeft;
+        buffStatusText.color = Color.white;
+        buffStatusText.raycastTarget = false;
+
+        ResourceUI2D resourceUI = resourcePanel.AddComponent<ResourceUI2D>();
+        AssignObjectReference(resourceUI, "playerResources", playerResources);
+        AssignObjectReference(resourceUI, "playerShooting", playerShooting);
+        AssignObjectReference(resourceUI, "ammoText", ammoText);
+        AssignObjectReference(resourceUI, "moneyText", moneyText);
+
+        WeaponUI2D weaponUI = resourcePanel.AddComponent<WeaponUI2D>();
+        AssignObjectReference(weaponUI, "playerShooting", playerShooting);
+        AssignObjectReference(weaponUI, "weaponText", weaponText);
+
+        BuffStatusUI2D buffStatusUI = resourcePanel.AddComponent<BuffStatusUI2D>();
+        AssignObjectReference(buffStatusUI, "playerBuffs", playerBuffs);
+        AssignObjectReference(buffStatusUI, "buffStatusText", buffStatusText);
+
+        choicePanel = CreateRectObject("BuffChoicePanel", canvasObject.transform);
+        SetRectTransform(choicePanel.GetComponent<RectTransform>(), new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(620f, 330f));
+
+        Image choicePanelImage = choicePanel.AddComponent<Image>();
+        choicePanelImage.color = new Color(0f, 0f, 0f, 0.86f);
+
+        GameObject buffTitleObject = CreateRectObject("BuffTitleText", choicePanel.transform);
+        SetRectTransform(buffTitleObject.GetComponent<RectTransform>(), new Vector2(0f, 1f), new Vector2(1f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -18f), new Vector2(-32f, 42f));
+
+        Text buffTitleText = buffTitleObject.AddComponent<Text>();
+        buffTitleText.font = GetBuiltinUIFont();
+        buffTitleText.text = "Choose a Buff";
+        buffTitleText.fontSize = 26;
+        buffTitleText.alignment = TextAnchor.MiddleCenter;
+        buffTitleText.color = Color.white;
+        buffTitleText.raycastTarget = false;
+
+        choiceButtons = new Button[3];
+        choiceTexts = new Text[3];
+        choiceButtons[0] = CreateBuffChoiceButton(choicePanel.transform, "BuffButton_01", new Vector2(0f, 62f), out choiceTexts[0]);
+        choiceButtons[1] = CreateBuffChoiceButton(choicePanel.transform, "BuffButton_02", new Vector2(0f, -28f), out choiceTexts[1]);
+        choiceButtons[2] = CreateBuffChoiceButton(choicePanel.transform, "BuffButton_03", new Vector2(0f, -118f), out choiceTexts[2]);
+        choicePanel.SetActive(false);
+
+        GameObject gameOverPanel = CreateRectObject("GameOverPanel", canvasObject.transform);
+        SetRectTransform(gameOverPanel.GetComponent<RectTransform>(), new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(360f, 160f));
+
+        Image gameOverBackground = gameOverPanel.AddComponent<Image>();
+        gameOverBackground.color = new Color(0f, 0f, 0f, 0.82f);
+
+        GameObject gameOverTextObject = CreateRectObject("GameOverText", gameOverPanel.transform);
+        StretchRectTransform(gameOverTextObject.GetComponent<RectTransform>(), new Vector2(16f, 16f), new Vector2(-16f, -16f));
+
+        Text gameOverText = gameOverTextObject.AddComponent<Text>();
+        gameOverText.font = GetBuiltinUIFont();
+        gameOverText.text = "GAME OVER\nPress R to restart";
+        gameOverText.fontSize = 30;
+        gameOverText.alignment = TextAnchor.MiddleCenter;
+        gameOverText.color = Color.white;
+        gameOverText.raycastTarget = false;
+
+        gameOverPanel.SetActive(false);
+        return gameOverPanel;
+    }
+
+    private static Button CreateBuffChoiceButton(Transform parent, string name, Vector2 anchoredPosition, out Text buttonText)
+    {
+        GameObject buttonObject = CreateRectObject(name, parent);
+        SetRectTransform(buttonObject.GetComponent<RectTransform>(), new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), anchoredPosition, new Vector2(540f, 74f));
+
+        Image buttonImage = buttonObject.AddComponent<Image>();
+        buttonImage.color = new Color(0.16f, 0.18f, 0.22f, 1f);
+
+        Button button = buttonObject.AddComponent<Button>();
+        button.targetGraphic = buttonImage;
+
+        GameObject textObject = CreateRectObject("Text", buttonObject.transform);
+        StretchRectTransform(textObject.GetComponent<RectTransform>(), new Vector2(12f, 8f), new Vector2(-12f, -8f));
+
+        buttonText = textObject.AddComponent<Text>();
+        buttonText.font = GetBuiltinUIFont();
+        buttonText.text = "Buff";
+        buttonText.fontSize = 17;
+        buttonText.alignment = TextAnchor.MiddleCenter;
+        buttonText.color = Color.white;
+        buttonText.raycastTarget = false;
+
+        return button;
+    }
+
+    private static BuffChoiceController2D CreateMinibossGameSystems(
+        Transform parent,
+        PlayerHealth2D playerHealth,
+        GameObject gameOverPanel,
+        PlayerBuffs2D playerBuffs,
+        BuffDefinition2D[] buffPool,
+        GameObject choicePanel,
+        Button[] choiceButtons,
+        Text[] choiceTexts)
+    {
+        GameObject gameSystems = new GameObject("GameSystems");
+        gameSystems.transform.SetParent(parent);
+
+        GameObject gameOverControllerObject = new GameObject("GameOverController");
+        gameOverControllerObject.transform.SetParent(gameSystems.transform);
+
+        GameOverController2D gameOverController = gameOverControllerObject.AddComponent<GameOverController2D>();
+        AssignObjectReference(gameOverController, "playerHealth", playerHealth);
+        AssignObjectReference(gameOverController, "gameOverPanel", gameOverPanel);
+        AssignString(gameOverController, "restartKey", "r");
+
+        GameObject buffChoiceControllerObject = new GameObject("BuffChoiceController");
+        buffChoiceControllerObject.transform.SetParent(gameSystems.transform);
+
+        BuffChoiceController2D buffChoiceController = buffChoiceControllerObject.AddComponent<BuffChoiceController2D>();
+        AssignObjectReference(buffChoiceController, "playerBuffs", playerBuffs);
+        AssignObjectReferenceArray(buffChoiceController, "buffPool", buffPool);
+        AssignObjectReference(buffChoiceController, "choicePanel", choicePanel);
+        AssignObjectReferenceArray(buffChoiceController, "choiceButtons", choiceButtons);
+        AssignObjectReferenceArray(buffChoiceController, "choiceTexts", choiceTexts);
+        AssignBool(buffChoiceController, "pauseGameWhileChoosing", true);
+        AssignInt(buffChoiceController, "choicesToShow", 3);
+
+        return buffChoiceController;
+    }
+
+    private static void CreateEventSystem(Transform parent)
+    {
+        if (UnityEngine.Object.FindObjectOfType<EventSystem>() != null)
+        {
+            return;
+        }
+
+        GameObject eventSystem = new GameObject("EventSystem", typeof(EventSystem), typeof(StandaloneInputModule));
+        eventSystem.transform.SetParent(parent);
+    }
+
     private static void CreateGameSystems(Transform parent, PlayerHealth2D playerHealth, GameObject gameOverPanel)
     {
         GameObject gameSystems = new GameObject("GameSystems");
@@ -1808,6 +2251,29 @@ public static class PrototypeSceneBuilder
         Color fill = new Color(0.95f, 0.2f, 0.18f, 1f);
         Color outline = new Color(0.35f, 0.02f, 0.02f, 1f);
         return CirclePixel(x, y, size, fill, outline);
+    }
+
+    private static Color CreateMinibossPixel(int x, int y, int size)
+    {
+        Color fill = new Color(0.58f, 0.08f, 0.78f, 1f);
+        Color outline = new Color(0.12f, 0.01f, 0.2f, 1f);
+        Color basePixel = CirclePixel(x, y, size, fill, outline);
+
+        if (basePixel.a <= 0f)
+        {
+            return basePixel;
+        }
+
+        float center = size * 0.5f;
+        bool core = Mathf.Abs(x + 0.5f - center) < size * 0.12f && Mathf.Abs(y + 0.5f - center) < size * 0.26f;
+        bool horns = (y > size * 0.62f) && (Mathf.Abs(x + 0.5f - center) > size * 0.22f) && (Mathf.Abs(x + 0.5f - center) < size * 0.36f);
+
+        if (core)
+        {
+            return new Color(1f, 0.45f, 0.95f, 1f);
+        }
+
+        return horns ? new Color(0.9f, 0.9f, 1f, 1f) : basePixel;
     }
 
     private static Color CreateBulletPixel(int x, int y, int size)

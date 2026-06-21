@@ -5,6 +5,8 @@ public class PlayerMovement2D : MonoBehaviour
 {
     [SerializeField] private float moveSpeed = 5f;
 
+    public float MoveSpeedMultiplier { get; private set; } = 1f;
+
     private Rigidbody2D body;
     private Camera mainCamera;
     private Vector2 movementInput;
@@ -34,8 +36,18 @@ public class PlayerMovement2D : MonoBehaviour
 
     private void FixedUpdate()
     {
-        Vector2 nextPosition = body.position + movementInput * moveSpeed * Time.fixedDeltaTime;
+        Vector2 nextPosition = body.position + movementInput * moveSpeed * MoveSpeedMultiplier * Time.fixedDeltaTime;
         body.MovePosition(nextPosition);
+    }
+
+    public void AddMoveSpeedMultiplier(float multiplier)
+    {
+        if (multiplier <= 0f)
+        {
+            return;
+        }
+
+        MoveSpeedMultiplier *= multiplier;
     }
 
     private void CacheMainCamera()

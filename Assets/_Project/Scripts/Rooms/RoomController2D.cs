@@ -16,6 +16,8 @@ public class RoomController2D : MonoBehaviour
     [SerializeField] private GameObject rewardPrefab;
     [SerializeField] private Transform rewardSpawnPoint;
     [SerializeField] private RoomLootSpawner2D lootSpawner;
+    [SerializeField] private BuffChoiceController2D buffChoiceController;
+    [SerializeField] private bool showBuffChoiceOnClear;
     [SerializeField] private float doorCloseDelay = 0.5f;
 
     private readonly List<EnemyHealth> spawnedEnemies = new List<EnemyHealth>();
@@ -148,6 +150,15 @@ public class RoomController2D : MonoBehaviour
 
         OpenDoors();
         SpawnClearReward();
+        ShowBuffChoicesIfNeeded();
+    }
+
+    private void ShowBuffChoicesIfNeeded()
+    {
+        if (showBuffChoiceOnClear && buffChoiceController != null)
+        {
+            buffChoiceController.ShowChoices();
+        }
     }
 
     private void SpawnClearReward()

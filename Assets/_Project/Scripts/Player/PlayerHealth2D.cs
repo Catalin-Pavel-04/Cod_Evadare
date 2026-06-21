@@ -96,6 +96,25 @@ public class PlayerHealth2D : MonoBehaviour
         }
     }
 
+    public void AddMaxHealth(int amount, bool healByIncrease = true)
+    {
+        int clampedAmount = Mathf.Max(0, amount);
+
+        if (clampedAmount == 0)
+        {
+            return;
+        }
+
+        maxHealth += clampedAmount;
+
+        if (healByIncrease && !IsDead)
+        {
+            CurrentHealth = Mathf.Min(maxHealth, CurrentHealth + clampedAmount);
+        }
+
+        HealthChanged?.Invoke(CurrentHealth, maxHealth);
+    }
+
     public void ResetHealth()
     {
         if (invincibilityRoutine != null)
