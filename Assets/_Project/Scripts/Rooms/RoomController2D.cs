@@ -15,6 +15,7 @@ public class RoomController2D : MonoBehaviour
     [SerializeField] private EnemySpawner2D enemySpawner;
     [SerializeField] private GameObject rewardPrefab;
     [SerializeField] private Transform rewardSpawnPoint;
+    [SerializeField] private RoomLootSpawner2D lootSpawner;
     [SerializeField] private float doorCloseDelay = 0.5f;
 
     private readonly List<EnemyHealth> spawnedEnemies = new List<EnemyHealth>();
@@ -146,6 +147,17 @@ public class RoomController2D : MonoBehaviour
         Debug.Log($"Room '{name}' cleared. Opening doors.", this);
 
         OpenDoors();
+        SpawnClearReward();
+    }
+
+    private void SpawnClearReward()
+    {
+        if (lootSpawner != null)
+        {
+            lootSpawner.SpawnLoot();
+            return;
+        }
+
         SpawnReward();
     }
 

@@ -14,15 +14,22 @@ public static class PrototypeSceneBuilder
     private const string ScenePath = "Assets/_Project/Scenes/Prototype_Lab.unity";
     private const string RoomLoopScenePath = "Assets/_Project/Scenes/Prototype_RoomLoop.unity";
     private const string HealthCombatScenePath = "Assets/_Project/Scenes/Prototype_HealthCombat.unity";
+    private const string LootResourcesScenePath = "Assets/_Project/Scenes/Prototype_LootResources.unity";
     private const string BulletPrefabPath = "Assets/_Project/Prefabs/Weapons/Bullet.prefab";
     private const string EnemyPrefabPath = "Assets/_Project/Prefabs/Enemies/TestEnemy.prefab";
     private const string RewardPrefabPath = "Assets/_Project/Prefabs/Pickups/PrototypeReward.prefab";
+    private const string HealthPickupPrefabPath = "Assets/_Project/Prefabs/Pickups/HealthPickup.prefab";
+    private const string AmmoPickupPrefabPath = "Assets/_Project/Prefabs/Pickups/AmmoPickup.prefab";
+    private const string MoneyPickupPrefabPath = "Assets/_Project/Prefabs/Pickups/MoneyPickup.prefab";
     private const string GeneratedArtFolder = "Assets/_Project/Art/Generated";
     private const string PlayerSpritePath = GeneratedArtFolder + "/Player_Prototype.png";
     private const string EnemySpritePath = GeneratedArtFolder + "/Enemy_Prototype.png";
     private const string BulletSpritePath = GeneratedArtFolder + "/Bullet_Prototype.png";
     private const string WallSpritePath = GeneratedArtFolder + "/Wall_Prototype.png";
     private const string RewardSpritePath = GeneratedArtFolder + "/Reward_Prototype.png";
+    private const string HealthPickupSpritePath = GeneratedArtFolder + "/HealthPickup_Prototype.png";
+    private const string AmmoPickupSpritePath = GeneratedArtFolder + "/AmmoPickup_Prototype.png";
+    private const string MoneyPickupSpritePath = GeneratedArtFolder + "/MoneyPickup_Prototype.png";
     private const string PlayerTag = "Player";
 
     private static readonly string[] RequiredFolders =
@@ -37,10 +44,13 @@ public static class PrototypeSceneBuilder
         "Assets/_Project/Prefabs/Weapons",
         "Assets/_Project/Prefabs/Enemies",
         "Assets/_Project/Prefabs/Pickups",
+        "Assets/_Project/Prefabs/Loot",
         "Assets/_Project/Prefabs/Rooms",
         "Assets/_Project/Scenes",
         "Assets/_Project/Scripts",
         "Assets/_Project/Scripts/Core",
+        "Assets/_Project/Scripts/Loot",
+        "Assets/_Project/Scripts/Resources",
         "Assets/_Project/Scripts/UI",
         "Assets/_Project/Scripts/Player",
         "Assets/_Project/Scripts/Weapons",
@@ -196,6 +206,82 @@ public static class PrototypeSceneBuilder
         Debug.Log($"Created Prototype 0.3 health combat scene at {HealthCombatScenePath}.");
     }
 
+    [MenuItem("Tools/Cod Evadare/Create Prototype 0.4 Loot Resources Scene")]
+    public static void CreatePrototypeLootResourcesScene()
+    {
+        if (!Application.isBatchMode && !EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo())
+        {
+            return;
+        }
+
+        CreateRequiredFolders();
+        GeneratePlaceholderSprites();
+        EnsureTag(PlayerTag);
+
+        Scene scene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
+        SceneManager.SetActiveScene(scene);
+
+        Sprite playerSprite = AssetDatabase.LoadAssetAtPath<Sprite>(PlayerSpritePath);
+        Sprite enemySprite = AssetDatabase.LoadAssetAtPath<Sprite>(EnemySpritePath);
+        Sprite bulletSprite = AssetDatabase.LoadAssetAtPath<Sprite>(BulletSpritePath);
+        Sprite wallSprite = AssetDatabase.LoadAssetAtPath<Sprite>(WallSpritePath);
+        Sprite healthPickupSprite = AssetDatabase.LoadAssetAtPath<Sprite>(HealthPickupSpritePath);
+        Sprite ammoPickupSprite = AssetDatabase.LoadAssetAtPath<Sprite>(AmmoPickupSpritePath);
+        Sprite moneyPickupSprite = AssetDatabase.LoadAssetAtPath<Sprite>(MoneyPickupSpritePath);
+
+        GameObject root = new GameObject("Prototype_LootResources");
+        GameObject cameraObject = CreateCamera(root.transform);
+        CreateLighting(root.transform);
+
+        GameObject player = CreatePlayer(root.transform, playerSprite, out Transform firePoint, out PlayerShooting2D playerShooting);
+        player.transform.position = new Vector3(-9f, 0f, 0f);
+
+        PlayerHealth2D playerHealth = player.AddComponent<PlayerHealth2D>();
+        AssignInt(playerHealth, "maxHealth", 5);
+        AssignFloat(playerHealth, "invincibilityDuration", 0.75f);
+        AssignBool(playerHealth, "destroyOnDeath", false);
+
+        PlayerResources2D playerResources = player.AddComponent<PlayerResources2D>();
+        AssignInt(playerResources, "startingAmmo", 30);
+        AssignInt(playerResources, "maxAmmo", 99);
+        AssignInt(playerResources, "startingMoney", 0);
+
+        GameObject bulletPrefab = GetOrCreateBulletPrefab(bulletSprite);
+        AssignObjectReference(playerShooting, "firePoint", firePoint);
+        AssignObjectReference(playerShooting, "bulletPrefab", bulletPrefab);
+        AssignBool(playerShooting, "useAmmo", true);
+        AssignInt(playerShooting, "ammoPerShot", 1);
+        AssignObjectReference(playerShooting, "playerResources", playerResources);
+        AssignInt(playerShooting, "magazineSize", 12);
+        AssignInt(playerShooting, "currentMagazineAmmo", 12);
+        AssignFloat(playerShooting, "reloadDuration", 1f);
+        AssignEnumByName(playerShooting, "reloadKey", nameof(KeyCode.R));
+        AssignBool(playerShooting, "autoReloadWhenEmpty", false);
+
+        CameraFollow2D cameraFollow = cameraObject.GetComponent<CameraFollow2D>();
+        AssignObjectReference(cameraFollow, "target", player.transform);
+
+        GameObject enemyPrefab = CreateEnemyPrefab(enemySprite);
+        GameObject[] lootPrefabs =
+        {
+            CreateResourcePickupPrefab("HealthPickup", HealthPickupPrefabPath, healthPickupSprite, ResourcePickupType.Health, 2),
+            CreateResourcePickupPrefab("AmmoPickup", AmmoPickupPrefabPath, ammoPickupSprite, ResourcePickupType.Ammo, 10),
+            CreateResourcePickupPrefab("MoneyPickup", MoneyPickupPrefabPath, moneyPickupSprite, ResourcePickupType.Money, 25)
+        };
+
+        CreateLootResourcesRoom(root.transform, wallSprite, enemyPrefab, lootPrefabs);
+
+        GameObject gameOverPanel = CreateLootResourcesUI(root.transform, playerHealth, playerResources, playerShooting);
+        CreateGameSystems(root.transform, playerHealth, gameOverPanel);
+
+        EditorSceneManager.SaveScene(scene, LootResourcesScenePath);
+        AddSceneToBuildSettings(LootResourcesScenePath);
+        AssetDatabase.SaveAssets();
+        AssetDatabase.Refresh();
+
+        Debug.Log($"Created Prototype 0.4 loot resources scene at {LootResourcesScenePath}.");
+    }
+
     private static void CreateRequiredFolders()
     {
         foreach (string folder in RequiredFolders)
@@ -213,6 +299,9 @@ public static class PrototypeSceneBuilder
         WriteSpriteTexture(BulletSpritePath, 32, CreateBulletPixel);
         WriteSpriteTexture(WallSpritePath, 64, CreateWallPixel);
         WriteSpriteTexture(RewardSpritePath, 64, CreateRewardPixel);
+        WriteSpriteTexture(HealthPickupSpritePath, 64, CreateHealthPickupPixel);
+        WriteSpriteTexture(AmmoPickupSpritePath, 64, CreateAmmoPickupPixel);
+        WriteSpriteTexture(MoneyPickupSpritePath, 64, CreateMoneyPickupPixel);
     }
 
     private static GameObject CreateCamera(Transform parent)
@@ -393,6 +482,34 @@ public static class PrototypeSceneBuilder
         return prefab;
     }
 
+    private static GameObject CreateResourcePickupPrefab(string pickupName, string prefabPath, Sprite sprite, ResourcePickupType pickupType, int amount)
+    {
+        GameObject pickupObject = new GameObject(pickupName);
+        pickupObject.transform.localScale = new Vector3(0.45f, 0.45f, 1f);
+
+        SpriteRenderer spriteRenderer = pickupObject.AddComponent<SpriteRenderer>();
+        spriteRenderer.sprite = sprite;
+        spriteRenderer.sortingOrder = 15;
+
+        CircleCollider2D collider = pickupObject.AddComponent<CircleCollider2D>();
+        collider.isTrigger = true;
+
+        ResourcePickup2D pickup = pickupObject.AddComponent<ResourcePickup2D>();
+        AssignEnum(pickup, "pickupType", (int)pickupType);
+        AssignInt(pickup, "amount", amount);
+        AssignBool(pickup, "destroyOnCollect", true);
+
+        GameObject prefab = PrefabUtility.SaveAsPrefabAsset(pickupObject, prefabPath);
+        UnityEngine.Object.DestroyImmediate(pickupObject);
+
+        if (prefab == null)
+        {
+            prefab = AssetDatabase.LoadAssetAtPath<GameObject>(prefabPath);
+        }
+
+        return prefab;
+    }
+
     private static void CreateEnemy(Transform parent, Sprite sprite)
     {
         GameObject enemy = new GameObject("TestEnemy");
@@ -481,6 +598,25 @@ public static class PrototypeSceneBuilder
         CreateRoomTrigger(room.transform, roomController);
     }
 
+    private static void CreateLootResourcesRoom(Transform parent, Sprite wallSprite, GameObject enemyPrefab, GameObject[] lootPrefabs)
+    {
+        GameObject room = new GameObject("Room_01");
+        room.transform.SetParent(parent);
+
+        CreateRoomLoopWalls(room.transform, wallSprite, out DoorController2D leftDoor, out DoorController2D rightDoor);
+
+        EnemySpawner2D enemySpawner = CreateEnemySpawner(room.transform, enemyPrefab);
+        RoomLootSpawner2D lootSpawner = CreateRoomLootSpawner(room.transform, lootPrefabs);
+
+        RoomController2D roomController = room.AddComponent<RoomController2D>();
+        AssignObjectReferenceArray(roomController, "doors", new[] { leftDoor, rightDoor });
+        AssignObjectReference(roomController, "enemySpawner", enemySpawner);
+        AssignObjectReference(roomController, "lootSpawner", lootSpawner);
+        AssignFloat(roomController, "doorCloseDelay", 0.5f);
+
+        CreateRoomTrigger(room.transform, roomController);
+    }
+
     private static void CreateWallWithDoorGap(Transform parent, string name, Sprite sprite, float x)
     {
         GameObject wall = new GameObject(name);
@@ -544,6 +680,27 @@ public static class PrototypeSceneBuilder
         AssignInt(spawner, "enemyCount", 3);
 
         return spawner;
+    }
+
+    private static RoomLootSpawner2D CreateRoomLootSpawner(Transform parent, GameObject[] lootPrefabs)
+    {
+        GameObject lootSpawnerObject = new GameObject("LootSpawner");
+        lootSpawnerObject.transform.SetParent(parent);
+
+        Transform[] spawnPoints =
+        {
+            CreateMarker(lootSpawnerObject.transform, "LootSpawnPoint_Health", new Vector3(3.8f, 1.1f, 0f)),
+            CreateMarker(lootSpawnerObject.transform, "LootSpawnPoint_Ammo", new Vector3(4.5f, 0f, 0f)),
+            CreateMarker(lootSpawnerObject.transform, "LootSpawnPoint_Money", new Vector3(3.8f, -1.1f, 0f))
+        };
+
+        RoomLootSpawner2D lootSpawner = lootSpawnerObject.AddComponent<RoomLootSpawner2D>();
+        AssignObjectReferenceArray(lootSpawner, "lootPrefabs", lootPrefabs);
+        AssignObjectReferenceArray(lootSpawner, "spawnPoints", spawnPoints);
+        AssignBool(lootSpawner, "spawnAll", true);
+        AssignInt(lootSpawner, "randomSpawnCount", 3);
+
+        return lootSpawner;
     }
 
     private static RoomController2D CreateRoomController(
@@ -638,6 +795,109 @@ public static class PrototypeSceneBuilder
         AssignObjectReference(healthUI, "playerHealth", playerHealth);
         AssignObjectReference(healthUI, "healthFill", healthFill);
         AssignObjectReference(healthUI, "healthText", healthText);
+
+        GameObject gameOverPanel = CreateRectObject("GameOverPanel", canvasObject.transform);
+        SetRectTransform(gameOverPanel.GetComponent<RectTransform>(), new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(360f, 160f));
+
+        Image gameOverBackground = gameOverPanel.AddComponent<Image>();
+        gameOverBackground.color = new Color(0f, 0f, 0f, 0.82f);
+
+        GameObject gameOverTextObject = CreateRectObject("GameOverText", gameOverPanel.transform);
+        StretchRectTransform(gameOverTextObject.GetComponent<RectTransform>(), new Vector2(16f, 16f), new Vector2(-16f, -16f));
+
+        Text gameOverText = gameOverTextObject.AddComponent<Text>();
+        gameOverText.font = GetBuiltinUIFont();
+        gameOverText.text = "GAME OVER\nPress R to restart";
+        gameOverText.fontSize = 30;
+        gameOverText.alignment = TextAnchor.MiddleCenter;
+        gameOverText.color = Color.white;
+        gameOverText.raycastTarget = false;
+
+        gameOverPanel.SetActive(false);
+        return gameOverPanel;
+    }
+
+    private static GameObject CreateLootResourcesUI(Transform parent, PlayerHealth2D playerHealth, PlayerResources2D playerResources, PlayerShooting2D playerShooting)
+    {
+        GameObject ui = new GameObject("UI");
+        ui.transform.SetParent(parent);
+
+        GameObject canvasObject = new GameObject("Canvas", typeof(RectTransform), typeof(Canvas), typeof(CanvasScaler), typeof(GraphicRaycaster));
+        canvasObject.transform.SetParent(ui.transform);
+
+        Canvas canvas = canvasObject.GetComponent<Canvas>();
+        canvas.renderMode = RenderMode.ScreenSpaceOverlay;
+
+        CanvasScaler canvasScaler = canvasObject.GetComponent<CanvasScaler>();
+        canvasScaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
+        canvasScaler.referenceResolution = new Vector2(1280f, 720f);
+        canvasScaler.matchWidthOrHeight = 0.5f;
+
+        GameObject healthPanel = CreateRectObject("HealthPanel", canvasObject.transform);
+        SetRectTransform(healthPanel.GetComponent<RectTransform>(), new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(24f, -24f), new Vector2(220f, 42f));
+
+        Image healthPanelImage = healthPanel.AddComponent<Image>();
+        healthPanelImage.color = new Color(0f, 0f, 0f, 0.65f);
+
+        GameObject healthFillObject = CreateRectObject("HealthFill", healthPanel.transform);
+        StretchRectTransform(healthFillObject.GetComponent<RectTransform>(), new Vector2(4f, 4f), new Vector2(-4f, -4f));
+
+        Image healthFill = healthFillObject.AddComponent<Image>();
+        healthFill.color = new Color(0.18f, 0.85f, 0.32f, 0.9f);
+        healthFill.type = Image.Type.Filled;
+        healthFill.fillMethod = Image.FillMethod.Horizontal;
+        healthFill.fillOrigin = (int)Image.OriginHorizontal.Left;
+        healthFill.fillAmount = 1f;
+
+        GameObject healthTextObject = CreateRectObject("HealthText", healthPanel.transform);
+        StretchRectTransform(healthTextObject.GetComponent<RectTransform>(), Vector2.zero, Vector2.zero);
+
+        Text healthText = healthTextObject.AddComponent<Text>();
+        healthText.font = GetBuiltinUIFont();
+        healthText.text = "HP: 5 / 5";
+        healthText.fontSize = 18;
+        healthText.alignment = TextAnchor.MiddleCenter;
+        healthText.color = Color.white;
+        healthText.raycastTarget = false;
+
+        HealthUI2D healthUI = healthPanel.AddComponent<HealthUI2D>();
+        AssignObjectReference(healthUI, "playerHealth", playerHealth);
+        AssignObjectReference(healthUI, "healthFill", healthFill);
+        AssignObjectReference(healthUI, "healthText", healthText);
+
+        GameObject resourcePanel = CreateRectObject("ResourcePanel", canvasObject.transform);
+        SetRectTransform(resourcePanel.GetComponent<RectTransform>(), new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(24f, -76f), new Vector2(430f, 64f));
+
+        Image resourcePanelImage = resourcePanel.AddComponent<Image>();
+        resourcePanelImage.color = new Color(0f, 0f, 0f, 0.65f);
+
+        GameObject ammoTextObject = CreateRectObject("AmmoText", resourcePanel.transform);
+        SetRectTransform(ammoTextObject.GetComponent<RectTransform>(), new Vector2(0f, 1f), new Vector2(1f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -8f), new Vector2(-16f, 24f));
+
+        Text ammoText = ammoTextObject.AddComponent<Text>();
+        ammoText.font = GetBuiltinUIFont();
+        ammoText.text = "Ammo: 12 / 12 | Reserve: 30 / 99";
+        ammoText.fontSize = 16;
+        ammoText.alignment = TextAnchor.MiddleLeft;
+        ammoText.color = Color.white;
+        ammoText.raycastTarget = false;
+
+        GameObject moneyTextObject = CreateRectObject("MoneyText", resourcePanel.transform);
+        SetRectTransform(moneyTextObject.GetComponent<RectTransform>(), new Vector2(0f, 0f), new Vector2(1f, 0f), new Vector2(0.5f, 0f), new Vector2(0f, 8f), new Vector2(-16f, 24f));
+
+        Text moneyText = moneyTextObject.AddComponent<Text>();
+        moneyText.font = GetBuiltinUIFont();
+        moneyText.text = "Money: 0";
+        moneyText.fontSize = 18;
+        moneyText.alignment = TextAnchor.MiddleLeft;
+        moneyText.color = Color.white;
+        moneyText.raycastTarget = false;
+
+        ResourceUI2D resourceUI = resourcePanel.AddComponent<ResourceUI2D>();
+        AssignObjectReference(resourceUI, "playerResources", playerResources);
+        AssignObjectReference(resourceUI, "playerShooting", playerShooting);
+        AssignObjectReference(resourceUI, "ammoText", ammoText);
+        AssignObjectReference(resourceUI, "moneyText", moneyText);
 
         GameObject gameOverPanel = CreateRectObject("GameOverPanel", canvasObject.transform);
         SetRectTransform(gameOverPanel.GetComponent<RectTransform>(), new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(360f, 160f));
@@ -849,6 +1109,64 @@ public static class PrototypeSceneBuilder
         return new Color(0.25f, 0.9f, 0.65f, 1f);
     }
 
+    private static Color CreateHealthPickupPixel(int x, int y, int size)
+    {
+        Color fill = new Color(0.12f, 0.8f, 0.28f, 1f);
+        Color outline = new Color(0.02f, 0.28f, 0.08f, 1f);
+        Color basePixel = CirclePixel(x, y, size, fill, outline);
+
+        if (basePixel.a <= 0f)
+        {
+            return basePixel;
+        }
+
+        float center = size * 0.5f;
+        bool verticalBar = Mathf.Abs(x + 0.5f - center) < size * 0.09f && Mathf.Abs(y + 0.5f - center) < size * 0.28f;
+        bool horizontalBar = Mathf.Abs(y + 0.5f - center) < size * 0.09f && Mathf.Abs(x + 0.5f - center) < size * 0.28f;
+
+        return verticalBar || horizontalBar ? Color.white : basePixel;
+    }
+
+    private static Color CreateAmmoPickupPixel(int x, int y, int size)
+    {
+        bool border = x < 7 || y < 10 || x >= size - 7 || y >= size - 10;
+        bool body = x >= 10 && x < size - 10 && y >= 14 && y < size - 14;
+        bool stripe = body && (x + y) % 12 < 6;
+
+        if (!body && !border)
+        {
+            return Color.clear;
+        }
+
+        if (border)
+        {
+            return new Color(0.58f, 0.25f, 0.02f, 1f);
+        }
+
+        return stripe
+            ? new Color(1f, 0.82f, 0.18f, 1f)
+            : new Color(0.95f, 0.5f, 0.08f, 1f);
+    }
+
+    private static Color CreateMoneyPickupPixel(int x, int y, int size)
+    {
+        Color fill = new Color(1f, 0.78f, 0.16f, 1f);
+        Color outline = new Color(0.55f, 0.32f, 0.04f, 1f);
+        Color basePixel = CirclePixel(x, y, size, fill, outline);
+
+        if (basePixel.a <= 0f)
+        {
+            return basePixel;
+        }
+
+        float center = size * 0.5f;
+        float dx = Mathf.Abs(x + 0.5f - center);
+        float dy = Mathf.Abs(y + 0.5f - center);
+        bool coinMark = dx < size * 0.08f && dy < size * 0.25f;
+
+        return coinMark ? new Color(0.55f, 0.32f, 0.04f, 1f) : basePixel;
+    }
+
     private static Color CirclePixel(int x, int y, int size, Color fill, Color outline)
     {
         float halfSize = size * 0.5f;
@@ -993,6 +1311,41 @@ public static class PrototypeSceneBuilder
 
         property.boolValue = value;
         property.serializedObject.ApplyModifiedPropertiesWithoutUndo();
+    }
+
+    private static void AssignEnum(UnityEngine.Object target, string propertyName, int enumValueIndex)
+    {
+        SerializedProperty property = FindSerializedProperty(target, propertyName);
+
+        if (property == null)
+        {
+            return;
+        }
+
+        property.enumValueIndex = enumValueIndex;
+        property.serializedObject.ApplyModifiedPropertiesWithoutUndo();
+    }
+
+    private static void AssignEnumByName(UnityEngine.Object target, string propertyName, string enumName)
+    {
+        SerializedProperty property = FindSerializedProperty(target, propertyName);
+
+        if (property == null)
+        {
+            return;
+        }
+
+        for (int i = 0; i < property.enumNames.Length; i++)
+        {
+            if (property.enumNames[i] == enumName)
+            {
+                property.enumValueIndex = i;
+                property.serializedObject.ApplyModifiedPropertiesWithoutUndo();
+                return;
+            }
+        }
+
+        Debug.LogWarning($"Could not assign enum property '{propertyName}' on {target.name} because value '{enumName}' was not found.");
     }
 
     private static void AssignString(UnityEngine.Object target, string propertyName, string value)
