@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 1473955104756798935}
   - component: {fileID: 525720763253720551}
   - component: {fileID: 26854437535318918}
+  - component: {fileID: 3563610003989894953}
   m_Layer: 0
   m_Name: SMGPickup
   m_TagString: Untagged
@@ -29,7 +30,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.55, y: 0.55, z: 1}
+  m_LocalScale: {x: 0.5, y: 0.5, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -74,8 +75,8 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 15
-  m_Sprite: {fileID: 21300000, guid: fe296af2526f8624da34f24660ec09e6, type: 3}
+  m_SortingOrder: 14
+  m_Sprite: {fileID: 21300000, guid: db193493738903d41aea06ec9e3c6e3b, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -135,3 +136,18 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   weapon: {fileID: 11400000, guid: d21a7c388d0561648a2dc2a87b720b23, type: 2}
   destroyOnPickup: 1
+--- !u!114 &3563610003989894953
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3972998165398295513}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3cb68b29d4596a44e81477d16aaf5518, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  bobHeight: 0.12
+  bobSpeed: 2
+  rotateSpeed: 0

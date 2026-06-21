@@ -12,9 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1abc97e96f96c724c8dfb0951f4c4ab2, type: 3}
   m_Name: Shop_Shotgun
   m_EditorClassIdentifier: 
-  displayName: SMG
+  displayName: Shotgun
   itemType: 2
   price: 70
   amount: 0
-  weaponDefinition: {fileID: 11400000, guid: d21a7c388d0561648a2dc2a87b720b23, type: 2}
-  icon: {fileID: 21300000, guid: 03ce2161cba2bdc47bba1d4ec64d9e9e, type: 3}
+  weaponDefinition: {fileID: 11400000, guid: 5ffd5cb12426bfc4583bf749faa6d82c, type: 2}
+  icon: {fileID: 21300000, guid: 24772114071925147bc37ff9132a7a5d, type: 3}

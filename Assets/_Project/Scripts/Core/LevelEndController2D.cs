@@ -8,6 +8,11 @@ public class LevelEndController2D : MonoBehaviour
     [SerializeField] private Text victoryText;
     [SerializeField] private string restartKey = "r";
     [SerializeField] private bool pauseOnVictory = true;
+    [SerializeField] private int completedLevelIndex;
+    [SerializeField] private int unlockLevelIndex;
+    [SerializeField] private string nextLevelSceneName;
+    [SerializeField] private bool showNextLevelButton = true;
+    [SerializeField] private GameObject nextLevelButtonObject;
 
     private bool victoryActive;
 
@@ -53,6 +58,13 @@ public class LevelEndController2D : MonoBehaviour
             victoryText.text = $"{message}\nPress R to restart";
         }
 
+        UnlockProgress();
+
+        if (nextLevelButtonObject != null)
+        {
+            nextLevelButtonObject.SetActive(showNextLevelButton && !string.IsNullOrWhiteSpace(nextLevelSceneName));
+        }
+
         if (pauseOnVictory)
         {
             Time.timeScale = 0f;
@@ -77,11 +89,45 @@ public class LevelEndController2D : MonoBehaviour
             victoryPanel.SetActive(false);
         }
 
+        if (nextLevelButtonObject != null)
+        {
+            nextLevelButtonObject.SetActive(false);
+        }
+
         Time.timeScale = 1f;
+    }
+
+    public void LoadNextLevel()
+    {
+        if (string.IsNullOrWhiteSpace(nextLevelSceneName))
+        {
+            Debug.LogWarning("Cannot load next level because nextLevelSceneName is empty.", this);
+            return;
+        }
+
+        Time.timeScale = 1f;
+        SceneManager.LoadScene(nextLevelSceneName);
+    }
+
+    private void UnlockProgress()
+    {
+        if (completedLevelIndex <= 0)
+        {
+            return;
+        }
+
+        int levelToUnlock = unlockLevelIndex > 0 ? unlockLevelIndex : completedLevelIndex + 1;
+        GameProgress2D.UnlockLevel(levelToUnlock);
     }
 
     private void OnDestroy()
     {
         Time.timeScale = 1f;
+    }
+
+    private void OnValidate()
+    {
+        completedLevelIndex = Mathf.Max(0, completedLevelIndex);
+        unlockLevelIndex = Mathf.Max(0, unlockLevelIndex);
     }
 }

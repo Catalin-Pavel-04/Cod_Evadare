@@ -7,6 +7,24 @@ using UnityEditor.SceneManagement;
 
 public class MainMenuController2D : MonoBehaviour
 {
+    [SerializeField] private string[] campaignSceneNames =
+    {
+        "Level_01_Laboratory",
+        "Level_02_Prison",
+        "Level_03_ZombieCity",
+        "Level_04_SciFiBase",
+        "Level_05_HorrorHospital"
+    };
+    [SerializeField] private string[] campaignScenePaths =
+    {
+        "Assets/_Project/Scenes/Levels/Level_01_Laboratory.unity",
+        "Assets/_Project/Scenes/Levels/Level_02_Prison.unity",
+        "Assets/_Project/Scenes/Levels/Level_03_ZombieCity.unity",
+        "Assets/_Project/Scenes/Levels/Level_04_SciFiBase.unity",
+        "Assets/_Project/Scenes/Levels/Level_05_HorrorHospital.unity"
+    };
+    [SerializeField] private string levelSelectSceneName = "LevelSelect";
+    [SerializeField] private string levelSelectScenePath = "Assets/_Project/Scenes/Game/LevelSelect.unity";
     [SerializeField] private string demoSceneName = "Prototype_FinalDemo";
     [SerializeField] private string demoScenePath = "Assets/_Project/Scenes/Prototype_FinalDemo.unity";
     [SerializeField] private string prisonSceneName = "Prototype_PrisonLevel";
@@ -27,6 +45,22 @@ public class MainMenuController2D : MonoBehaviour
         LoadScene(demoSceneName, demoScenePath);
     }
 
+    public void PlayNewGame()
+    {
+        GameProgress2D.ResetProgress();
+        LoadCampaignLevel(1);
+    }
+
+    public void ContinueGame()
+    {
+        LoadCampaignLevel(GameProgress2D.GetHighestUnlockedLevel());
+    }
+
+    public void ShowLevelSelect()
+    {
+        LoadScene(levelSelectSceneName, levelSelectScenePath);
+    }
+
     public void PlayPrisonLevel()
     {
         LoadScene(prisonSceneName, prisonScenePath);
@@ -40,6 +74,15 @@ public class MainMenuController2D : MonoBehaviour
     public void LoadSceneByName(string sceneName)
     {
         LoadScene(sceneName, string.Empty);
+    }
+
+    private void LoadCampaignLevel(int levelIndex)
+    {
+        int safeLevelIndex = Mathf.Clamp(levelIndex, 1, campaignSceneNames != null && campaignSceneNames.Length > 0 ? campaignSceneNames.Length : 1);
+        int arrayIndex = safeLevelIndex - 1;
+        string sceneName = campaignSceneNames != null && arrayIndex < campaignSceneNames.Length ? campaignSceneNames[arrayIndex] : string.Empty;
+        string scenePath = campaignScenePaths != null && arrayIndex < campaignScenePaths.Length ? campaignScenePaths[arrayIndex] : string.Empty;
+        LoadScene(sceneName, scenePath);
     }
 
     private void LoadScene(string sceneName, string scenePath)

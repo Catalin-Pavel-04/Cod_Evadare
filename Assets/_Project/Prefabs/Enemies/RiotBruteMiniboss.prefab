@@ -13,10 +13,10 @@ GameObject:
   - component: {fileID: 8802950869198837134}
   - component: {fileID: 3996906408331936548}
   - component: {fileID: 391928162786832851}
-  - component: {fileID: 7059013810518297104}
-  - component: {fileID: 1600999220334817458}
-  - component: {fileID: 2424284888968040941}
   - component: {fileID: 3491718106108218306}
+  - component: {fileID: 1600999220334817458}
+  - component: {fileID: 7059013810518297104}
+  - component: {fileID: 2424284888968040941}
   m_Layer: 0
   m_Name: RiotBruteMiniboss
   m_TagString: Untagged
@@ -34,7 +34,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1.5, y: 1.5, z: 1}
+  m_LocalScale: {x: 1.4, y: 1.4, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -80,7 +80,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 10
-  m_Sprite: {fileID: 21300000, guid: 66d61ea9e92c7fd41a813d561da10c22, type: 3}
+  m_Sprite: {fileID: 21300000, guid: faa6b72e9cfa8ed4da0c6390ad6f1f99, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -116,7 +116,7 @@ Rigidbody2D:
     m_Bits: 0
   m_Interpolate: 1
   m_SleepingMode: 1
-  m_CollisionDetection: 0
+  m_CollisionDetection: 1
   m_Constraints: 4
 --- !u!61 &3996906408331936548
 BoxCollider2D:
@@ -175,8 +175,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c16862fcd87c03c4c95e2f405586ad0f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxHealth: 22
---- !u!114 &7059013810518297104
+  maxHealth: 20
+--- !u!114 &3491718106108218306
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -185,11 +185,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 151690361925214008}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f3118b9498bf53d4d98b667151f58f7e, type: 3}
+  m_Script: {fileID: 11500000, guid: de84a6f2cf169ae42905a8b50f9496af, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  moveSpeed: 1.2
-  stopDistance: 1.1
+  spriteRenderer: {fileID: 0}
+  flashColor: {r: 1, g: 1, b: 1, a: 1}
+  flashDuration: 0.08
 --- !u!114 &1600999220334817458
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -203,7 +204,21 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   damage: 2
-  damageCooldown: 1.2
+  damageCooldown: 1
+--- !u!114 &7059013810518297104
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 151690361925214008}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f3118b9498bf53d4d98b667151f58f7e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  moveSpeed: 1.05
+  stopDistance: 1.2
 --- !u!114 &2424284888968040941
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -217,18 +232,3 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   minibossName: Riot Brute
---- !u!114 &3491718106108218306
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 151690361925214008}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: de84a6f2cf169ae42905a8b50f9496af, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  spriteRenderer: {fileID: 4070216326470174407}
-  flashColor: {r: 1, g: 1, b: 1, a: 1}
-  flashDuration: 0.08

@@ -12,6 +12,7 @@ public class DemoAudioManager2D : MonoBehaviour
     [SerializeField] private AudioClip bossPhaseClip;
     [SerializeField] private AudioClip victoryClip;
     [SerializeField] private AudioClip gameOverClip;
+    [SerializeField] private AudioClip explosionClip;
     [SerializeField] private AudioClip laserClip;
     [SerializeField] private AudioClip keycardClip;
     [SerializeField] private float volume = 0.6f;
@@ -64,6 +65,11 @@ public class DemoAudioManager2D : MonoBehaviour
     public void PlayGameOver()
     {
         PlayClip(gameOverClip);
+    }
+
+    public void PlayExplosion()
+    {
+        PlayClip(explosionClip != null ? explosionClip : hitClip);
     }
 
     public void PlayLaser()

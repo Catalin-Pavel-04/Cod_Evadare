@@ -17,4 +17,4 @@ MonoBehaviour:
   price: 25
   amount: 2
   weaponDefinition: {fileID: 0}
-  icon: {fileID: 21300000, guid: 26b28e3b2219a1a4b92a6a1c0ac95747, type: 3}
+  icon: {fileID: 21300000, guid: 14935ce7e601fa34c8564270f406a978, type: 3}
