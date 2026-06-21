@@ -8,6 +8,7 @@ public class Bullet2D : MonoBehaviour
     [SerializeField] private int damage = 1;
 
     private Rigidbody2D body;
+    private bool lifetimeStarted;
 
     private void Awake()
     {
@@ -15,9 +16,21 @@ public class Bullet2D : MonoBehaviour
         body.gravityScale = 0f;
     }
 
-    private void OnEnable()
+    private void Start()
     {
-        Destroy(gameObject, lifetime);
+        StartLifetimeTimer();
+    }
+
+    public void Configure(int newDamage, float newSpeed, float newLifetime)
+    {
+        damage = Mathf.Max(0, newDamage);
+        speed = Mathf.Max(0f, newSpeed);
+        lifetime = Mathf.Max(0.01f, newLifetime);
+
+        if (lifetimeStarted)
+        {
+            StartLifetimeTimer();
+        }
     }
 
     public void Fire(Vector2 direction)
@@ -33,6 +46,18 @@ public class Bullet2D : MonoBehaviour
         }
 
         body.velocity = direction.normalized * speed;
+    }
+
+    private void StartLifetimeTimer()
+    {
+        CancelInvoke(nameof(DestroySelf));
+        lifetimeStarted = true;
+        Invoke(nameof(DestroySelf), lifetime);
+    }
+
+    private void DestroySelf()
+    {
+        Destroy(gameObject);
     }
 
     private void OnTriggerEnter2D(Collider2D other)

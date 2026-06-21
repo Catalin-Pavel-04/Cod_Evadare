@@ -15,13 +15,18 @@ public class PlayerShooting2D : MonoBehaviour
     [SerializeField] private float reloadDuration = 1f;
     [SerializeField] private KeyCode reloadKey = KeyCode.R;
     [SerializeField] private bool autoReloadWhenEmpty;
+    [SerializeField] private WeaponDefinition2D startingWeapon;
+    [SerializeField] private WeaponDefinition2D equippedWeapon;
 
     public event Action<int, int> MagazineChanged;
     public event Action<bool> ReloadStateChanged;
+    public event Action<WeaponDefinition2D> WeaponChanged;
 
     public int CurrentMagazineAmmo => currentMagazineAmmo;
     public int MagazineSize => magazineSize;
     public bool IsReloading { get; private set; }
+    public WeaponDefinition2D EquippedWeapon => equippedWeapon;
+    public string CurrentWeaponName => equippedWeapon != null ? equippedWeapon.WeaponName : "Default";
 
     private float nextFireTime;
     private bool loggedMissingFirePoint;
@@ -40,6 +45,15 @@ public class PlayerShooting2D : MonoBehaviour
         if (useAmmo && playerResources == null)
         {
             playerResources = GetComponent<PlayerResources2D>();
+        }
+
+        if (startingWeapon != null)
+        {
+            EquipWeapon(startingWeapon, true);
+        }
+        else if (equippedWeapon != null)
+        {
+            EquipWeapon(equippedWeapon, true);
         }
     }
 
@@ -99,17 +113,94 @@ public class PlayerShooting2D : MonoBehaviour
             return;
         }
 
-        GameObject bulletObject = Instantiate(bulletPrefab, firePoint.position, firePoint.rotation);
-        Bullet2D bullet = bulletObject.GetComponent<Bullet2D>();
+        FireProjectiles();
+    }
 
-        if (bullet == null)
+    public void EquipWeapon(WeaponDefinition2D weapon, bool refillMagazine = true)
+    {
+        if (weapon == null)
         {
-            LogWarningOnce(ref loggedMissingBulletComponent, $"The bullet prefab '{bulletPrefab.name}' is missing a Bullet2D component.");
-            Destroy(bulletObject);
             return;
         }
 
-        bullet.Fire(firePoint.right);
+        CancelReload();
+
+        equippedWeapon = weapon;
+
+        if (weapon.BulletPrefab != null)
+        {
+            bulletPrefab = weapon.BulletPrefab;
+        }
+
+        fireCooldown = weapon.FireCooldown;
+        magazineSize = weapon.MagazineSize;
+        ammoPerShot = weapon.AmmoPerShot;
+        reloadDuration = weapon.ReloadDuration;
+        currentMagazineAmmo = refillMagazine
+            ? magazineSize
+            : Mathf.Clamp(currentMagazineAmmo, 0, magazineSize);
+
+        MagazineChanged?.Invoke(currentMagazineAmmo, magazineSize);
+        WeaponChanged?.Invoke(equippedWeapon);
+        Debug.Log($"Equipped weapon: {weapon.WeaponName} ({weapon.Rarity})", this);
+    }
+
+    private void FireProjectiles()
+    {
+        int projectileCount = equippedWeapon != null ? Mathf.Max(1, equippedWeapon.ProjectilesPerShot) : 1;
+        float spread = equippedWeapon != null ? Mathf.Max(0f, equippedWeapon.SpreadAngle) : 0f;
+        Vector2 centerDirection = firePoint.right;
+
+        for (int i = 0; i < projectileCount; i++)
+        {
+            Vector2 projectileDirection = GetProjectileDirection(centerDirection, projectileCount, spread, i);
+            GameObject bulletObject = Instantiate(bulletPrefab, firePoint.position, firePoint.rotation);
+            bulletObject.transform.right = projectileDirection;
+
+            Bullet2D bullet = bulletObject.GetComponent<Bullet2D>();
+
+            if (bullet == null)
+            {
+                LogWarningOnce(ref loggedMissingBulletComponent, $"The bullet prefab '{bulletPrefab.name}' is missing a Bullet2D component.");
+                Destroy(bulletObject);
+                continue;
+            }
+
+            if (equippedWeapon != null)
+            {
+                bullet.Configure(equippedWeapon.ProjectileDamage, equippedWeapon.ProjectileSpeed, equippedWeapon.ProjectileLifetime);
+            }
+
+            bullet.Fire(projectileDirection);
+        }
+    }
+
+    private Vector2 GetProjectileDirection(Vector2 centerDirection, int projectileCount, float spread, int projectileIndex)
+    {
+        if (centerDirection.sqrMagnitude < 0.0001f)
+        {
+            centerDirection = transform.right;
+        }
+
+        if (spread <= 0f)
+        {
+            return centerDirection.normalized;
+        }
+
+        float angle;
+
+        if (projectileCount <= 1)
+        {
+            angle = UnityEngine.Random.Range(spread * -0.5f, spread * 0.5f);
+        }
+        else
+        {
+            float t = (float)projectileIndex / (projectileCount - 1);
+            angle = Mathf.Lerp(spread * -0.5f, spread * 0.5f, t);
+        }
+
+        Vector3 rotatedDirection = Quaternion.Euler(0f, 0f, angle) * centerDirection.normalized;
+        return new Vector2(rotatedDirection.x, rotatedDirection.y).normalized;
     }
 
     private bool CanSpendAmmo()
@@ -228,6 +319,21 @@ public class PlayerShooting2D : MonoBehaviour
 
         Debug.Log("No reserve ammo.", this);
         loggedNoReserveAmmo = true;
+    }
+
+    private void CancelReload()
+    {
+        if (reloadRoutine != null)
+        {
+            StopCoroutine(reloadRoutine);
+            reloadRoutine = null;
+        }
+
+        if (IsReloading)
+        {
+            IsReloading = false;
+            ReloadStateChanged?.Invoke(false);
+        }
     }
 
     private void LogWarningOnce(ref bool alreadyLogged, string message)

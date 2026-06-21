@@ -15,12 +15,18 @@ public static class PrototypeSceneBuilder
     private const string RoomLoopScenePath = "Assets/_Project/Scenes/Prototype_RoomLoop.unity";
     private const string HealthCombatScenePath = "Assets/_Project/Scenes/Prototype_HealthCombat.unity";
     private const string LootResourcesScenePath = "Assets/_Project/Scenes/Prototype_LootResources.unity";
+    private const string WeaponLootScenePath = "Assets/_Project/Scenes/Prototype_WeaponLoot.unity";
     private const string BulletPrefabPath = "Assets/_Project/Prefabs/Weapons/Bullet.prefab";
     private const string EnemyPrefabPath = "Assets/_Project/Prefabs/Enemies/TestEnemy.prefab";
     private const string RewardPrefabPath = "Assets/_Project/Prefabs/Pickups/PrototypeReward.prefab";
     private const string HealthPickupPrefabPath = "Assets/_Project/Prefabs/Pickups/HealthPickup.prefab";
     private const string AmmoPickupPrefabPath = "Assets/_Project/Prefabs/Pickups/AmmoPickup.prefab";
     private const string MoneyPickupPrefabPath = "Assets/_Project/Prefabs/Pickups/MoneyPickup.prefab";
+    private const string SMGPickupPrefabPath = "Assets/_Project/Prefabs/Pickups/SMGPickup.prefab";
+    private const string ShotgunPickupPrefabPath = "Assets/_Project/Prefabs/Pickups/ShotgunPickup.prefab";
+    private const string PistolWeaponPath = "Assets/_Project/ScriptableObjects/Weapons/Pistol.asset";
+    private const string SMGWeaponPath = "Assets/_Project/ScriptableObjects/Weapons/SMG.asset";
+    private const string ShotgunWeaponPath = "Assets/_Project/ScriptableObjects/Weapons/Shotgun.asset";
     private const string GeneratedArtFolder = "Assets/_Project/Art/Generated";
     private const string PlayerSpritePath = GeneratedArtFolder + "/Player_Prototype.png";
     private const string EnemySpritePath = GeneratedArtFolder + "/Enemy_Prototype.png";
@@ -30,6 +36,10 @@ public static class PrototypeSceneBuilder
     private const string HealthPickupSpritePath = GeneratedArtFolder + "/HealthPickup_Prototype.png";
     private const string AmmoPickupSpritePath = GeneratedArtFolder + "/AmmoPickup_Prototype.png";
     private const string MoneyPickupSpritePath = GeneratedArtFolder + "/MoneyPickup_Prototype.png";
+    private const string PistolSpritePath = GeneratedArtFolder + "/Pistol_Prototype.png";
+    private const string SMGSpritePath = GeneratedArtFolder + "/SMG_Prototype.png";
+    private const string ShotgunSpritePath = GeneratedArtFolder + "/Shotgun_Prototype.png";
+    private const string WeaponPickupSpritePath = GeneratedArtFolder + "/WeaponPickup_Prototype.png";
     private const string PlayerTag = "Player";
 
     private static readonly string[] RequiredFolders =
@@ -47,6 +57,8 @@ public static class PrototypeSceneBuilder
         "Assets/_Project/Prefabs/Loot",
         "Assets/_Project/Prefabs/Rooms",
         "Assets/_Project/Scenes",
+        "Assets/_Project/ScriptableObjects",
+        "Assets/_Project/ScriptableObjects/Weapons",
         "Assets/_Project/Scripts",
         "Assets/_Project/Scripts/Core",
         "Assets/_Project/Scripts/Loot",
@@ -282,6 +294,86 @@ public static class PrototypeSceneBuilder
         Debug.Log($"Created Prototype 0.4 loot resources scene at {LootResourcesScenePath}.");
     }
 
+    [MenuItem("Tools/Cod Evadare/Create Prototype 0.5 Weapon Loot Scene")]
+    public static void CreatePrototypeWeaponLootScene()
+    {
+        if (!Application.isBatchMode && !EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo())
+        {
+            return;
+        }
+
+        CreateRequiredFolders();
+        GeneratePlaceholderSprites();
+        EnsureTag(PlayerTag);
+
+        Scene scene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
+        SceneManager.SetActiveScene(scene);
+
+        Sprite playerSprite = AssetDatabase.LoadAssetAtPath<Sprite>(PlayerSpritePath);
+        Sprite enemySprite = AssetDatabase.LoadAssetAtPath<Sprite>(EnemySpritePath);
+        Sprite bulletSprite = AssetDatabase.LoadAssetAtPath<Sprite>(BulletSpritePath);
+        Sprite wallSprite = AssetDatabase.LoadAssetAtPath<Sprite>(WallSpritePath);
+        Sprite healthPickupSprite = AssetDatabase.LoadAssetAtPath<Sprite>(HealthPickupSpritePath);
+        Sprite ammoPickupSprite = AssetDatabase.LoadAssetAtPath<Sprite>(AmmoPickupSpritePath);
+        Sprite moneyPickupSprite = AssetDatabase.LoadAssetAtPath<Sprite>(MoneyPickupSpritePath);
+        Sprite weaponPickupSprite = AssetDatabase.LoadAssetAtPath<Sprite>(WeaponPickupSpritePath);
+
+        GameObject root = new GameObject("Prototype_WeaponLoot");
+        GameObject cameraObject = CreateCamera(root.transform);
+        CreateLighting(root.transform);
+
+        GameObject player = CreatePlayer(root.transform, playerSprite, out Transform firePoint, out PlayerShooting2D playerShooting);
+        player.transform.position = new Vector3(-9f, 0f, 0f);
+
+        PlayerHealth2D playerHealth = player.AddComponent<PlayerHealth2D>();
+        AssignInt(playerHealth, "maxHealth", 5);
+        AssignFloat(playerHealth, "invincibilityDuration", 0.75f);
+        AssignBool(playerHealth, "destroyOnDeath", false);
+
+        PlayerResources2D playerResources = player.AddComponent<PlayerResources2D>();
+        AssignInt(playerResources, "startingAmmo", 30);
+        AssignInt(playerResources, "maxAmmo", 99);
+        AssignInt(playerResources, "startingMoney", 0);
+
+        GameObject bulletPrefab = GetOrCreateBulletPrefab(bulletSprite);
+        WeaponDefinition2D pistol = CreateWeaponDefinition(PistolWeaponPath, "Pistol", WeaponRarity2D.Common, bulletPrefab, 0.2f, 12, 1, 1f, 1, 12f, 2f, 1, 0f);
+        WeaponDefinition2D smg = CreateWeaponDefinition(SMGWeaponPath, "SMG", WeaponRarity2D.Rare, bulletPrefab, 0.08f, 24, 1, 1.2f, 1, 13f, 2f, 1, 3f);
+        WeaponDefinition2D shotgun = CreateWeaponDefinition(ShotgunWeaponPath, "Shotgun", WeaponRarity2D.Epic, bulletPrefab, 0.55f, 6, 1, 1.4f, 1, 11f, 1.2f, 5, 35f);
+        GameObject smgPickup = CreateWeaponPickupPrefab("SMGPickup", SMGPickupPrefabPath, weaponPickupSprite, smg);
+        GameObject shotgunPickup = CreateWeaponPickupPrefab("ShotgunPickup", ShotgunPickupPrefabPath, weaponPickupSprite, shotgun);
+
+        AssignObjectReference(playerShooting, "firePoint", firePoint);
+        AssignObjectReference(playerShooting, "bulletPrefab", bulletPrefab);
+        AssignBool(playerShooting, "useAmmo", true);
+        AssignObjectReference(playerShooting, "playerResources", playerResources);
+        AssignObjectReference(playerShooting, "startingWeapon", pistol);
+        AssignObjectReference(playerShooting, "equippedWeapon", pistol);
+
+        CameraFollow2D cameraFollow = cameraObject.GetComponent<CameraFollow2D>();
+        AssignObjectReference(cameraFollow, "target", player.transform);
+
+        GameObject enemyPrefab = CreateEnemyPrefab(enemySprite);
+        GameObject[] lootPrefabs =
+        {
+            CreateResourcePickupPrefab("HealthPickup", HealthPickupPrefabPath, healthPickupSprite, ResourcePickupType.Health, 2),
+            CreateResourcePickupPrefab("AmmoPickup", AmmoPickupPrefabPath, ammoPickupSprite, ResourcePickupType.Ammo, 10),
+            CreateResourcePickupPrefab("MoneyPickup", MoneyPickupPrefabPath, moneyPickupSprite, ResourcePickupType.Money, 25),
+            shotgunPickup != null ? shotgunPickup : smgPickup
+        };
+
+        CreateWeaponLootRoom(root.transform, wallSprite, enemyPrefab, lootPrefabs);
+
+        GameObject gameOverPanel = CreateWeaponLootUI(root.transform, playerHealth, playerResources, playerShooting);
+        CreateGameSystems(root.transform, playerHealth, gameOverPanel);
+
+        EditorSceneManager.SaveScene(scene, WeaponLootScenePath);
+        AddSceneToBuildSettings(WeaponLootScenePath);
+        AssetDatabase.SaveAssets();
+        AssetDatabase.Refresh();
+
+        Debug.Log($"Created Prototype 0.5 weapon loot scene at {WeaponLootScenePath}.");
+    }
+
     private static void CreateRequiredFolders()
     {
         foreach (string folder in RequiredFolders)
@@ -302,6 +394,10 @@ public static class PrototypeSceneBuilder
         WriteSpriteTexture(HealthPickupSpritePath, 64, CreateHealthPickupPixel);
         WriteSpriteTexture(AmmoPickupSpritePath, 64, CreateAmmoPickupPixel);
         WriteSpriteTexture(MoneyPickupSpritePath, 64, CreateMoneyPickupPixel);
+        WriteSpriteTexture(PistolSpritePath, 64, CreatePistolPixel);
+        WriteSpriteTexture(SMGSpritePath, 64, CreateSMGPixel);
+        WriteSpriteTexture(ShotgunSpritePath, 64, CreateShotgunPixel);
+        WriteSpriteTexture(WeaponPickupSpritePath, 64, CreateWeaponPickupPixel);
     }
 
     private static GameObject CreateCamera(Transform parent)
@@ -510,6 +606,74 @@ public static class PrototypeSceneBuilder
         return prefab;
     }
 
+    private static WeaponDefinition2D CreateWeaponDefinition(
+        string assetPath,
+        string weaponName,
+        WeaponRarity2D rarity,
+        GameObject bulletPrefab,
+        float fireCooldown,
+        int magazineSize,
+        int ammoPerShot,
+        float reloadDuration,
+        int projectileDamage,
+        float projectileSpeed,
+        float projectileLifetime,
+        int projectilesPerShot,
+        float spreadAngle)
+    {
+        WeaponDefinition2D weapon = AssetDatabase.LoadAssetAtPath<WeaponDefinition2D>(assetPath);
+
+        if (weapon == null)
+        {
+            weapon = ScriptableObject.CreateInstance<WeaponDefinition2D>();
+            AssetDatabase.CreateAsset(weapon, assetPath);
+        }
+
+        AssignString(weapon, "weaponName", weaponName);
+        AssignEnum(weapon, "rarity", (int)rarity);
+        AssignObjectReference(weapon, "bulletPrefab", bulletPrefab);
+        AssignFloat(weapon, "fireCooldown", fireCooldown);
+        AssignInt(weapon, "magazineSize", magazineSize);
+        AssignInt(weapon, "ammoPerShot", ammoPerShot);
+        AssignFloat(weapon, "reloadDuration", reloadDuration);
+        AssignInt(weapon, "projectileDamage", projectileDamage);
+        AssignFloat(weapon, "projectileSpeed", projectileSpeed);
+        AssignFloat(weapon, "projectileLifetime", projectileLifetime);
+        AssignInt(weapon, "projectilesPerShot", projectilesPerShot);
+        AssignFloat(weapon, "spreadAngle", spreadAngle);
+
+        EditorUtility.SetDirty(weapon);
+        AssetDatabase.SaveAssets();
+        return weapon;
+    }
+
+    private static GameObject CreateWeaponPickupPrefab(string pickupName, string prefabPath, Sprite sprite, WeaponDefinition2D weapon)
+    {
+        GameObject pickupObject = new GameObject(pickupName);
+        pickupObject.transform.localScale = new Vector3(0.55f, 0.55f, 1f);
+
+        SpriteRenderer spriteRenderer = pickupObject.AddComponent<SpriteRenderer>();
+        spriteRenderer.sprite = sprite;
+        spriteRenderer.sortingOrder = 15;
+
+        CircleCollider2D collider = pickupObject.AddComponent<CircleCollider2D>();
+        collider.isTrigger = true;
+
+        WeaponPickup2D pickup = pickupObject.AddComponent<WeaponPickup2D>();
+        AssignObjectReference(pickup, "weapon", weapon);
+        AssignBool(pickup, "destroyOnPickup", true);
+
+        GameObject prefab = PrefabUtility.SaveAsPrefabAsset(pickupObject, prefabPath);
+        UnityEngine.Object.DestroyImmediate(pickupObject);
+
+        if (prefab == null)
+        {
+            prefab = AssetDatabase.LoadAssetAtPath<GameObject>(prefabPath);
+        }
+
+        return prefab;
+    }
+
     private static void CreateEnemy(Transform parent, Sprite sprite)
     {
         GameObject enemy = new GameObject("TestEnemy");
@@ -617,6 +781,25 @@ public static class PrototypeSceneBuilder
         CreateRoomTrigger(room.transform, roomController);
     }
 
+    private static void CreateWeaponLootRoom(Transform parent, Sprite wallSprite, GameObject enemyPrefab, GameObject[] lootPrefabs)
+    {
+        GameObject room = new GameObject("Room_01");
+        room.transform.SetParent(parent);
+
+        CreateRoomLoopWalls(room.transform, wallSprite, out DoorController2D leftDoor, out DoorController2D rightDoor);
+
+        EnemySpawner2D enemySpawner = CreateEnemySpawner(room.transform, enemyPrefab);
+        RoomLootSpawner2D lootSpawner = CreateWeaponRoomLootSpawner(room.transform, lootPrefabs);
+
+        RoomController2D roomController = room.AddComponent<RoomController2D>();
+        AssignObjectReferenceArray(roomController, "doors", new[] { leftDoor, rightDoor });
+        AssignObjectReference(roomController, "enemySpawner", enemySpawner);
+        AssignObjectReference(roomController, "lootSpawner", lootSpawner);
+        AssignFloat(roomController, "doorCloseDelay", 0.5f);
+
+        CreateRoomTrigger(room.transform, roomController);
+    }
+
     private static void CreateWallWithDoorGap(Transform parent, string name, Sprite sprite, float x)
     {
         GameObject wall = new GameObject(name);
@@ -699,6 +882,28 @@ public static class PrototypeSceneBuilder
         AssignObjectReferenceArray(lootSpawner, "spawnPoints", spawnPoints);
         AssignBool(lootSpawner, "spawnAll", true);
         AssignInt(lootSpawner, "randomSpawnCount", 3);
+
+        return lootSpawner;
+    }
+
+    private static RoomLootSpawner2D CreateWeaponRoomLootSpawner(Transform parent, GameObject[] lootPrefabs)
+    {
+        GameObject lootSpawnerObject = new GameObject("LootSpawner");
+        lootSpawnerObject.transform.SetParent(parent);
+
+        Transform[] spawnPoints =
+        {
+            CreateMarker(lootSpawnerObject.transform, "LootSpawnPoint_Health", new Vector3(3.8f, 1.3f, 0f)),
+            CreateMarker(lootSpawnerObject.transform, "LootSpawnPoint_Ammo", new Vector3(4.5f, 0.45f, 0f)),
+            CreateMarker(lootSpawnerObject.transform, "LootSpawnPoint_Money", new Vector3(4.5f, -0.45f, 0f)),
+            CreateMarker(lootSpawnerObject.transform, "LootSpawnPoint_Weapon", new Vector3(3.8f, -1.3f, 0f))
+        };
+
+        RoomLootSpawner2D lootSpawner = lootSpawnerObject.AddComponent<RoomLootSpawner2D>();
+        AssignObjectReferenceArray(lootSpawner, "lootPrefabs", lootPrefabs);
+        AssignObjectReferenceArray(lootSpawner, "spawnPoints", spawnPoints);
+        AssignBool(lootSpawner, "spawnAll", true);
+        AssignInt(lootSpawner, "randomSpawnCount", 4);
 
         return lootSpawner;
     }
@@ -898,6 +1103,124 @@ public static class PrototypeSceneBuilder
         AssignObjectReference(resourceUI, "playerShooting", playerShooting);
         AssignObjectReference(resourceUI, "ammoText", ammoText);
         AssignObjectReference(resourceUI, "moneyText", moneyText);
+
+        GameObject gameOverPanel = CreateRectObject("GameOverPanel", canvasObject.transform);
+        SetRectTransform(gameOverPanel.GetComponent<RectTransform>(), new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(360f, 160f));
+
+        Image gameOverBackground = gameOverPanel.AddComponent<Image>();
+        gameOverBackground.color = new Color(0f, 0f, 0f, 0.82f);
+
+        GameObject gameOverTextObject = CreateRectObject("GameOverText", gameOverPanel.transform);
+        StretchRectTransform(gameOverTextObject.GetComponent<RectTransform>(), new Vector2(16f, 16f), new Vector2(-16f, -16f));
+
+        Text gameOverText = gameOverTextObject.AddComponent<Text>();
+        gameOverText.font = GetBuiltinUIFont();
+        gameOverText.text = "GAME OVER\nPress R to restart";
+        gameOverText.fontSize = 30;
+        gameOverText.alignment = TextAnchor.MiddleCenter;
+        gameOverText.color = Color.white;
+        gameOverText.raycastTarget = false;
+
+        gameOverPanel.SetActive(false);
+        return gameOverPanel;
+    }
+
+    private static GameObject CreateWeaponLootUI(Transform parent, PlayerHealth2D playerHealth, PlayerResources2D playerResources, PlayerShooting2D playerShooting)
+    {
+        GameObject ui = new GameObject("UI");
+        ui.transform.SetParent(parent);
+
+        GameObject canvasObject = new GameObject("Canvas", typeof(RectTransform), typeof(Canvas), typeof(CanvasScaler), typeof(GraphicRaycaster));
+        canvasObject.transform.SetParent(ui.transform);
+
+        Canvas canvas = canvasObject.GetComponent<Canvas>();
+        canvas.renderMode = RenderMode.ScreenSpaceOverlay;
+
+        CanvasScaler canvasScaler = canvasObject.GetComponent<CanvasScaler>();
+        canvasScaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
+        canvasScaler.referenceResolution = new Vector2(1280f, 720f);
+        canvasScaler.matchWidthOrHeight = 0.5f;
+
+        GameObject healthPanel = CreateRectObject("HealthPanel", canvasObject.transform);
+        SetRectTransform(healthPanel.GetComponent<RectTransform>(), new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(24f, -24f), new Vector2(220f, 42f));
+
+        Image healthPanelImage = healthPanel.AddComponent<Image>();
+        healthPanelImage.color = new Color(0f, 0f, 0f, 0.65f);
+
+        GameObject healthFillObject = CreateRectObject("HealthFill", healthPanel.transform);
+        StretchRectTransform(healthFillObject.GetComponent<RectTransform>(), new Vector2(4f, 4f), new Vector2(-4f, -4f));
+
+        Image healthFill = healthFillObject.AddComponent<Image>();
+        healthFill.color = new Color(0.18f, 0.85f, 0.32f, 0.9f);
+        healthFill.type = Image.Type.Filled;
+        healthFill.fillMethod = Image.FillMethod.Horizontal;
+        healthFill.fillOrigin = (int)Image.OriginHorizontal.Left;
+        healthFill.fillAmount = 1f;
+
+        GameObject healthTextObject = CreateRectObject("HealthText", healthPanel.transform);
+        StretchRectTransform(healthTextObject.GetComponent<RectTransform>(), Vector2.zero, Vector2.zero);
+
+        Text healthText = healthTextObject.AddComponent<Text>();
+        healthText.font = GetBuiltinUIFont();
+        healthText.text = "HP: 5 / 5";
+        healthText.fontSize = 18;
+        healthText.alignment = TextAnchor.MiddleCenter;
+        healthText.color = Color.white;
+        healthText.raycastTarget = false;
+
+        HealthUI2D healthUI = healthPanel.AddComponent<HealthUI2D>();
+        AssignObjectReference(healthUI, "playerHealth", playerHealth);
+        AssignObjectReference(healthUI, "healthFill", healthFill);
+        AssignObjectReference(healthUI, "healthText", healthText);
+
+        GameObject resourcePanel = CreateRectObject("ResourcePanel", canvasObject.transform);
+        SetRectTransform(resourcePanel.GetComponent<RectTransform>(), new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(24f, -76f), new Vector2(430f, 92f));
+
+        Image resourcePanelImage = resourcePanel.AddComponent<Image>();
+        resourcePanelImage.color = new Color(0f, 0f, 0f, 0.65f);
+
+        GameObject ammoTextObject = CreateRectObject("AmmoText", resourcePanel.transform);
+        SetRectTransform(ammoTextObject.GetComponent<RectTransform>(), new Vector2(0f, 1f), new Vector2(1f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -8f), new Vector2(-16f, 24f));
+
+        Text ammoText = ammoTextObject.AddComponent<Text>();
+        ammoText.font = GetBuiltinUIFont();
+        ammoText.text = "Ammo: 12 / 12 | Reserve: 30 / 99";
+        ammoText.fontSize = 16;
+        ammoText.alignment = TextAnchor.MiddleLeft;
+        ammoText.color = Color.white;
+        ammoText.raycastTarget = false;
+
+        GameObject moneyTextObject = CreateRectObject("MoneyText", resourcePanel.transform);
+        SetRectTransform(moneyTextObject.GetComponent<RectTransform>(), new Vector2(0f, 0.5f), new Vector2(1f, 0.5f), new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(-16f, 24f));
+
+        Text moneyText = moneyTextObject.AddComponent<Text>();
+        moneyText.font = GetBuiltinUIFont();
+        moneyText.text = "Money: 0";
+        moneyText.fontSize = 16;
+        moneyText.alignment = TextAnchor.MiddleLeft;
+        moneyText.color = Color.white;
+        moneyText.raycastTarget = false;
+
+        GameObject weaponTextObject = CreateRectObject("WeaponText", resourcePanel.transform);
+        SetRectTransform(weaponTextObject.GetComponent<RectTransform>(), new Vector2(0f, 0f), new Vector2(1f, 0f), new Vector2(0.5f, 0f), new Vector2(0f, 8f), new Vector2(-16f, 24f));
+
+        Text weaponText = weaponTextObject.AddComponent<Text>();
+        weaponText.font = GetBuiltinUIFont();
+        weaponText.text = "Weapon: Pistol [Common]";
+        weaponText.fontSize = 16;
+        weaponText.alignment = TextAnchor.MiddleLeft;
+        weaponText.color = Color.white;
+        weaponText.raycastTarget = false;
+
+        ResourceUI2D resourceUI = resourcePanel.AddComponent<ResourceUI2D>();
+        AssignObjectReference(resourceUI, "playerResources", playerResources);
+        AssignObjectReference(resourceUI, "playerShooting", playerShooting);
+        AssignObjectReference(resourceUI, "ammoText", ammoText);
+        AssignObjectReference(resourceUI, "moneyText", moneyText);
+
+        WeaponUI2D weaponUI = resourcePanel.AddComponent<WeaponUI2D>();
+        AssignObjectReference(weaponUI, "playerShooting", playerShooting);
+        AssignObjectReference(weaponUI, "weaponText", weaponText);
 
         GameObject gameOverPanel = CreateRectObject("GameOverPanel", canvasObject.transform);
         SetRectTransform(gameOverPanel.GetComponent<RectTransform>(), new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(360f, 160f));
@@ -1165,6 +1488,74 @@ public static class PrototypeSceneBuilder
         bool coinMark = dx < size * 0.08f && dy < size * 0.25f;
 
         return coinMark ? new Color(0.55f, 0.32f, 0.04f, 1f) : basePixel;
+    }
+
+    private static Color CreatePistolPixel(int x, int y, int size)
+    {
+        bool barrel = x >= 24 && x < 54 && y >= 34 && y < 42;
+        bool body = x >= 18 && x < 36 && y >= 24 && y < 38;
+        bool grip = x >= 20 && x < 30 && y >= 12 && y < 28;
+        bool outline = (barrel || body || grip) && (x % 8 == 0 || y % 8 == 0);
+
+        if (!barrel && !body && !grip)
+        {
+            return Color.clear;
+        }
+
+        return outline ? new Color(0.08f, 0.08f, 0.09f, 1f) : new Color(0.55f, 0.6f, 0.65f, 1f);
+    }
+
+    private static Color CreateSMGPixel(int x, int y, int size)
+    {
+        bool barrel = x >= 18 && x < 56 && y >= 35 && y < 42;
+        bool body = x >= 12 && x < 42 && y >= 25 && y < 38;
+        bool magazine = x >= 28 && x < 36 && y >= 12 && y < 27;
+        bool stock = x >= 6 && x < 16 && y >= 27 && y < 35;
+
+        if (!barrel && !body && !magazine && !stock)
+        {
+            return Color.clear;
+        }
+
+        if (x < 10 || y < 14 || x > 52)
+        {
+            return new Color(0.1f, 0.1f, 0.12f, 1f);
+        }
+
+        return new Color(0.32f, 0.55f, 0.85f, 1f);
+    }
+
+    private static Color CreateShotgunPixel(int x, int y, int size)
+    {
+        bool barrel = x >= 14 && x < 58 && y >= 36 && y < 43;
+        bool lowerBarrel = x >= 16 && x < 56 && y >= 29 && y < 34;
+        bool stock = x >= 6 && x < 22 && y >= 24 && y < 38;
+        bool grip = x >= 24 && x < 32 && y >= 14 && y < 30;
+
+        if (!barrel && !lowerBarrel && !stock && !grip)
+        {
+            return Color.clear;
+        }
+
+        if (stock || grip)
+        {
+            return new Color(0.45f, 0.24f, 0.08f, 1f);
+        }
+
+        return new Color(0.75f, 0.62f, 0.32f, 1f);
+    }
+
+    private static Color CreateWeaponPickupPixel(int x, int y, int size)
+    {
+        Color basePixel = CirclePixel(x, y, size, new Color(0.52f, 0.22f, 0.9f, 1f), new Color(0.16f, 0.04f, 0.32f, 1f));
+
+        if (basePixel.a <= 0f)
+        {
+            return basePixel;
+        }
+
+        bool weaponMark = (x >= 18 && x < 48 && y >= 34 && y < 40) || (x >= 22 && x < 32 && y >= 20 && y < 36);
+        return weaponMark ? Color.white : basePixel;
     }
 
     private static Color CirclePixel(int x, int y, int size, Color fill, Color outline)
