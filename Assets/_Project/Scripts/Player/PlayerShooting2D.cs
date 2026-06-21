@@ -116,7 +116,10 @@ public class PlayerShooting2D : MonoBehaviour
             return;
         }
 
-        FireProjectiles();
+        if (FireProjectiles())
+        {
+            PlayShootFeedback();
+        }
     }
 
     public void EquipWeapon(WeaponDefinition2D weapon, bool refillMagazine = true)
@@ -148,11 +151,12 @@ public class PlayerShooting2D : MonoBehaviour
         Debug.Log($"Equipped weapon: {weapon.WeaponName} ({weapon.Rarity})", this);
     }
 
-    private void FireProjectiles()
+    private bool FireProjectiles()
     {
         int projectileCount = equippedWeapon != null ? Mathf.Max(1, equippedWeapon.ProjectilesPerShot) : 1;
         float spread = equippedWeapon != null ? Mathf.Max(0f, equippedWeapon.SpreadAngle) : 0f;
         Vector2 centerDirection = firePoint.right;
+        bool firedAnyProjectile = false;
 
         for (int i = 0; i < projectileCount; i++)
         {
@@ -176,7 +180,10 @@ public class PlayerShooting2D : MonoBehaviour
             }
 
             bullet.Fire(projectileDirection);
+            firedAnyProjectile = true;
         }
+
+        return firedAnyProjectile;
     }
 
     public void AddProjectileDamageBonus(int amount)
@@ -386,6 +393,26 @@ public class PlayerShooting2D : MonoBehaviour
 
         Debug.LogWarning(message, this);
         alreadyLogged = true;
+    }
+
+    private void PlayShootFeedback()
+    {
+        DemoAudioManager2D audioManager = FindObjectOfType<DemoAudioManager2D>();
+
+        if (audioManager != null)
+        {
+            audioManager.PlayShoot();
+        }
+
+        SimpleCameraShake2D cameraShake = FindObjectOfType<SimpleCameraShake2D>();
+
+        if (cameraShake == null)
+        {
+            return;
+        }
+
+        bool isHeavyShot = equippedWeapon != null && equippedWeapon.ProjectilesPerShot > 1;
+        cameraShake.Shake(isHeavyShot ? 0.12f : 0.06f, isHeavyShot ? 0.12f : 0.04f);
     }
 
     private void OnValidate()

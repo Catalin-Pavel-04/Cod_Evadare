@@ -25,6 +25,7 @@ public class DoorController2D : MonoBehaviour
         }
 
         Debug.Log($"Door '{name}' opened.", this);
+        PlayDoorFeedback();
     }
 
     public void CloseDoor()
@@ -42,6 +43,7 @@ public class DoorController2D : MonoBehaviour
         }
 
         Debug.Log($"Door '{name}' closed.", this);
+        PlayDoorFeedback();
     }
 
     private void CacheComponents()
@@ -54,6 +56,16 @@ public class DoorController2D : MonoBehaviour
         if (doorCollider == null)
         {
             doorCollider = GetComponent<Collider2D>();
+        }
+    }
+
+    private void PlayDoorFeedback()
+    {
+        DemoAudioManager2D audioManager = FindObjectOfType<DemoAudioManager2D>();
+
+        if (audioManager != null)
+        {
+            audioManager.PlayDoor();
         }
     }
 }

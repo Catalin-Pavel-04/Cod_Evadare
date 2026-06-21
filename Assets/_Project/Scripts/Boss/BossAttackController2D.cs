@@ -199,6 +199,7 @@ public class BossAttackController2D : MonoBehaviour
         {
             isPhaseTwo = true;
             Debug.Log($"{bossName} entered phase 2", this);
+            PlayBossPhaseFeedback();
         }
     }
 
@@ -265,6 +266,16 @@ public class BossAttackController2D : MonoBehaviour
     private void HandleBossDied(EnemyHealth deadBoss)
     {
         DeactivateBoss();
+    }
+
+    private void PlayBossPhaseFeedback()
+    {
+        DemoAudioManager2D audioManager = FindObjectOfType<DemoAudioManager2D>();
+
+        if (audioManager != null)
+        {
+            audioManager.PlayBossPhase();
+        }
     }
 
     private void OnDestroy()

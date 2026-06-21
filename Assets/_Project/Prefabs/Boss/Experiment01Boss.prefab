@@ -47,6 +47,7 @@ GameObject:
   - component: {fileID: 2683240175520680485}
   - component: {fileID: 9018785128725400331}
   - component: {fileID: 4394032581314915906}
+  - component: {fileID: 801271430583668283}
   m_Layer: 0
   m_Name: Experiment01Boss
   m_TagString: Untagged
@@ -252,3 +253,18 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   bossName: Experiment-01
+--- !u!114 &801271430583668283
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4507485062581455076}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: de84a6f2cf169ae42905a8b50f9496af, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  spriteRenderer: {fileID: 1902360695126387321}
+  flashColor: {r: 1, g: 1, b: 1, a: 1}
+  flashDuration: 0.08

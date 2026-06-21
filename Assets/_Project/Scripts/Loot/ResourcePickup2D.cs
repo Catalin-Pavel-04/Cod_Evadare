@@ -39,6 +39,7 @@ public class ResourcePickup2D : MonoBehaviour
         }
 
         Debug.Log($"Player collected {pickupType} pickup for {Mathf.Max(0, amount)}.", this);
+        PlayPickupFeedback();
 
         if (destroyOnCollect)
         {
@@ -111,6 +112,16 @@ public class ResourcePickup2D : MonoBehaviour
 
         Debug.LogWarning($"{name} could not be collected because the player is missing {componentName}.", this);
         loggedMissingComponent = true;
+    }
+
+    private void PlayPickupFeedback()
+    {
+        DemoAudioManager2D audioManager = FindObjectOfType<DemoAudioManager2D>();
+
+        if (audioManager != null)
+        {
+            audioManager.PlayPickup();
+        }
     }
 
     private void OnValidate()

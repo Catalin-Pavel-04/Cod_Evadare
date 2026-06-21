@@ -132,6 +132,7 @@ public class BuffChoiceController2D : MonoBehaviour
         }
 
         playerBuffs.ApplyBuff(buff);
+        PlayBuffFeedback();
         HideChoices();
     }
 
@@ -176,6 +177,16 @@ public class BuffChoiceController2D : MonoBehaviour
         if (pausedByThisController)
         {
             Time.timeScale = 1f;
+        }
+    }
+
+    private void PlayBuffFeedback()
+    {
+        DemoAudioManager2D audioManager = FindObjectOfType<DemoAudioManager2D>();
+
+        if (audioManager != null)
+        {
+            audioManager.PlayBuff();
         }
     }
 

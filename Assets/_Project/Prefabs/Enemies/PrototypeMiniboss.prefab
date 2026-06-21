@@ -16,6 +16,7 @@ GameObject:
   - component: {fileID: 683227874723559044}
   - component: {fileID: 4316160520456348695}
   - component: {fileID: 4968601261500326985}
+  - component: {fileID: 4299377086190400334}
   m_Layer: 0
   m_Name: PrototypeMiniboss
   m_TagString: Untagged
@@ -216,3 +217,18 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   minibossName: Prototype Miniboss
+--- !u!114 &4299377086190400334
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1197417793263340933}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: de84a6f2cf169ae42905a8b50f9496af, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  spriteRenderer: {fileID: 3095556769592859909}
+  flashColor: {r: 1, g: 1, b: 1, a: 1}
+  flashDuration: 0.08

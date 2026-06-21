@@ -58,6 +58,13 @@ public class LevelEndController2D : MonoBehaviour
             Time.timeScale = 0f;
         }
 
+        DemoAudioManager2D audioManager = FindObjectOfType<DemoAudioManager2D>();
+
+        if (audioManager != null)
+        {
+            audioManager.PlayVictory();
+        }
+
         Debug.Log(message, this);
     }
 

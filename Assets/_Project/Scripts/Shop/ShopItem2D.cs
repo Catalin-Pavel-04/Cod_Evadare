@@ -101,6 +101,7 @@ public class ShopItem2D : MonoBehaviour
         ApplyItem(nearbyPlayer, resources);
         ShowMessage($"Bought: {itemDefinition.DisplayName}");
         Debug.Log($"Player bought '{itemDefinition.DisplayName}' for ${itemDefinition.Price}.", this);
+        PlayShopFeedback();
 
         if (singlePurchase)
         {
@@ -221,5 +222,15 @@ public class ShopItem2D : MonoBehaviour
 
         Debug.LogWarning(message, this);
         alreadyLogged = true;
+    }
+
+    private void PlayShopFeedback()
+    {
+        DemoAudioManager2D audioManager = FindObjectOfType<DemoAudioManager2D>();
+
+        if (audioManager != null)
+        {
+            audioManager.PlayShop();
+        }
     }
 }

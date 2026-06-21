@@ -15,6 +15,7 @@ GameObject:
   - component: {fileID: 282977873347786850}
   - component: {fileID: 3179347671582909345}
   - component: {fileID: 8005702389229563592}
+  - component: {fileID: 1581559479629497219}
   m_Layer: 0
   m_Name: TestEnemy
   m_TagString: Untagged
@@ -202,3 +203,18 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   damage: 1
   damageCooldown: 1
+--- !u!114 &1581559479629497219
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6285265434719246608}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: de84a6f2cf169ae42905a8b50f9496af, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  spriteRenderer: {fileID: 62026719007483434}
+  flashColor: {r: 1, g: 1, b: 1, a: 1}
+  flashDuration: 0.08

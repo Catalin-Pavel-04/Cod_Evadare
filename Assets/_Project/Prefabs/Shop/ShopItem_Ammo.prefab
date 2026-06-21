@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 4215720174326756391}
   - component: {fileID: 4643270009950351377}
   - component: {fileID: 2349679599532750237}
+  - component: {fileID: 8943145038379195190}
   m_Layer: 0
   m_Name: ShopItem_Ammo
   m_TagString: Untagged
@@ -138,3 +139,18 @@ MonoBehaviour:
   singlePurchase: 1
   spriteRenderer: {fileID: 4215720174326756391}
   shopUI: {fileID: 0}
+--- !u!114 &8943145038379195190
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7017208600840259951}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3cb68b29d4596a44e81477d16aaf5518, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  bobHeight: 0.12
+  bobSpeed: 2
+  rotateSpeed: 0

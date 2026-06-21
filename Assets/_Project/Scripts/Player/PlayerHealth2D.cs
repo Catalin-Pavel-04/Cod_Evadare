@@ -63,6 +63,7 @@ public class PlayerHealth2D : MonoBehaviour
         }
 
         Debug.Log($"Player took {clampedDamage} damage. Health: {CurrentHealth}/{maxHealth}.", this);
+        PlayDamageFeedback();
 
         if (CurrentHealth <= 0)
         {
@@ -213,6 +214,7 @@ public class PlayerHealth2D : MonoBehaviour
 
         RestoreSprite();
         Debug.Log("Player died.", this);
+        PlayGameOverFeedback();
         PlayerDied?.Invoke();
 
         if (destroyOnDeath)
@@ -230,6 +232,40 @@ public class PlayerHealth2D : MonoBehaviour
 
         spriteRenderer.enabled = originalSpriteEnabled;
         spriteRenderer.color = originalSpriteColor;
+    }
+
+    private void PlayDamageFeedback()
+    {
+        SpriteFlash2D flash = GetComponent<SpriteFlash2D>();
+
+        if (flash != null)
+        {
+            flash.Flash();
+        }
+
+        SimpleCameraShake2D cameraShake = FindObjectOfType<SimpleCameraShake2D>();
+
+        if (cameraShake != null)
+        {
+            cameraShake.Shake(0.18f, 0.2f);
+        }
+
+        DemoAudioManager2D audioManager = FindObjectOfType<DemoAudioManager2D>();
+
+        if (audioManager != null)
+        {
+            audioManager.PlayHit();
+        }
+    }
+
+    private void PlayGameOverFeedback()
+    {
+        DemoAudioManager2D audioManager = FindObjectOfType<DemoAudioManager2D>();
+
+        if (audioManager != null)
+        {
+            audioManager.PlayGameOver();
+        }
     }
 
     private void OnValidate()

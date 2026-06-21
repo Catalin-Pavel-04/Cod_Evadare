@@ -42,6 +42,7 @@ public class WeaponPickup2D : MonoBehaviour
 
         playerShooting.EquipWeapon(weapon, true);
         Debug.Log($"Player picked up weapon: {weapon.WeaponName} ({weapon.Rarity}).", this);
+        PlayPickupFeedback();
 
         if (destroyOnPickup)
         {
@@ -68,5 +69,15 @@ public class WeaponPickup2D : MonoBehaviour
 
         Debug.LogWarning(message, this);
         alreadyLogged = true;
+    }
+
+    private void PlayPickupFeedback()
+    {
+        DemoAudioManager2D audioManager = FindObjectOfType<DemoAudioManager2D>();
+
+        if (audioManager != null)
+        {
+            audioManager.PlayPickup();
+        }
     }
 }

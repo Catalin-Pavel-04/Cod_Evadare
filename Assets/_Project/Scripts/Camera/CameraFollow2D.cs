@@ -7,6 +7,13 @@ public class CameraFollow2D : MonoBehaviour
     [SerializeField] private Vector3 offset;
 
     private const float CameraZPosition = -10f;
+    private Vector3 shakeOffset;
+
+    public void SetShakeOffset(Vector3 offset)
+    {
+        shakeOffset = offset;
+        shakeOffset.z = 0f;
+    }
 
     private void LateUpdate()
     {
@@ -16,6 +23,7 @@ public class CameraFollow2D : MonoBehaviour
         }
 
         Vector3 desiredPosition = target.position + offset;
+        desiredPosition += shakeOffset;
         desiredPosition.z = CameraZPosition;
 
         if (smoothSpeed <= 0f)

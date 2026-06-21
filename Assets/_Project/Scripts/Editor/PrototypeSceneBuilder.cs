@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using UnityEditor;
+using UnityEditor.Events;
 using UnityEditor.SceneManagement;
 using UnityEditorInternal;
 using UnityEngine;
@@ -21,6 +22,8 @@ public static class PrototypeSceneBuilder
     private const string MinibossBuffScenePath = "Assets/_Project/Scenes/Prototype_MinibossBuffs.unity";
     private const string BossFightScenePath = "Assets/_Project/Scenes/Prototype_BossFight.unity";
     private const string FullLaboratoryLevelScenePath = "Assets/_Project/Scenes/Prototype_FullLaboratoryLevel.unity";
+    private const string MainMenuScenePath = "Assets/_Project/Scenes/MainMenu.unity";
+    private const string FinalDemoScenePath = "Assets/_Project/Scenes/Prototype_FinalDemo.unity";
     private const string BulletPrefabPath = "Assets/_Project/Prefabs/Weapons/Bullet.prefab";
     private const string EnemyPrefabPath = "Assets/_Project/Prefabs/Enemies/TestEnemy.prefab";
     private const string MinibossPrefabPath = "Assets/_Project/Prefabs/Enemies/PrototypeMiniboss.prefab";
@@ -71,6 +74,16 @@ public static class PrototypeSceneBuilder
     private const string ShopAmmoSpritePath = GeneratedArtFolder + "/ShopAmmo_Prototype.png";
     private const string ShopWeaponSpritePath = GeneratedArtFolder + "/ShopWeapon_Prototype.png";
     private const string PlayerTag = "Player";
+    private const string GeneratedAudioFolder = "Assets/_Project/Audio/Generated";
+    private const string ShootAudioPath = GeneratedAudioFolder + "/Shoot.wav";
+    private const string HitAudioPath = GeneratedAudioFolder + "/Hit.wav";
+    private const string PickupAudioPath = GeneratedAudioFolder + "/Pickup.wav";
+    private const string DoorAudioPath = GeneratedAudioFolder + "/Door.wav";
+    private const string ShopAudioPath = GeneratedAudioFolder + "/Shop.wav";
+    private const string BuffAudioPath = GeneratedAudioFolder + "/Buff.wav";
+    private const string BossPhaseAudioPath = GeneratedAudioFolder + "/BossPhase.wav";
+    private const string VictoryAudioPath = GeneratedAudioFolder + "/Victory.wav";
+    private const string GameOverAudioPath = GeneratedAudioFolder + "/GameOver.wav";
 
     private static readonly string[] RequiredFolders =
     {
@@ -86,6 +99,7 @@ public static class PrototypeSceneBuilder
         "Assets/_Project/Prefabs/Boss",
         "Assets/_Project/Prefabs/Projectiles",
         "Assets/_Project/Prefabs/Environment",
+        "Assets/_Project/Prefabs/UI",
         "Assets/_Project/Prefabs/Pickups",
         "Assets/_Project/Prefabs/Loot",
         "Assets/_Project/Prefabs/Buffs",
@@ -99,8 +113,10 @@ public static class PrototypeSceneBuilder
         "Assets/_Project/Scripts",
         "Assets/_Project/Scripts/Buffs",
         "Assets/_Project/Scripts/Boss",
+        "Assets/_Project/Scripts/Audio",
         "Assets/_Project/Scripts/Core",
         "Assets/_Project/Scripts/Environment",
+        "Assets/_Project/Scripts/Feedback",
         "Assets/_Project/Scripts/Level",
         "Assets/_Project/Scripts/Loot",
         "Assets/_Project/Scripts/Projectiles",
@@ -112,8 +128,10 @@ public static class PrototypeSceneBuilder
         "Assets/_Project/Scripts/Enemies",
         "Assets/_Project/Scripts/Rooms",
         "Assets/_Project/Scripts/Pickups",
+        "Assets/_Project/Scripts/Menu",
         "Assets/_Project/Scripts/Camera",
-        "Assets/_Project/Scripts/Editor"
+        "Assets/_Project/Scripts/Editor",
+        "Assets/_Project/Audio/Generated"
     };
 
     [MenuItem("Tools/Cod Evadare/Create Prototype 0.1 Scene")]
@@ -790,6 +808,177 @@ public static class PrototypeSceneBuilder
         Debug.Log($"Created Prototype 0.9 full laboratory level at {FullLaboratoryLevelScenePath}.");
     }
 
+    [MenuItem("Tools/Cod Evadare/Create Main Menu Scene")]
+    public static void CreateMainMenuScene()
+    {
+        if (!Application.isBatchMode && !EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo())
+        {
+            return;
+        }
+
+        CreateRequiredFolders();
+
+        Scene scene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
+        SceneManager.SetActiveScene(scene);
+
+        GameObject root = new GameObject("MainMenu");
+        CreateMenuCamera(root.transform);
+        CreateMainMenuUI(root.transform);
+        CreateEventSystem(root.transform);
+
+        EditorSceneManager.SaveScene(scene, MainMenuScenePath);
+        AddSceneToBuildSettingsFirst(MainMenuScenePath);
+        AssetDatabase.SaveAssets();
+        AssetDatabase.Refresh();
+
+        Debug.Log($"Created main menu scene at {MainMenuScenePath}.");
+    }
+
+    [MenuItem("Tools/Cod Evadare/Create Prototype 1.0 Final Demo")]
+    public static void CreatePrototypeFinalDemo()
+    {
+        if (!Application.isBatchMode && !EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo())
+        {
+            return;
+        }
+
+        CreateRequiredFolders();
+        GeneratePlaceholderSprites();
+        GeneratePlaceholderAudio();
+        EnsureTag(PlayerTag);
+
+        Scene scene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
+        SceneManager.SetActiveScene(scene);
+
+        Sprite playerSprite = AssetDatabase.LoadAssetAtPath<Sprite>(PlayerSpritePath);
+        Sprite enemySprite = AssetDatabase.LoadAssetAtPath<Sprite>(EnemySpritePath);
+        Sprite minibossSprite = AssetDatabase.LoadAssetAtPath<Sprite>(MinibossSpritePath);
+        Sprite bossSprite = AssetDatabase.LoadAssetAtPath<Sprite>(BossSpritePath);
+        Sprite bulletSprite = AssetDatabase.LoadAssetAtPath<Sprite>(BulletSpritePath);
+        Sprite enemyProjectileSprite = AssetDatabase.LoadAssetAtPath<Sprite>(EnemyProjectileSpritePath);
+        Sprite wallSprite = AssetDatabase.LoadAssetAtPath<Sprite>(WallSpritePath);
+        Sprite bossWallSprite = AssetDatabase.LoadAssetAtPath<Sprite>(BossArenaWallSpritePath);
+        Sprite coverSprite = AssetDatabase.LoadAssetAtPath<Sprite>(CoverSpritePath);
+        Sprite healthPickupSprite = AssetDatabase.LoadAssetAtPath<Sprite>(HealthPickupSpritePath);
+        Sprite ammoPickupSprite = AssetDatabase.LoadAssetAtPath<Sprite>(AmmoPickupSpritePath);
+        Sprite moneyPickupSprite = AssetDatabase.LoadAssetAtPath<Sprite>(MoneyPickupSpritePath);
+        Sprite weaponPickupSprite = AssetDatabase.LoadAssetAtPath<Sprite>(WeaponPickupSpritePath);
+        Sprite shopHealthSprite = AssetDatabase.LoadAssetAtPath<Sprite>(ShopHealthSpritePath);
+        Sprite shopAmmoSprite = AssetDatabase.LoadAssetAtPath<Sprite>(ShopAmmoSpritePath);
+        Sprite shopWeaponSprite = AssetDatabase.LoadAssetAtPath<Sprite>(ShopWeaponSpritePath);
+
+        GameObject root = new GameObject("Prototype_FinalDemo");
+        GameObject cameraObject = CreateCamera(root.transform);
+        SimpleCameraShake2D cameraShake = cameraObject.AddComponent<SimpleCameraShake2D>();
+        AssignFloat(cameraShake, "defaultDuration", 0.12f);
+        AssignFloat(cameraShake, "defaultMagnitude", 0.12f);
+        CreateLighting(root.transform);
+
+        GameObject player = CreatePlayer(root.transform, playerSprite, out Transform firePoint, out PlayerShooting2D playerShooting);
+        player.transform.position = new Vector3(-24f, 0f, 0f);
+        SpriteFlash2D playerFlash = player.AddComponent<SpriteFlash2D>();
+        AssignObjectReference(playerFlash, "spriteRenderer", player.GetComponent<SpriteRenderer>());
+
+        PlayerHealth2D playerHealth = player.AddComponent<PlayerHealth2D>();
+        AssignInt(playerHealth, "maxHealth", 6);
+        AssignFloat(playerHealth, "invincibilityDuration", 0.75f);
+        AssignBool(playerHealth, "destroyOnDeath", false);
+
+        PlayerResources2D playerResources = player.AddComponent<PlayerResources2D>();
+        AssignInt(playerResources, "startingAmmo", 100);
+        AssignInt(playerResources, "maxAmmo", 160);
+        AssignInt(playerResources, "startingMoney", 50);
+
+        PlayerBuffs2D playerBuffs = player.AddComponent<PlayerBuffs2D>();
+
+        GameObject bulletPrefab = GetOrCreateBulletPrefab(bulletSprite);
+        WeaponDefinition2D pistol = CreateWeaponDefinition(PistolWeaponPath, "Pistol", WeaponRarity2D.Common, bulletPrefab, 0.2f, 12, 1, 1f, 1, 12f, 2f, 1, 0f);
+        CreateWeaponDefinition(SMGWeaponPath, "SMG", WeaponRarity2D.Rare, bulletPrefab, 0.08f, 24, 1, 1.2f, 1, 13f, 2f, 1, 3f);
+        WeaponDefinition2D shotgun = CreateWeaponDefinition(ShotgunWeaponPath, "Shotgun", WeaponRarity2D.Epic, bulletPrefab, 0.55f, 6, 1, 1.4f, 1, 11f, 1.2f, 5, 35f);
+
+        AssignObjectReference(playerShooting, "firePoint", firePoint);
+        AssignObjectReference(playerShooting, "bulletPrefab", bulletPrefab);
+        AssignBool(playerShooting, "useAmmo", true);
+        AssignObjectReference(playerShooting, "playerResources", playerResources);
+        AssignObjectReference(playerShooting, "startingWeapon", pistol);
+        AssignObjectReference(playerShooting, "equippedWeapon", pistol);
+
+        CameraFollow2D cameraFollow = cameraObject.GetComponent<CameraFollow2D>();
+        AssignObjectReference(cameraFollow, "target", player.transform);
+
+        GameObject enemyPrefab = CreateEnemyPrefab(enemySprite);
+        GameObject minibossPrefab = CreateMinibossPrefab(minibossSprite);
+        GameObject enemyProjectilePrefab = CreateEnemyProjectilePrefab(enemyProjectileSprite);
+        GameObject bossPrefab = CreateBossPrefab(bossSprite, enemyProjectilePrefab);
+
+        GameObject healthPickup = CreateResourcePickupPrefab("HealthPickup", HealthPickupPrefabPath, healthPickupSprite, ResourcePickupType.Health, 2);
+        GameObject ammoPickup = CreateResourcePickupPrefab("AmmoPickup", AmmoPickupPrefabPath, ammoPickupSprite, ResourcePickupType.Ammo, 25);
+        GameObject moneyPickup = CreateResourcePickupPrefab("MoneyPickup", MoneyPickupPrefabPath, moneyPickupSprite, ResourcePickupType.Money, 25);
+        GameObject shotgunPickup = CreateWeaponPickupPrefab("ShotgunPickup", ShotgunPickupPrefabPath, weaponPickupSprite, shotgun);
+
+        ShopItemDefinition2D healthShopItem = CreateShopItemDefinition(ShopHealthDefinitionPath, "Health +2", ShopItemType2D.Health, 25, 2, null, shopHealthSprite);
+        ShopItemDefinition2D ammoShopItem = CreateShopItemDefinition(ShopAmmoDefinitionPath, "Ammo +15", ShopItemType2D.Ammo, 20, 15, null, shopAmmoSprite);
+        ShopItemDefinition2D shotgunShopItem = CreateShopItemDefinition(ShopShotgunDefinitionPath, "Shotgun", ShopItemType2D.Weapon, 75, 0, shotgun, shopWeaponSprite);
+        GameObject healthShopPrefab = CreateShopItemPrefab("ShopItem_Health", ShopHealthPrefabPath, shopHealthSprite, healthShopItem);
+        GameObject ammoShopPrefab = CreateShopItemPrefab("ShopItem_Ammo", ShopAmmoPrefabPath, shopAmmoSprite, ammoShopItem);
+        GameObject shotgunShopPrefab = CreateShopItemPrefab("ShopItem_Weapon", ShopShotgunPrefabPath, shopWeaponSprite, shotgunShopItem);
+
+        BuffDefinition2D[] buffPool = CreatePrototypeBuffDefinitions();
+        GameObject gameOverPanel = CreateFullLaboratoryUI(
+            root.transform,
+            playerHealth,
+            playerResources,
+            playerShooting,
+            playerBuffs,
+            out ObjectiveUI2D objectiveUI,
+            out ShopUI2D shopUI,
+            out GameObject choicePanel,
+            out Button[] choiceButtons,
+            out Text[] choiceTexts,
+            out GameObject victoryPanel,
+            out Text victoryText);
+
+        AddFinalDemoUiOverlays(root.transform, out GameObject pausePanel, out DemoMessageUI2D demoMessageUI);
+
+        CreateFinalDemoGameSystems(
+            root.transform,
+            playerHealth,
+            gameOverPanel,
+            playerBuffs,
+            buffPool,
+            choicePanel,
+            choiceButtons,
+            choiceTexts,
+            objectiveUI,
+            victoryPanel,
+            victoryText,
+            pausePanel,
+            demoMessageUI,
+            out BuffChoiceController2D buffChoiceController,
+            out LevelEndController2D levelEndController);
+
+        CreateStartArea(root.transform, objectiveUI);
+        CreateFullCombatRoom(root.transform, "Combat_Room_01", -16f, wallSprite, enemyPrefab, 3, new[] { healthPickup, ammoPickup, moneyPickup }, objectiveUI, "Clear the first laboratory chamber", "Collect supplies, then move to the shop");
+        CreateFullShopArea(root.transform, -5f, wallSprite, shopUI, objectiveUI, healthShopPrefab, ammoShopPrefab, shotgunShopPrefab);
+        CreateFullCombatRoom(root.transform, "Combat_Room_02", 7f, wallSprite, enemyPrefab, 4, new[] { healthPickup, ammoPickup, moneyPickup, shotgunPickup }, objectiveUI, "Clear the second laboratory chamber", "Proceed to the miniboss room");
+        CreateFullMinibossRoom(root.transform, 19f, wallSprite, minibossPrefab, buffChoiceController, objectiveUI);
+        CreateFullBossRoom(root.transform, 34f, bossWallSprite, coverSprite, bossPrefab, levelEndController, objectiveUI);
+        CreateEventSystem(root.transform);
+
+        EditorSceneManager.SaveScene(scene, FinalDemoScenePath);
+        AddSceneToBuildSettings(FinalDemoScenePath);
+
+        if (File.Exists(ToAbsoluteAssetPath(MainMenuScenePath)))
+        {
+            AddSceneToBuildSettingsFirst(MainMenuScenePath);
+        }
+
+        AssetDatabase.SaveAssets();
+        AssetDatabase.Refresh();
+
+        Debug.Log($"Created Prototype 1.0 final demo scene at {FinalDemoScenePath}.");
+    }
+
     private static void CreateRequiredFolders()
     {
         foreach (string folder in RequiredFolders)
@@ -824,6 +1013,83 @@ public static class PrototypeSceneBuilder
         WriteSpriteTexture(ShopWeaponSpritePath, 64, CreateShopWeaponPixel);
     }
 
+    private static void GeneratePlaceholderAudio()
+    {
+        WriteSineWave(ShootAudioPath, 620f, 0.08f, 0.35f);
+        WriteSineWave(HitAudioPath, 180f, 0.12f, 0.45f);
+        WriteSineWave(PickupAudioPath, 880f, 0.12f, 0.35f);
+        WriteSineWave(DoorAudioPath, 120f, 0.18f, 0.4f);
+        WriteSineWave(ShopAudioPath, 760f, 0.12f, 0.35f);
+        WriteSineWave(BuffAudioPath, 1040f, 0.2f, 0.35f);
+        WriteSineWave(BossPhaseAudioPath, 90f, 0.35f, 0.45f);
+        WriteSineWave(VictoryAudioPath, 660f, 0.45f, 0.35f);
+        WriteSineWave(GameOverAudioPath, 110f, 0.45f, 0.45f);
+
+        AssetDatabase.Refresh(ImportAssetOptions.ForceSynchronousImport);
+    }
+
+    private static void WriteSineWave(string assetPath, float frequency, float duration, float amplitude)
+    {
+        const int sampleRate = 44100;
+        int sampleCount = Mathf.Max(1, Mathf.CeilToInt(sampleRate * Mathf.Max(0.01f, duration)));
+        byte[] wavBytes = new byte[44 + sampleCount * 2];
+        int byteRate = sampleRate * 2;
+        int dataSize = sampleCount * 2;
+
+        WriteAscii(wavBytes, 0, "RIFF");
+        WriteInt32(wavBytes, 4, 36 + dataSize);
+        WriteAscii(wavBytes, 8, "WAVE");
+        WriteAscii(wavBytes, 12, "fmt ");
+        WriteInt32(wavBytes, 16, 16);
+        WriteInt16(wavBytes, 20, 1);
+        WriteInt16(wavBytes, 22, 1);
+        WriteInt32(wavBytes, 24, sampleRate);
+        WriteInt32(wavBytes, 28, byteRate);
+        WriteInt16(wavBytes, 32, 2);
+        WriteInt16(wavBytes, 34, 16);
+        WriteAscii(wavBytes, 36, "data");
+        WriteInt32(wavBytes, 40, dataSize);
+
+        for (int i = 0; i < sampleCount; i++)
+        {
+            float t = (float)i / sampleRate;
+            float fade = 1f - (float)i / sampleCount;
+            short sample = (short)(Mathf.Sin(t * frequency * Mathf.PI * 2f) * amplitude * fade * short.MaxValue);
+            WriteInt16(wavBytes, 44 + i * 2, sample);
+        }
+
+        string absolutePath = ToAbsoluteAssetPath(assetPath);
+        string directory = Path.GetDirectoryName(absolutePath);
+
+        if (!string.IsNullOrEmpty(directory))
+        {
+            Directory.CreateDirectory(directory);
+        }
+
+        File.WriteAllBytes(absolutePath, wavBytes);
+        AssetDatabase.ImportAsset(assetPath, ImportAssetOptions.ForceSynchronousImport | ImportAssetOptions.ForceUpdate);
+    }
+
+    private static void WriteAscii(byte[] bytes, int startIndex, string text)
+    {
+        for (int i = 0; i < text.Length; i++)
+        {
+            bytes[startIndex + i] = (byte)text[i];
+        }
+    }
+
+    private static void WriteInt16(byte[] bytes, int startIndex, int value)
+    {
+        byte[] valueBytes = BitConverter.GetBytes((short)value);
+        Array.Copy(valueBytes, 0, bytes, startIndex, valueBytes.Length);
+    }
+
+    private static void WriteInt32(byte[] bytes, int startIndex, int value)
+    {
+        byte[] valueBytes = BitConverter.GetBytes(value);
+        Array.Copy(valueBytes, 0, bytes, startIndex, valueBytes.Length);
+    }
+
     private static GameObject CreateCamera(Transform parent)
     {
         GameObject cameraObject = new GameObject("Main Camera", typeof(Camera), typeof(AudioListener));
@@ -842,6 +1108,131 @@ public static class PrototypeSceneBuilder
         AssignVector3(cameraFollow, "offset", Vector3.zero);
 
         return cameraObject;
+    }
+
+    private static void CreateMenuCamera(Transform parent)
+    {
+        GameObject cameraObject = new GameObject("Main Camera", typeof(Camera), typeof(AudioListener));
+        cameraObject.transform.SetParent(parent);
+        cameraObject.transform.position = new Vector3(0f, 0f, -10f);
+        cameraObject.tag = "MainCamera";
+
+        Camera camera = cameraObject.GetComponent<Camera>();
+        camera.orthographic = true;
+        camera.orthographicSize = 5f;
+        camera.clearFlags = CameraClearFlags.SolidColor;
+        camera.backgroundColor = new Color(0.04f, 0.05f, 0.06f);
+    }
+
+    private static void CreateMainMenuUI(Transform parent)
+    {
+        GameObject ui = new GameObject("UI");
+        ui.transform.SetParent(parent);
+
+        GameObject canvasObject = new GameObject("Canvas", typeof(RectTransform), typeof(Canvas), typeof(CanvasScaler), typeof(GraphicRaycaster));
+        canvasObject.transform.SetParent(ui.transform);
+
+        Canvas canvas = canvasObject.GetComponent<Canvas>();
+        canvas.renderMode = RenderMode.ScreenSpaceOverlay;
+
+        CanvasScaler canvasScaler = canvasObject.GetComponent<CanvasScaler>();
+        canvasScaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
+        canvasScaler.referenceResolution = new Vector2(1280f, 720f);
+        canvasScaler.matchWidthOrHeight = 0.5f;
+
+        GameObject mainPanel = CreateRectObject("MainPanel", canvasObject.transform);
+        StretchRectTransform(mainPanel.GetComponent<RectTransform>(), Vector2.zero, Vector2.zero);
+
+        GameObject titleObject = CreateRectObject("TitleText", mainPanel.transform);
+        SetRectTransform(titleObject.GetComponent<RectTransform>(), new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -105f), new Vector2(720f, 70f));
+        Text titleText = titleObject.AddComponent<Text>();
+        titleText.font = GetBuiltinUIFont();
+        titleText.text = "COD: EVADARE";
+        titleText.fontSize = 46;
+        titleText.alignment = TextAnchor.MiddleCenter;
+        titleText.color = Color.white;
+        titleText.raycastTarget = false;
+
+        GameObject subtitleObject = CreateRectObject("SubtitleText", mainPanel.transform);
+        SetRectTransform(subtitleObject.GetComponent<RectTransform>(), new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -168f), new Vector2(600f, 40f));
+        Text subtitleText = subtitleObject.AddComponent<Text>();
+        subtitleText.font = GetBuiltinUIFont();
+        subtitleText.text = "Laboratory Escape Demo";
+        subtitleText.fontSize = 24;
+        subtitleText.alignment = TextAnchor.MiddleCenter;
+        subtitleText.color = new Color(0.72f, 0.9f, 1f, 1f);
+        subtitleText.raycastTarget = false;
+
+        GameObject controlsPanel = CreateRectObject("ControlsPanel", canvasObject.transform);
+        StretchRectTransform(controlsPanel.GetComponent<RectTransform>(), Vector2.zero, Vector2.zero);
+
+        GameObject menuSystems = new GameObject("MenuSystems");
+        menuSystems.transform.SetParent(parent);
+        GameObject controllerObject = new GameObject("MainMenuController");
+        controllerObject.transform.SetParent(menuSystems.transform);
+        MainMenuController2D controller = controllerObject.AddComponent<MainMenuController2D>();
+        AssignString(controller, "demoSceneName", "Prototype_FinalDemo");
+        AssignObjectReference(controller, "mainPanel", mainPanel);
+        AssignObjectReference(controller, "controlsPanel", controlsPanel);
+
+        Button playButton = CreateMenuButton(mainPanel.transform, "PlayButton", "Play Demo", new Vector2(0f, -15f));
+        UnityEventTools.AddPersistentListener(playButton.onClick, controller.PlayDemo);
+
+        Button controlsButton = CreateMenuButton(mainPanel.transform, "ControlsButton", "Controls", new Vector2(0f, -90f));
+        UnityEventTools.AddPersistentListener(controlsButton.onClick, controller.ShowControls);
+
+        Button quitButton = CreateMenuButton(mainPanel.transform, "QuitButton", "Quit", new Vector2(0f, -165f));
+        UnityEventTools.AddPersistentListener(quitButton.onClick, controller.QuitGame);
+
+        GameObject controlsTitleObject = CreateRectObject("ControlsTitleText", controlsPanel.transform);
+        SetRectTransform(controlsTitleObject.GetComponent<RectTransform>(), new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -90f), new Vector2(620f, 54f));
+        Text controlsTitleText = controlsTitleObject.AddComponent<Text>();
+        controlsTitleText.font = GetBuiltinUIFont();
+        controlsTitleText.text = "Controls";
+        controlsTitleText.fontSize = 36;
+        controlsTitleText.alignment = TextAnchor.MiddleCenter;
+        controlsTitleText.color = Color.white;
+        controlsTitleText.raycastTarget = false;
+
+        GameObject controlsBodyObject = CreateRectObject("ControlsBodyText", controlsPanel.transform);
+        SetRectTransform(controlsBodyObject.GetComponent<RectTransform>(), new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0f, 24f), new Vector2(620f, 260f));
+        Text controlsBodyText = controlsBodyObject.AddComponent<Text>();
+        controlsBodyText.font = GetBuiltinUIFont();
+        controlsBodyText.text = "WASD / Arrow Keys - Move\nMouse - Aim\nLeft Click - Shoot\nR - Reload\nE - Interact\nEscape - Pause";
+        controlsBodyText.fontSize = 24;
+        controlsBodyText.alignment = TextAnchor.MiddleCenter;
+        controlsBodyText.color = Color.white;
+        controlsBodyText.raycastTarget = false;
+
+        Button backButton = CreateMenuButton(controlsPanel.transform, "BackButton", "Back", new Vector2(0f, -220f));
+        UnityEventTools.AddPersistentListener(backButton.onClick, controller.ShowMainMenu);
+
+        controlsPanel.SetActive(false);
+    }
+
+    private static Button CreateMenuButton(Transform parent, string name, string label, Vector2 anchoredPosition)
+    {
+        GameObject buttonObject = CreateRectObject(name, parent);
+        SetRectTransform(buttonObject.GetComponent<RectTransform>(), new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), anchoredPosition, new Vector2(260f, 54f));
+
+        Image image = buttonObject.AddComponent<Image>();
+        image.color = new Color(0.12f, 0.2f, 0.24f, 1f);
+
+        Button button = buttonObject.AddComponent<Button>();
+        button.targetGraphic = image;
+
+        GameObject textObject = CreateRectObject("Text", buttonObject.transform);
+        StretchRectTransform(textObject.GetComponent<RectTransform>(), new Vector2(8f, 6f), new Vector2(-8f, -6f));
+
+        Text text = textObject.AddComponent<Text>();
+        text.font = GetBuiltinUIFont();
+        text.text = label;
+        text.fontSize = 22;
+        text.alignment = TextAnchor.MiddleCenter;
+        text.color = Color.white;
+        text.raycastTarget = false;
+
+        return button;
     }
 
     private static void CreateLighting(Transform parent)
@@ -965,6 +1356,9 @@ public static class PrototypeSceneBuilder
         AssignInt(contactDamage, "damage", 1);
         AssignFloat(contactDamage, "damageCooldown", 1f);
 
+        SpriteFlash2D flash = enemy.AddComponent<SpriteFlash2D>();
+        AssignObjectReference(flash, "spriteRenderer", spriteRenderer);
+
         GameObject prefab = PrefabUtility.SaveAsPrefabAsset(enemy, EnemyPrefabPath);
         UnityEngine.Object.DestroyImmediate(enemy);
 
@@ -1005,6 +1399,9 @@ public static class PrototypeSceneBuilder
 
         MinibossMarker2D marker = miniboss.AddComponent<MinibossMarker2D>();
         AssignString(marker, "minibossName", "Prototype Miniboss");
+
+        SpriteFlash2D flash = miniboss.AddComponent<SpriteFlash2D>();
+        AssignObjectReference(flash, "spriteRenderer", spriteRenderer);
 
         GameObject prefab = PrefabUtility.SaveAsPrefabAsset(miniboss, MinibossPrefabPath);
         UnityEngine.Object.DestroyImmediate(miniboss);
@@ -1099,6 +1496,9 @@ public static class PrototypeSceneBuilder
         BossMarker2D marker = boss.AddComponent<BossMarker2D>();
         AssignString(marker, "bossName", "Experiment-01");
 
+        SpriteFlash2D flash = boss.AddComponent<SpriteFlash2D>();
+        AssignObjectReference(flash, "spriteRenderer", spriteRenderer);
+
         GameObject prefab = PrefabUtility.SaveAsPrefabAsset(boss, BossPrefabPath);
         UnityEngine.Object.DestroyImmediate(boss);
 
@@ -1124,6 +1524,8 @@ public static class PrototypeSceneBuilder
 
         RewardPickup2D pickup = reward.AddComponent<RewardPickup2D>();
         AssignString(pickup, "rewardName", "Prototype Reward");
+
+        reward.AddComponent<PickupBob2D>();
 
         GameObject prefab = PrefabUtility.SaveAsPrefabAsset(reward, RewardPrefabPath);
         UnityEngine.Object.DestroyImmediate(reward);
@@ -1152,6 +1554,8 @@ public static class PrototypeSceneBuilder
         AssignEnum(pickup, "pickupType", (int)pickupType);
         AssignInt(pickup, "amount", amount);
         AssignBool(pickup, "destroyOnCollect", true);
+
+        pickupObject.AddComponent<PickupBob2D>();
 
         GameObject prefab = PrefabUtility.SaveAsPrefabAsset(pickupObject, prefabPath);
         UnityEngine.Object.DestroyImmediate(pickupObject);
@@ -1265,6 +1669,8 @@ public static class PrototypeSceneBuilder
         AssignObjectReference(pickup, "weapon", weapon);
         AssignBool(pickup, "destroyOnPickup", true);
 
+        pickupObject.AddComponent<PickupBob2D>();
+
         GameObject prefab = PrefabUtility.SaveAsPrefabAsset(pickupObject, prefabPath);
         UnityEngine.Object.DestroyImmediate(pickupObject);
 
@@ -1323,6 +1729,8 @@ public static class PrototypeSceneBuilder
         AssignEnumByName(shopItem, "interactKey", nameof(KeyCode.E));
         AssignBool(shopItem, "singlePurchase", true);
         AssignObjectReference(shopItem, "spriteRenderer", spriteRenderer);
+
+        itemObject.AddComponent<PickupBob2D>();
 
         GameObject prefab = PrefabUtility.SaveAsPrefabAsset(itemObject, prefabPath);
         UnityEngine.Object.DestroyImmediate(itemObject);
@@ -3337,6 +3745,54 @@ public static class PrototypeSceneBuilder
         return gameOverPanel;
     }
 
+    private static void AddFinalDemoUiOverlays(Transform root, out GameObject pausePanel, out DemoMessageUI2D demoMessageUI)
+    {
+        Transform canvasTransform = root.Find("UI/Canvas");
+
+        if (canvasTransform == null)
+        {
+            pausePanel = null;
+            demoMessageUI = null;
+            return;
+        }
+
+        pausePanel = CreateRectObject("PausePanel", canvasTransform);
+        SetRectTransform(pausePanel.GetComponent<RectTransform>(), new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(420f, 270f));
+
+        Image pauseBackground = pausePanel.AddComponent<Image>();
+        pauseBackground.color = new Color(0f, 0f, 0f, 0.86f);
+
+        GameObject titleObject = CreateRectObject("PauseTitleText", pausePanel.transform);
+        SetRectTransform(titleObject.GetComponent<RectTransform>(), new Vector2(0f, 1f), new Vector2(1f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -22f), new Vector2(-24f, 48f));
+        Text titleText = titleObject.AddComponent<Text>();
+        titleText.font = GetBuiltinUIFont();
+        titleText.text = "Paused";
+        titleText.fontSize = 30;
+        titleText.alignment = TextAnchor.MiddleCenter;
+        titleText.color = Color.white;
+        titleText.raycastTarget = false;
+
+        CreateMenuButton(pausePanel.transform, "ResumeButton", "Resume", new Vector2(0f, 38f));
+        CreateMenuButton(pausePanel.transform, "RestartButton", "Restart", new Vector2(0f, -32f));
+        CreateMenuButton(pausePanel.transform, "MainMenuButton", "Main Menu", new Vector2(0f, -102f));
+        pausePanel.SetActive(false);
+
+        GameObject messageObject = CreateRectObject("DemoMessageText", canvasTransform);
+        SetRectTransform(messageObject.GetComponent<RectTransform>(), new Vector2(0.5f, 0f), new Vector2(0.5f, 0f), new Vector2(0.5f, 0f), new Vector2(0f, 116f), new Vector2(640f, 34f));
+
+        Text messageText = messageObject.AddComponent<Text>();
+        messageText.font = GetBuiltinUIFont();
+        messageText.text = string.Empty;
+        messageText.fontSize = 18;
+        messageText.alignment = TextAnchor.MiddleCenter;
+        messageText.color = new Color(0.9f, 0.96f, 1f, 1f);
+        messageText.raycastTarget = false;
+
+        demoMessageUI = messageObject.AddComponent<DemoMessageUI2D>();
+        AssignObjectReference(demoMessageUI, "messageText", messageText);
+        AssignFloat(demoMessageUI, "defaultDuration", 2f);
+    }
+
     private static Button CreateBuffChoiceButton(Transform parent, string name, Vector2 anchoredPosition, out Text buttonText)
     {
         GameObject buttonObject = CreateRectObject(name, parent);
@@ -3509,6 +3965,118 @@ public static class PrototypeSceneBuilder
         AssignObjectReferenceArray(buffChoiceController, "choiceTexts", choiceTexts);
         AssignBool(buffChoiceController, "pauseGameWhileChoosing", true);
         AssignInt(buffChoiceController, "choicesToShow", 3);
+    }
+
+    private static void CreateFinalDemoGameSystems(
+        Transform parent,
+        PlayerHealth2D playerHealth,
+        GameObject gameOverPanel,
+        PlayerBuffs2D playerBuffs,
+        BuffDefinition2D[] buffPool,
+        GameObject choicePanel,
+        Button[] choiceButtons,
+        Text[] choiceTexts,
+        ObjectiveUI2D objectiveUI,
+        GameObject victoryPanel,
+        Text victoryText,
+        GameObject pausePanel,
+        DemoMessageUI2D demoMessageUI,
+        out BuffChoiceController2D buffChoiceController,
+        out LevelEndController2D levelEndController)
+    {
+        GameObject gameSystems = new GameObject("GameSystems");
+        gameSystems.transform.SetParent(parent);
+
+        GameObject gameOverControllerObject = new GameObject("GameOverController");
+        gameOverControllerObject.transform.SetParent(gameSystems.transform);
+
+        GameOverController2D gameOverController = gameOverControllerObject.AddComponent<GameOverController2D>();
+        AssignObjectReference(gameOverController, "playerHealth", playerHealth);
+        AssignObjectReference(gameOverController, "gameOverPanel", gameOverPanel);
+        AssignString(gameOverController, "restartKey", "r");
+
+        GameObject levelEndControllerObject = new GameObject("LevelEndController");
+        levelEndControllerObject.transform.SetParent(gameSystems.transform);
+
+        levelEndController = levelEndControllerObject.AddComponent<LevelEndController2D>();
+        AssignObjectReference(levelEndController, "victoryPanel", victoryPanel);
+        AssignObjectReference(levelEndController, "victoryText", victoryText);
+        AssignString(levelEndController, "restartKey", "r");
+        AssignBool(levelEndController, "pauseOnVictory", true);
+
+        GameObject levelFlowControllerObject = new GameObject("LevelFlowController");
+        levelFlowControllerObject.transform.SetParent(gameSystems.transform);
+
+        LevelFlowController2D levelFlowController = levelFlowControllerObject.AddComponent<LevelFlowController2D>();
+        AssignObjectReference(levelFlowController, "objectiveUI", objectiveUI);
+        AssignObjectReference(levelFlowController, "levelEndController", levelEndController);
+        AssignString(levelFlowController, "levelName", "Laboratory");
+        AssignString(levelFlowController, "startingObjective", "Escape the Laboratory");
+        AssignString(levelFlowController, "controlsHint", "WASD move | Mouse aim | Left click shoot | R reload | E interact");
+
+        GameObject buffChoiceControllerObject = new GameObject("BuffChoiceController");
+        buffChoiceControllerObject.transform.SetParent(gameSystems.transform);
+
+        buffChoiceController = buffChoiceControllerObject.AddComponent<BuffChoiceController2D>();
+        AssignObjectReference(buffChoiceController, "playerBuffs", playerBuffs);
+        AssignObjectReferenceArray(buffChoiceController, "buffPool", buffPool);
+        AssignObjectReference(buffChoiceController, "choicePanel", choicePanel);
+        AssignObjectReferenceArray(buffChoiceController, "choiceButtons", choiceButtons);
+        AssignObjectReferenceArray(buffChoiceController, "choiceTexts", choiceTexts);
+        AssignBool(buffChoiceController, "pauseGameWhileChoosing", true);
+        AssignInt(buffChoiceController, "choicesToShow", 3);
+
+        GameObject pauseControllerObject = new GameObject("PauseMenuController");
+        pauseControllerObject.transform.SetParent(gameSystems.transform);
+
+        PauseMenuController2D pauseController = pauseControllerObject.AddComponent<PauseMenuController2D>();
+        AssignObjectReference(pauseController, "pausePanel", pausePanel);
+        AssignString(pauseController, "mainMenuSceneName", "MainMenu");
+        AssignEnumByName(pauseController, "pauseKey", nameof(KeyCode.Escape));
+        WirePauseButton(pausePanel, "ResumeButton", pauseController.Resume);
+        WirePauseButton(pausePanel, "RestartButton", pauseController.RestartScene);
+        WirePauseButton(pausePanel, "MainMenuButton", pauseController.ReturnToMainMenu);
+
+        GameObject audioObject = new GameObject("DemoAudioManager");
+        audioObject.transform.SetParent(gameSystems.transform);
+
+        AudioSource audioSource = audioObject.AddComponent<AudioSource>();
+        DemoAudioManager2D audioManager = audioObject.AddComponent<DemoAudioManager2D>();
+        AssignObjectReference(audioManager, "sfxSource", audioSource);
+        AssignObjectReference(audioManager, "shootClip", AssetDatabase.LoadAssetAtPath<AudioClip>(ShootAudioPath));
+        AssignObjectReference(audioManager, "hitClip", AssetDatabase.LoadAssetAtPath<AudioClip>(HitAudioPath));
+        AssignObjectReference(audioManager, "pickupClip", AssetDatabase.LoadAssetAtPath<AudioClip>(PickupAudioPath));
+        AssignObjectReference(audioManager, "doorClip", AssetDatabase.LoadAssetAtPath<AudioClip>(DoorAudioPath));
+        AssignObjectReference(audioManager, "shopClip", AssetDatabase.LoadAssetAtPath<AudioClip>(ShopAudioPath));
+        AssignObjectReference(audioManager, "buffClip", AssetDatabase.LoadAssetAtPath<AudioClip>(BuffAudioPath));
+        AssignObjectReference(audioManager, "bossPhaseClip", AssetDatabase.LoadAssetAtPath<AudioClip>(BossPhaseAudioPath));
+        AssignObjectReference(audioManager, "victoryClip", AssetDatabase.LoadAssetAtPath<AudioClip>(VictoryAudioPath));
+        AssignObjectReference(audioManager, "gameOverClip", AssetDatabase.LoadAssetAtPath<AudioClip>(GameOverAudioPath));
+        AssignFloat(audioManager, "volume", 0.6f);
+
+        _ = demoMessageUI;
+    }
+
+    private static void WirePauseButton(GameObject pausePanel, string buttonName, UnityEngine.Events.UnityAction action)
+    {
+        if (pausePanel == null || action == null)
+        {
+            return;
+        }
+
+        Transform buttonTransform = pausePanel.transform.Find(buttonName);
+
+        if (buttonTransform == null)
+        {
+            return;
+        }
+
+        Button button = buttonTransform.GetComponent<Button>();
+
+        if (button != null)
+        {
+            UnityEventTools.AddPersistentListener(button.onClick, action);
+        }
     }
 
     private static GameObject CreateRectObject(string name, Transform parent)
@@ -4014,6 +4582,14 @@ public static class PrototypeSceneBuilder
         }
 
         scenes.Add(new EditorBuildSettingsScene(scenePath, true));
+        EditorBuildSettings.scenes = scenes.ToArray();
+    }
+
+    private static void AddSceneToBuildSettingsFirst(string scenePath)
+    {
+        List<EditorBuildSettingsScene> scenes = new List<EditorBuildSettingsScene>(EditorBuildSettings.scenes);
+        scenes.RemoveAll(scene => scene.path == scenePath);
+        scenes.Insert(0, new EditorBuildSettingsScene(scenePath, true));
         EditorBuildSettings.scenes = scenes.ToArray();
     }
 

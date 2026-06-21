@@ -39,6 +39,7 @@ public class EnemyHealth : MonoBehaviour
         currentHealth = Mathf.Max(0, currentHealth - clampedDamage);
         HealthChanged?.Invoke(currentHealth, maxHealth);
         Debug.Log($"{name} took {clampedDamage} damage. Health: {currentHealth}/{maxHealth}.", this);
+        PlayHitFeedback();
 
         if (currentHealth <= 0)
         {
@@ -57,6 +58,23 @@ public class EnemyHealth : MonoBehaviour
         Debug.Log($"{name} destroyed.", this);
         Died?.Invoke(this);
         Destroy(gameObject);
+    }
+
+    private void PlayHitFeedback()
+    {
+        SpriteFlash2D flash = GetComponent<SpriteFlash2D>();
+
+        if (flash != null)
+        {
+            flash.Flash();
+        }
+
+        DemoAudioManager2D audioManager = FindObjectOfType<DemoAudioManager2D>();
+
+        if (audioManager != null)
+        {
+            audioManager.PlayHit();
+        }
     }
 
     private void OnValidate()
