@@ -16,6 +16,7 @@ public static class PrototypeSceneBuilder
     private const string HealthCombatScenePath = "Assets/_Project/Scenes/Prototype_HealthCombat.unity";
     private const string LootResourcesScenePath = "Assets/_Project/Scenes/Prototype_LootResources.unity";
     private const string WeaponLootScenePath = "Assets/_Project/Scenes/Prototype_WeaponLoot.unity";
+    private const string ShopScenePath = "Assets/_Project/Scenes/Prototype_Shop.unity";
     private const string BulletPrefabPath = "Assets/_Project/Prefabs/Weapons/Bullet.prefab";
     private const string EnemyPrefabPath = "Assets/_Project/Prefabs/Enemies/TestEnemy.prefab";
     private const string RewardPrefabPath = "Assets/_Project/Prefabs/Pickups/PrototypeReward.prefab";
@@ -24,9 +25,15 @@ public static class PrototypeSceneBuilder
     private const string MoneyPickupPrefabPath = "Assets/_Project/Prefabs/Pickups/MoneyPickup.prefab";
     private const string SMGPickupPrefabPath = "Assets/_Project/Prefabs/Pickups/SMGPickup.prefab";
     private const string ShotgunPickupPrefabPath = "Assets/_Project/Prefabs/Pickups/ShotgunPickup.prefab";
+    private const string ShopHealthPrefabPath = "Assets/_Project/Prefabs/Shop/ShopItem_Health.prefab";
+    private const string ShopAmmoPrefabPath = "Assets/_Project/Prefabs/Shop/ShopItem_Ammo.prefab";
+    private const string ShopShotgunPrefabPath = "Assets/_Project/Prefabs/Shop/ShopItem_Shotgun.prefab";
     private const string PistolWeaponPath = "Assets/_Project/ScriptableObjects/Weapons/Pistol.asset";
     private const string SMGWeaponPath = "Assets/_Project/ScriptableObjects/Weapons/SMG.asset";
     private const string ShotgunWeaponPath = "Assets/_Project/ScriptableObjects/Weapons/Shotgun.asset";
+    private const string ShopHealthDefinitionPath = "Assets/_Project/ScriptableObjects/Shop/Shop_HealthSmall.asset";
+    private const string ShopAmmoDefinitionPath = "Assets/_Project/ScriptableObjects/Shop/Shop_AmmoPack.asset";
+    private const string ShopShotgunDefinitionPath = "Assets/_Project/ScriptableObjects/Shop/Shop_Shotgun.asset";
     private const string GeneratedArtFolder = "Assets/_Project/Art/Generated";
     private const string PlayerSpritePath = GeneratedArtFolder + "/Player_Prototype.png";
     private const string EnemySpritePath = GeneratedArtFolder + "/Enemy_Prototype.png";
@@ -40,6 +47,9 @@ public static class PrototypeSceneBuilder
     private const string SMGSpritePath = GeneratedArtFolder + "/SMG_Prototype.png";
     private const string ShotgunSpritePath = GeneratedArtFolder + "/Shotgun_Prototype.png";
     private const string WeaponPickupSpritePath = GeneratedArtFolder + "/WeaponPickup_Prototype.png";
+    private const string ShopHealthSpritePath = GeneratedArtFolder + "/ShopHealth_Prototype.png";
+    private const string ShopAmmoSpritePath = GeneratedArtFolder + "/ShopAmmo_Prototype.png";
+    private const string ShopWeaponSpritePath = GeneratedArtFolder + "/ShopWeapon_Prototype.png";
     private const string PlayerTag = "Player";
 
     private static readonly string[] RequiredFolders =
@@ -56,13 +66,16 @@ public static class PrototypeSceneBuilder
         "Assets/_Project/Prefabs/Pickups",
         "Assets/_Project/Prefabs/Loot",
         "Assets/_Project/Prefabs/Rooms",
+        "Assets/_Project/Prefabs/Shop",
         "Assets/_Project/Scenes",
         "Assets/_Project/ScriptableObjects",
         "Assets/_Project/ScriptableObjects/Weapons",
+        "Assets/_Project/ScriptableObjects/Shop",
         "Assets/_Project/Scripts",
         "Assets/_Project/Scripts/Core",
         "Assets/_Project/Scripts/Loot",
         "Assets/_Project/Scripts/Resources",
+        "Assets/_Project/Scripts/Shop",
         "Assets/_Project/Scripts/UI",
         "Assets/_Project/Scripts/Player",
         "Assets/_Project/Scripts/Weapons",
@@ -374,6 +387,87 @@ public static class PrototypeSceneBuilder
         Debug.Log($"Created Prototype 0.5 weapon loot scene at {WeaponLootScenePath}.");
     }
 
+    [MenuItem("Tools/Cod Evadare/Create Prototype 0.6 Shop Scene")]
+    public static void CreatePrototypeShopScene()
+    {
+        if (!Application.isBatchMode && !EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo())
+        {
+            return;
+        }
+
+        CreateRequiredFolders();
+        GeneratePlaceholderSprites();
+        EnsureTag(PlayerTag);
+
+        Scene scene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
+        SceneManager.SetActiveScene(scene);
+
+        Sprite playerSprite = AssetDatabase.LoadAssetAtPath<Sprite>(PlayerSpritePath);
+        Sprite enemySprite = AssetDatabase.LoadAssetAtPath<Sprite>(EnemySpritePath);
+        Sprite bulletSprite = AssetDatabase.LoadAssetAtPath<Sprite>(BulletSpritePath);
+        Sprite wallSprite = AssetDatabase.LoadAssetAtPath<Sprite>(WallSpritePath);
+        Sprite moneyPickupSprite = AssetDatabase.LoadAssetAtPath<Sprite>(MoneyPickupSpritePath);
+        Sprite shopHealthSprite = AssetDatabase.LoadAssetAtPath<Sprite>(ShopHealthSpritePath);
+        Sprite shopAmmoSprite = AssetDatabase.LoadAssetAtPath<Sprite>(ShopAmmoSpritePath);
+        Sprite shopWeaponSprite = AssetDatabase.LoadAssetAtPath<Sprite>(ShopWeaponSpritePath);
+
+        GameObject root = new GameObject("Prototype_Shop");
+        GameObject cameraObject = CreateCamera(root.transform);
+        CreateLighting(root.transform);
+
+        GameObject player = CreatePlayer(root.transform, playerSprite, out Transform firePoint, out PlayerShooting2D playerShooting);
+        player.transform.position = new Vector3(-4.5f, 0f, 0f);
+
+        PlayerHealth2D playerHealth = player.AddComponent<PlayerHealth2D>();
+        AssignInt(playerHealth, "maxHealth", 5);
+        AssignFloat(playerHealth, "invincibilityDuration", 0.75f);
+        AssignBool(playerHealth, "destroyOnDeath", false);
+
+        PlayerResources2D playerResources = player.AddComponent<PlayerResources2D>();
+        AssignInt(playerResources, "startingAmmo", 30);
+        AssignInt(playerResources, "maxAmmo", 99);
+        AssignInt(playerResources, "startingMoney", 100);
+
+        GameObject bulletPrefab = GetOrCreateBulletPrefab(bulletSprite);
+        WeaponDefinition2D pistol = CreateWeaponDefinition(PistolWeaponPath, "Pistol", WeaponRarity2D.Common, bulletPrefab, 0.2f, 12, 1, 1f, 1, 12f, 2f, 1, 0f);
+        CreateWeaponDefinition(SMGWeaponPath, "SMG", WeaponRarity2D.Rare, bulletPrefab, 0.08f, 24, 1, 1.2f, 1, 13f, 2f, 1, 3f);
+        WeaponDefinition2D shotgun = CreateWeaponDefinition(ShotgunWeaponPath, "Shotgun", WeaponRarity2D.Epic, bulletPrefab, 0.55f, 6, 1, 1.4f, 1, 11f, 1.2f, 5, 35f);
+
+        AssignObjectReference(playerShooting, "firePoint", firePoint);
+        AssignObjectReference(playerShooting, "bulletPrefab", bulletPrefab);
+        AssignBool(playerShooting, "useAmmo", true);
+        AssignObjectReference(playerShooting, "playerResources", playerResources);
+        AssignObjectReference(playerShooting, "startingWeapon", pistol);
+        AssignObjectReference(playerShooting, "equippedWeapon", pistol);
+
+        CameraFollow2D cameraFollow = cameraObject.GetComponent<CameraFollow2D>();
+        AssignObjectReference(cameraFollow, "target", player.transform);
+
+        GameObject enemyPrefab = CreateEnemyPrefab(enemySprite);
+        GameObject moneyPickup = CreateResourcePickupPrefab("MoneyPickup", MoneyPickupPrefabPath, moneyPickupSprite, ResourcePickupType.Money, 25);
+        CreateShopCombatRoom(root.transform, wallSprite, enemyPrefab, moneyPickup);
+
+        ShopItemDefinition2D healthShopItem = CreateShopItemDefinition(ShopHealthDefinitionPath, "Health +2", ShopItemType2D.Health, 25, 2, null, shopHealthSprite);
+        ShopItemDefinition2D ammoShopItem = CreateShopItemDefinition(ShopAmmoDefinitionPath, "Ammo +15", ShopItemType2D.Ammo, 20, 15, null, shopAmmoSprite);
+        ShopItemDefinition2D shotgunShopItem = CreateShopItemDefinition(ShopShotgunDefinitionPath, "Shotgun", ShopItemType2D.Weapon, 75, 0, shotgun, shopWeaponSprite);
+
+        GameObject healthShopPrefab = CreateShopItemPrefab("ShopItem_Health", ShopHealthPrefabPath, shopHealthSprite, healthShopItem);
+        GameObject ammoShopPrefab = CreateShopItemPrefab("ShopItem_Ammo", ShopAmmoPrefabPath, shopAmmoSprite, ammoShopItem);
+        GameObject shotgunShopPrefab = CreateShopItemPrefab("ShopItem_Shotgun", ShopShotgunPrefabPath, shopWeaponSprite, shotgunShopItem);
+
+        GameObject gameOverPanel = CreateShopSceneUI(root.transform, playerHealth, playerResources, playerShooting, out ShopUI2D shopUI);
+        GameObject shopArea = CreateShopArea(root.transform, wallSprite, shopUI, healthShopPrefab, ammoShopPrefab, shotgunShopPrefab);
+        shopArea.transform.SetSiblingIndex(4);
+        CreateGameSystems(root.transform, playerHealth, gameOverPanel);
+
+        EditorSceneManager.SaveScene(scene, ShopScenePath);
+        AddSceneToBuildSettings(ShopScenePath);
+        AssetDatabase.SaveAssets();
+        AssetDatabase.Refresh();
+
+        Debug.Log($"Created Prototype 0.6 shop scene at {ShopScenePath}.");
+    }
+
     private static void CreateRequiredFolders()
     {
         foreach (string folder in RequiredFolders)
@@ -398,6 +492,9 @@ public static class PrototypeSceneBuilder
         WriteSpriteTexture(SMGSpritePath, 64, CreateSMGPixel);
         WriteSpriteTexture(ShotgunSpritePath, 64, CreateShotgunPixel);
         WriteSpriteTexture(WeaponPickupSpritePath, 64, CreateWeaponPickupPixel);
+        WriteSpriteTexture(ShopHealthSpritePath, 64, CreateShopHealthPixel);
+        WriteSpriteTexture(ShopAmmoSpritePath, 64, CreateShopAmmoPixel);
+        WriteSpriteTexture(ShopWeaponSpritePath, 64, CreateShopWeaponPixel);
     }
 
     private static GameObject CreateCamera(Transform parent)
@@ -674,6 +771,65 @@ public static class PrototypeSceneBuilder
         return prefab;
     }
 
+    private static ShopItemDefinition2D CreateShopItemDefinition(
+        string assetPath,
+        string displayName,
+        ShopItemType2D itemType,
+        int price,
+        int amount,
+        WeaponDefinition2D weaponDefinition,
+        Sprite icon)
+    {
+        ShopItemDefinition2D item = AssetDatabase.LoadAssetAtPath<ShopItemDefinition2D>(assetPath);
+
+        if (item == null)
+        {
+            item = ScriptableObject.CreateInstance<ShopItemDefinition2D>();
+            AssetDatabase.CreateAsset(item, assetPath);
+        }
+
+        AssignString(item, "displayName", displayName);
+        AssignEnum(item, "itemType", (int)itemType);
+        AssignInt(item, "price", price);
+        AssignInt(item, "amount", amount);
+        AssignObjectReference(item, "weaponDefinition", weaponDefinition);
+        AssignObjectReference(item, "icon", icon);
+
+        EditorUtility.SetDirty(item);
+        AssetDatabase.SaveAssets();
+        return item;
+    }
+
+    private static GameObject CreateShopItemPrefab(string itemName, string prefabPath, Sprite sprite, ShopItemDefinition2D itemDefinition)
+    {
+        GameObject itemObject = new GameObject(itemName);
+        itemObject.transform.localScale = new Vector3(0.6f, 0.6f, 1f);
+
+        SpriteRenderer spriteRenderer = itemObject.AddComponent<SpriteRenderer>();
+        spriteRenderer.sprite = sprite;
+        spriteRenderer.sortingOrder = 15;
+
+        CircleCollider2D collider = itemObject.AddComponent<CircleCollider2D>();
+        collider.isTrigger = true;
+        collider.radius = 0.65f;
+
+        ShopItem2D shopItem = itemObject.AddComponent<ShopItem2D>();
+        AssignObjectReference(shopItem, "itemDefinition", itemDefinition);
+        AssignEnumByName(shopItem, "interactKey", nameof(KeyCode.E));
+        AssignBool(shopItem, "singlePurchase", true);
+        AssignObjectReference(shopItem, "spriteRenderer", spriteRenderer);
+
+        GameObject prefab = PrefabUtility.SaveAsPrefabAsset(itemObject, prefabPath);
+        UnityEngine.Object.DestroyImmediate(itemObject);
+
+        if (prefab == null)
+        {
+            prefab = AssetDatabase.LoadAssetAtPath<GameObject>(prefabPath);
+        }
+
+        return prefab;
+    }
+
     private static void CreateEnemy(Transform parent, Sprite sprite)
     {
         GameObject enemy = new GameObject("TestEnemy");
@@ -800,6 +956,25 @@ public static class PrototypeSceneBuilder
         CreateRoomTrigger(room.transform, roomController);
     }
 
+    private static void CreateShopCombatRoom(Transform parent, Sprite wallSprite, GameObject enemyPrefab, GameObject moneyPickupPrefab)
+    {
+        GameObject room = new GameObject("Room_01");
+        room.transform.SetParent(parent);
+
+        CreateRoomLoopWalls(room.transform, wallSprite, out DoorController2D leftDoor, out DoorController2D rightDoor);
+
+        EnemySpawner2D enemySpawner = CreateEnemySpawner(room.transform, enemyPrefab);
+        RoomLootSpawner2D lootSpawner = CreateShopRoomLootSpawner(room.transform, moneyPickupPrefab);
+
+        RoomController2D roomController = room.AddComponent<RoomController2D>();
+        AssignObjectReferenceArray(roomController, "doors", new[] { leftDoor, rightDoor });
+        AssignObjectReference(roomController, "enemySpawner", enemySpawner);
+        AssignObjectReference(roomController, "lootSpawner", lootSpawner);
+        AssignFloat(roomController, "doorCloseDelay", 0.5f);
+
+        CreateRoomTrigger(room.transform, roomController);
+    }
+
     private static void CreateWallWithDoorGap(Transform parent, string name, Sprite sprite, float x)
     {
         GameObject wall = new GameObject(name);
@@ -908,6 +1083,25 @@ public static class PrototypeSceneBuilder
         return lootSpawner;
     }
 
+    private static RoomLootSpawner2D CreateShopRoomLootSpawner(Transform parent, GameObject moneyPickupPrefab)
+    {
+        GameObject lootSpawnerObject = new GameObject("LootSpawner");
+        lootSpawnerObject.transform.SetParent(parent);
+
+        Transform[] spawnPoints =
+        {
+            CreateMarker(lootSpawnerObject.transform, "LootSpawnPoint_Money", new Vector3(5.2f, 0f, 0f))
+        };
+
+        RoomLootSpawner2D lootSpawner = lootSpawnerObject.AddComponent<RoomLootSpawner2D>();
+        AssignObjectReferenceArray(lootSpawner, "lootPrefabs", new[] { moneyPickupPrefab });
+        AssignObjectReferenceArray(lootSpawner, "spawnPoints", spawnPoints);
+        AssignBool(lootSpawner, "spawnAll", true);
+        AssignInt(lootSpawner, "randomSpawnCount", 1);
+
+        return lootSpawner;
+    }
+
     private static RoomController2D CreateRoomController(
         Transform parent,
         DoorController2D[] doors,
@@ -951,6 +1145,73 @@ public static class PrototypeSceneBuilder
         marker.transform.localScale = Vector3.one;
 
         return marker.transform;
+    }
+
+    private static GameObject CreateShopArea(
+        Transform parent,
+        Sprite wallSprite,
+        ShopUI2D shopUI,
+        GameObject healthShopPrefab,
+        GameObject ammoShopPrefab,
+        GameObject weaponShopPrefab)
+    {
+        GameObject shopArea = new GameObject("Shop_Area");
+        shopArea.transform.SetParent(parent);
+        shopArea.transform.position = Vector3.zero;
+
+        BoxCollider2D areaTrigger = shopArea.AddComponent<BoxCollider2D>();
+        areaTrigger.isTrigger = true;
+        areaTrigger.offset = new Vector2(11f, 0f);
+        areaTrigger.size = new Vector2(6f, 6f);
+
+        shopArea.AddComponent<ShopArea2D>();
+
+        GameObject shopWalls = new GameObject("ShopWalls");
+        shopWalls.transform.SetParent(shopArea.transform);
+
+        CreateWall(shopWalls.transform, "ShopWall_Top", wallSprite, new Vector3(11f, 3f, 0f), new Vector3(6.2f, 0.35f, 1f));
+        CreateWall(shopWalls.transform, "ShopWall_Bottom", wallSprite, new Vector3(11f, -3f, 0f), new Vector3(6.2f, 0.35f, 1f));
+        CreateWall(shopWalls.transform, "ShopWall_Right", wallSprite, new Vector3(14f, 0f, 0f), new Vector3(0.35f, 6.2f, 1f));
+        CreateWall(shopWalls.transform, "ShopWall_Left_Upper", wallSprite, new Vector3(8f, 2f, 0f), new Vector3(0.35f, 2f, 1f));
+        CreateWall(shopWalls.transform, "ShopWall_Left_Lower", wallSprite, new Vector3(8f, -2f, 0f), new Vector3(0.35f, 2f, 1f));
+
+        InstantiateShopItem(shopArea.transform, healthShopPrefab, "ShopItem_Health", new Vector3(10f, 1.5f, 0f), shopUI);
+        InstantiateShopItem(shopArea.transform, ammoShopPrefab, "ShopItem_Ammo", new Vector3(11f, 0f, 0f), shopUI);
+        InstantiateShopItem(shopArea.transform, weaponShopPrefab, "ShopItem_Weapon", new Vector3(12f, -1.5f, 0f), shopUI);
+
+        return shopArea;
+    }
+
+    private static void InstantiateShopItem(Transform parent, GameObject prefab, string fallbackName, Vector3 position, ShopUI2D shopUI)
+    {
+        GameObject itemObject;
+
+        if (prefab != null)
+        {
+            itemObject = PrefabUtility.InstantiatePrefab(prefab) as GameObject;
+        }
+        else
+        {
+            itemObject = new GameObject(fallbackName);
+        }
+
+        if (itemObject == null)
+        {
+            Debug.LogWarning($"Could not instantiate shop item '{fallbackName}'.");
+            return;
+        }
+
+        itemObject.name = fallbackName;
+        itemObject.transform.SetParent(parent);
+        itemObject.transform.position = position;
+        itemObject.transform.localRotation = Quaternion.identity;
+
+        ShopItem2D shopItem = itemObject.GetComponent<ShopItem2D>();
+
+        if (shopItem != null)
+        {
+            AssignObjectReference(shopItem, "shopUI", shopUI);
+        }
     }
 
     private static GameObject CreateHealthCombatUI(Transform parent, PlayerHealth2D playerHealth)
@@ -1221,6 +1482,164 @@ public static class PrototypeSceneBuilder
         WeaponUI2D weaponUI = resourcePanel.AddComponent<WeaponUI2D>();
         AssignObjectReference(weaponUI, "playerShooting", playerShooting);
         AssignObjectReference(weaponUI, "weaponText", weaponText);
+
+        GameObject gameOverPanel = CreateRectObject("GameOverPanel", canvasObject.transform);
+        SetRectTransform(gameOverPanel.GetComponent<RectTransform>(), new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(360f, 160f));
+
+        Image gameOverBackground = gameOverPanel.AddComponent<Image>();
+        gameOverBackground.color = new Color(0f, 0f, 0f, 0.82f);
+
+        GameObject gameOverTextObject = CreateRectObject("GameOverText", gameOverPanel.transform);
+        StretchRectTransform(gameOverTextObject.GetComponent<RectTransform>(), new Vector2(16f, 16f), new Vector2(-16f, -16f));
+
+        Text gameOverText = gameOverTextObject.AddComponent<Text>();
+        gameOverText.font = GetBuiltinUIFont();
+        gameOverText.text = "GAME OVER\nPress R to restart";
+        gameOverText.fontSize = 30;
+        gameOverText.alignment = TextAnchor.MiddleCenter;
+        gameOverText.color = Color.white;
+        gameOverText.raycastTarget = false;
+
+        gameOverPanel.SetActive(false);
+        return gameOverPanel;
+    }
+
+    private static GameObject CreateShopSceneUI(
+        Transform parent,
+        PlayerHealth2D playerHealth,
+        PlayerResources2D playerResources,
+        PlayerShooting2D playerShooting,
+        out ShopUI2D shopUI)
+    {
+        GameObject ui = new GameObject("UI");
+        ui.transform.SetParent(parent);
+
+        GameObject canvasObject = new GameObject("Canvas", typeof(RectTransform), typeof(Canvas), typeof(CanvasScaler), typeof(GraphicRaycaster));
+        canvasObject.transform.SetParent(ui.transform);
+
+        Canvas canvas = canvasObject.GetComponent<Canvas>();
+        canvas.renderMode = RenderMode.ScreenSpaceOverlay;
+
+        CanvasScaler canvasScaler = canvasObject.GetComponent<CanvasScaler>();
+        canvasScaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
+        canvasScaler.referenceResolution = new Vector2(1280f, 720f);
+        canvasScaler.matchWidthOrHeight = 0.5f;
+
+        GameObject healthPanel = CreateRectObject("HealthPanel", canvasObject.transform);
+        SetRectTransform(healthPanel.GetComponent<RectTransform>(), new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(24f, -24f), new Vector2(220f, 42f));
+
+        Image healthPanelImage = healthPanel.AddComponent<Image>();
+        healthPanelImage.color = new Color(0f, 0f, 0f, 0.65f);
+
+        GameObject healthFillObject = CreateRectObject("HealthFill", healthPanel.transform);
+        StretchRectTransform(healthFillObject.GetComponent<RectTransform>(), new Vector2(4f, 4f), new Vector2(-4f, -4f));
+
+        Image healthFill = healthFillObject.AddComponent<Image>();
+        healthFill.color = new Color(0.18f, 0.85f, 0.32f, 0.9f);
+        healthFill.type = Image.Type.Filled;
+        healthFill.fillMethod = Image.FillMethod.Horizontal;
+        healthFill.fillOrigin = (int)Image.OriginHorizontal.Left;
+        healthFill.fillAmount = 1f;
+
+        GameObject healthTextObject = CreateRectObject("HealthText", healthPanel.transform);
+        StretchRectTransform(healthTextObject.GetComponent<RectTransform>(), Vector2.zero, Vector2.zero);
+
+        Text healthText = healthTextObject.AddComponent<Text>();
+        healthText.font = GetBuiltinUIFont();
+        healthText.text = "HP: 5 / 5";
+        healthText.fontSize = 18;
+        healthText.alignment = TextAnchor.MiddleCenter;
+        healthText.color = Color.white;
+        healthText.raycastTarget = false;
+
+        HealthUI2D healthUI = healthPanel.AddComponent<HealthUI2D>();
+        AssignObjectReference(healthUI, "playerHealth", playerHealth);
+        AssignObjectReference(healthUI, "healthFill", healthFill);
+        AssignObjectReference(healthUI, "healthText", healthText);
+
+        GameObject resourcePanel = CreateRectObject("ResourcePanel", canvasObject.transform);
+        SetRectTransform(resourcePanel.GetComponent<RectTransform>(), new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(24f, -76f), new Vector2(430f, 92f));
+
+        Image resourcePanelImage = resourcePanel.AddComponent<Image>();
+        resourcePanelImage.color = new Color(0f, 0f, 0f, 0.65f);
+
+        GameObject ammoTextObject = CreateRectObject("AmmoText", resourcePanel.transform);
+        SetRectTransform(ammoTextObject.GetComponent<RectTransform>(), new Vector2(0f, 1f), new Vector2(1f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -8f), new Vector2(-16f, 24f));
+
+        Text ammoText = ammoTextObject.AddComponent<Text>();
+        ammoText.font = GetBuiltinUIFont();
+        ammoText.text = "Ammo: 12 / 12 | Reserve: 30 / 99";
+        ammoText.fontSize = 16;
+        ammoText.alignment = TextAnchor.MiddleLeft;
+        ammoText.color = Color.white;
+        ammoText.raycastTarget = false;
+
+        GameObject moneyTextObject = CreateRectObject("MoneyText", resourcePanel.transform);
+        SetRectTransform(moneyTextObject.GetComponent<RectTransform>(), new Vector2(0f, 0.5f), new Vector2(1f, 0.5f), new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(-16f, 24f));
+
+        Text moneyText = moneyTextObject.AddComponent<Text>();
+        moneyText.font = GetBuiltinUIFont();
+        moneyText.text = "Money: 100";
+        moneyText.fontSize = 16;
+        moneyText.alignment = TextAnchor.MiddleLeft;
+        moneyText.color = Color.white;
+        moneyText.raycastTarget = false;
+
+        GameObject weaponTextObject = CreateRectObject("WeaponText", resourcePanel.transform);
+        SetRectTransform(weaponTextObject.GetComponent<RectTransform>(), new Vector2(0f, 0f), new Vector2(1f, 0f), new Vector2(0.5f, 0f), new Vector2(0f, 8f), new Vector2(-16f, 24f));
+
+        Text weaponText = weaponTextObject.AddComponent<Text>();
+        weaponText.font = GetBuiltinUIFont();
+        weaponText.text = "Weapon: Pistol [Common]";
+        weaponText.fontSize = 16;
+        weaponText.alignment = TextAnchor.MiddleLeft;
+        weaponText.color = Color.white;
+        weaponText.raycastTarget = false;
+
+        ResourceUI2D resourceUI = resourcePanel.AddComponent<ResourceUI2D>();
+        AssignObjectReference(resourceUI, "playerResources", playerResources);
+        AssignObjectReference(resourceUI, "playerShooting", playerShooting);
+        AssignObjectReference(resourceUI, "ammoText", ammoText);
+        AssignObjectReference(resourceUI, "moneyText", moneyText);
+
+        WeaponUI2D weaponUI = resourcePanel.AddComponent<WeaponUI2D>();
+        AssignObjectReference(weaponUI, "playerShooting", playerShooting);
+        AssignObjectReference(weaponUI, "weaponText", weaponText);
+
+        GameObject shopPanel = CreateRectObject("ShopPanel", canvasObject.transform);
+        SetRectTransform(shopPanel.GetComponent<RectTransform>(), new Vector2(0.5f, 0f), new Vector2(0.5f, 0f), new Vector2(0.5f, 0f), new Vector2(0f, 36f), new Vector2(460f, 74f));
+
+        Image shopPanelImage = shopPanel.AddComponent<Image>();
+        shopPanelImage.color = new Color(0f, 0f, 0f, 0.78f);
+
+        GameObject shopPromptTextObject = CreateRectObject("ShopPromptText", shopPanel.transform);
+        SetRectTransform(shopPromptTextObject.GetComponent<RectTransform>(), new Vector2(0f, 1f), new Vector2(1f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -8f), new Vector2(-24f, 28f));
+
+        Text shopPromptText = shopPromptTextObject.AddComponent<Text>();
+        shopPromptText.font = GetBuiltinUIFont();
+        shopPromptText.text = string.Empty;
+        shopPromptText.fontSize = 17;
+        shopPromptText.alignment = TextAnchor.MiddleCenter;
+        shopPromptText.color = Color.white;
+        shopPromptText.raycastTarget = false;
+
+        GameObject shopMessageTextObject = CreateRectObject("ShopMessageText", shopPanel.transform);
+        SetRectTransform(shopMessageTextObject.GetComponent<RectTransform>(), new Vector2(0f, 0f), new Vector2(1f, 0f), new Vector2(0.5f, 0f), new Vector2(0f, 8f), new Vector2(-24f, 28f));
+
+        Text shopMessageText = shopMessageTextObject.AddComponent<Text>();
+        shopMessageText.font = GetBuiltinUIFont();
+        shopMessageText.text = string.Empty;
+        shopMessageText.fontSize = 17;
+        shopMessageText.alignment = TextAnchor.MiddleCenter;
+        shopMessageText.color = new Color(1f, 0.86f, 0.2f, 1f);
+        shopMessageText.raycastTarget = false;
+
+        shopUI = canvasObject.AddComponent<ShopUI2D>();
+        AssignObjectReference(shopUI, "shopPanel", shopPanel);
+        AssignObjectReference(shopUI, "promptText", shopPromptText);
+        AssignObjectReference(shopUI, "messageText", shopMessageText);
+        AssignFloat(shopUI, "messageDuration", 2f);
+        shopPanel.SetActive(false);
 
         GameObject gameOverPanel = CreateRectObject("GameOverPanel", canvasObject.transform);
         SetRectTransform(gameOverPanel.GetComponent<RectTransform>(), new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(360f, 160f));
@@ -1556,6 +1975,48 @@ public static class PrototypeSceneBuilder
 
         bool weaponMark = (x >= 18 && x < 48 && y >= 34 && y < 40) || (x >= 22 && x < 32 && y >= 20 && y < 36);
         return weaponMark ? Color.white : basePixel;
+    }
+
+    private static Color CreateShopHealthPixel(int x, int y, int size)
+    {
+        Color basePixel = CirclePixel(x, y, size, new Color(0.1f, 0.7f, 0.28f, 1f), new Color(0.02f, 0.22f, 0.08f, 1f));
+
+        if (basePixel.a <= 0f)
+        {
+            return basePixel;
+        }
+
+        bool cross = (x >= 28 && x < 36 && y >= 18 && y < 46) || (y >= 28 && y < 36 && x >= 18 && x < 46);
+        bool priceDot = x >= 45 && x < 51 && y >= 12 && y < 18;
+        return cross || priceDot ? Color.white : basePixel;
+    }
+
+    private static Color CreateShopAmmoPixel(int x, int y, int size)
+    {
+        Color basePixel = CirclePixel(x, y, size, new Color(0.95f, 0.55f, 0.08f, 1f), new Color(0.42f, 0.18f, 0.02f, 1f));
+
+        if (basePixel.a <= 0f)
+        {
+            return basePixel;
+        }
+
+        bool ammoBox = x >= 19 && x < 45 && y >= 24 && y < 42;
+        bool stripe = ammoBox && (x + y) % 10 < 5;
+        return stripe ? new Color(1f, 0.9f, 0.2f, 1f) : basePixel;
+    }
+
+    private static Color CreateShopWeaponPixel(int x, int y, int size)
+    {
+        Color basePixel = CirclePixel(x, y, size, new Color(0.55f, 0.24f, 0.92f, 1f), new Color(0.16f, 0.04f, 0.34f, 1f));
+
+        if (basePixel.a <= 0f)
+        {
+            return basePixel;
+        }
+
+        bool weapon = (x >= 16 && x < 50 && y >= 35 && y < 41) || (x >= 24 && x < 33 && y >= 18 && y < 36);
+        bool priceDot = x >= 45 && x < 51 && y >= 12 && y < 18;
+        return weapon || priceDot ? Color.white : basePixel;
     }
 
     private static Color CirclePixel(int x, int y, int size, Color fill, Color outline)

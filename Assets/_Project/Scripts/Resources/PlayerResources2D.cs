@@ -54,6 +54,31 @@ public class PlayerResources2D : MonoBehaviour
         return spentAmount;
     }
 
+    public bool CanAfford(int cost)
+    {
+        int clampedCost = Mathf.Max(0, cost);
+        return CurrentMoney >= clampedCost;
+    }
+
+    public bool TrySpendMoney(int amount)
+    {
+        int clampedAmount = Mathf.Max(0, amount);
+
+        if (clampedAmount == 0)
+        {
+            return true;
+        }
+
+        if (CurrentMoney < clampedAmount)
+        {
+            return false;
+        }
+
+        CurrentMoney -= clampedAmount;
+        ResourcesChanged?.Invoke(CurrentAmmo, maxAmmo, CurrentMoney);
+        return true;
+    }
+
     public void AddAmmo(int amount)
     {
         int clampedAmount = Mathf.Max(0, amount);

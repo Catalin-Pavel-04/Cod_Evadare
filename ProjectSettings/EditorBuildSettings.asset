@@ -23,4 +23,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/_Project/Scenes/Prototype_WeaponLoot.unity
     guid: bd64fb6eddae05b4d8cea626a50b1e0c
+  - enabled: 1
+    path: Assets/_Project/Scenes/Prototype_Shop.unity
+    guid: f0a8690210f009147adb79b689fb75b2
   m_configObjects: {}
