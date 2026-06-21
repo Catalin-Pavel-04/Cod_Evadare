@@ -25,12 +25,6 @@ public class MainMenuController2D : MonoBehaviour
     };
     [SerializeField] private string levelSelectSceneName = "LevelSelect";
     [SerializeField] private string levelSelectScenePath = "Assets/_Project/Scenes/Game/LevelSelect.unity";
-    [SerializeField] private string demoSceneName = "Prototype_FinalDemo";
-    [SerializeField] private string demoScenePath = "Assets/_Project/Scenes/Prototype_FinalDemo.unity";
-    [SerializeField] private string prisonSceneName = "Prototype_PrisonLevel";
-    [SerializeField] private string prisonScenePath = "Assets/_Project/Scenes/Prototype_PrisonLevel.unity";
-    [SerializeField] private string balancedPrisonSceneName = "Prototype_PrisonLevel_Balanced";
-    [SerializeField] private string balancedPrisonScenePath = "Assets/_Project/Scenes/Prototype_PrisonLevel_Balanced.unity";
     [SerializeField] private GameObject mainPanel;
     [SerializeField] private GameObject controlsPanel;
 
@@ -42,7 +36,7 @@ public class MainMenuController2D : MonoBehaviour
 
     public void PlayDemo()
     {
-        LoadScene(demoSceneName, demoScenePath);
+        LoadCampaignLevel(1);
     }
 
     public void PlayNewGame()
@@ -63,12 +57,12 @@ public class MainMenuController2D : MonoBehaviour
 
     public void PlayPrisonLevel()
     {
-        LoadScene(prisonSceneName, prisonScenePath);
+        LoadCampaignLevel(2);
     }
 
     public void PlayBalancedPrisonLevel()
     {
-        LoadScene(balancedPrisonSceneName, balancedPrisonScenePath);
+        LoadCampaignLevel(2);
     }
 
     public void LoadSceneByName(string sceneName)

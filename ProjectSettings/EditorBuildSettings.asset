@@ -27,45 +27,6 @@ EditorBuildSettings:
     path: Assets/_Project/Scenes/Levels/Level_05_HorrorHospital.unity
     guid: 6dbaeefa7ff6539488b0476b30dccdeb
   - enabled: 1
-    path: Assets/_Project/Scenes/MainMenu.unity
-    guid: 09ed356a5fa70eb429e999af14bb5627
-  - enabled: 1
     path: Assets/Scenes/SampleScene.unity
     guid: 8c9cfa26abfee488c85f1582747f6a02
-  - enabled: 1
-    path: Assets/_Project/Scenes/Prototype_Lab.unity
-    guid: f4173bc90118f074095d0f8e915d0d1f
-  - enabled: 1
-    path: Assets/_Project/Scenes/Prototype_RoomLoop.unity
-    guid: 154961984279b5846b7068f7f5076932
-  - enabled: 1
-    path: Assets/_Project/Scenes/Prototype_HealthCombat.unity
-    guid: c67f7000ff6826443a07e38801f9e0ac
-  - enabled: 1
-    path: Assets/_Project/Scenes/Prototype_LootResources.unity
-    guid: 9833083b9edf54b47b9e9d51a53f4637
-  - enabled: 1
-    path: Assets/_Project/Scenes/Prototype_WeaponLoot.unity
-    guid: bd64fb6eddae05b4d8cea626a50b1e0c
-  - enabled: 1
-    path: Assets/_Project/Scenes/Prototype_Shop.unity
-    guid: f0a8690210f009147adb79b689fb75b2
-  - enabled: 1
-    path: Assets/_Project/Scenes/Prototype_MinibossBuffs.unity
-    guid: f6dc04a045551de41a8a669b0efce2be
-  - enabled: 1
-    path: Assets/_Project/Scenes/Prototype_BossFight.unity
-    guid: 2d98e10f6dd01154bbe971516bfabfae
-  - enabled: 1
-    path: Assets/_Project/Scenes/Prototype_FullLaboratoryLevel.unity
-    guid: 9e5fc42b4a3de214a909d0db86072bc4
-  - enabled: 1
-    path: Assets/_Project/Scenes/Prototype_FinalDemo.unity
-    guid: 67cb695baa6099243bf6cc24cc6a0172
-  - enabled: 1
-    path: Assets/_Project/Scenes/Prototype_PrisonLevel.unity
-    guid: e4bce64cfe72c4248b0efdeabae0cb97
-  - enabled: 1
-    path: Assets/_Project/Scenes/Prototype_PrisonLevel_Balanced.unity
-    guid: c83fafe451f96274bbff8d4abf3309d5
   m_configObjects: {}

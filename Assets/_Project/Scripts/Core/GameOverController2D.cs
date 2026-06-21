@@ -39,7 +39,16 @@ public class GameOverController2D : MonoBehaviour
         if (!string.IsNullOrEmpty(restartKey) && Input.GetKeyDown(restartKey))
         {
             Time.timeScale = 1f;
-            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+            Scene activeScene = SceneManager.GetActiveScene();
+
+            if (activeScene.buildIndex >= 0)
+            {
+                SceneManager.LoadScene(activeScene.buildIndex);
+            }
+            else
+            {
+                SceneManager.LoadScene(activeScene.name);
+            }
         }
     }
 

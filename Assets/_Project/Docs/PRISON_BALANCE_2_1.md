@@ -57,7 +57,7 @@ Target clear time for a new player is roughly 4-8 minutes.
 
 ## Manual Test Checklist
 
-- Main menu loads `Prototype_PrisonLevel_Balanced`.
+- Main menu loads `Level_02_Prison`.
 - Keycard UI starts at 0.
 - First ranged guard telegraphs before firing.
 - First room clear spawns keycard, ammo, and money.

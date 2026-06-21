@@ -180,7 +180,7 @@ public static class PrototypeSceneBuilder
         "Assets/_Project/Audio/Generated"
     };
 
-    [MenuItem("Tools/Cod Evadare/Create Prototype 0.1 Scene")]
+    [MenuItem("Tools/Cod Evadare/Legacy Prototypes/Create Prototype 0.1 Scene")]
     public static void CreatePrototypeScene()
     {
         if (!Application.isBatchMode && !EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo())
@@ -223,7 +223,7 @@ public static class PrototypeSceneBuilder
         Debug.Log($"Created Prototype 0.1 scene at {ScenePath}.");
     }
 
-    [MenuItem("Tools/Cod Evadare/Create Prototype 0.2 Room Scene")]
+    [MenuItem("Tools/Cod Evadare/Legacy Prototypes/Create Prototype 0.2 Room Scene")]
     public static void CreatePrototypeRoomScene()
     {
         if (!Application.isBatchMode && !EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo())
@@ -270,7 +270,7 @@ public static class PrototypeSceneBuilder
         Debug.Log($"Created Prototype 0.2 room loop scene at {RoomLoopScenePath}.");
     }
 
-    [MenuItem("Tools/Cod Evadare/Create Prototype 0.3 Health Combat Scene")]
+    [MenuItem("Tools/Cod Evadare/Legacy Prototypes/Create Prototype 0.3 Health Combat Scene")]
     public static void CreatePrototypeHealthCombatScene()
     {
         if (!Application.isBatchMode && !EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo())
@@ -325,7 +325,7 @@ public static class PrototypeSceneBuilder
         Debug.Log($"Created Prototype 0.3 health combat scene at {HealthCombatScenePath}.");
     }
 
-    [MenuItem("Tools/Cod Evadare/Create Prototype 0.4 Loot Resources Scene")]
+    [MenuItem("Tools/Cod Evadare/Legacy Prototypes/Create Prototype 0.4 Loot Resources Scene")]
     public static void CreatePrototypeLootResourcesScene()
     {
         if (!Application.isBatchMode && !EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo())
@@ -401,7 +401,7 @@ public static class PrototypeSceneBuilder
         Debug.Log($"Created Prototype 0.4 loot resources scene at {LootResourcesScenePath}.");
     }
 
-    [MenuItem("Tools/Cod Evadare/Create Prototype 0.5 Weapon Loot Scene")]
+    [MenuItem("Tools/Cod Evadare/Legacy Prototypes/Create Prototype 0.5 Weapon Loot Scene")]
     public static void CreatePrototypeWeaponLootScene()
     {
         if (!Application.isBatchMode && !EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo())
@@ -481,7 +481,7 @@ public static class PrototypeSceneBuilder
         Debug.Log($"Created Prototype 0.5 weapon loot scene at {WeaponLootScenePath}.");
     }
 
-    [MenuItem("Tools/Cod Evadare/Create Prototype 0.6 Shop Scene")]
+    [MenuItem("Tools/Cod Evadare/Legacy Prototypes/Create Prototype 0.6 Shop Scene")]
     public static void CreatePrototypeShopScene()
     {
         if (!Application.isBatchMode && !EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo())
@@ -562,7 +562,7 @@ public static class PrototypeSceneBuilder
         Debug.Log($"Created Prototype 0.6 shop scene at {ShopScenePath}.");
     }
 
-    [MenuItem("Tools/Cod Evadare/Create Prototype 0.7 Miniboss Buff Scene")]
+    [MenuItem("Tools/Cod Evadare/Legacy Prototypes/Create Prototype 0.7 Miniboss Buff Scene")]
     public static void CreatePrototypeMinibossBuffScene()
     {
         if (!Application.isBatchMode && !EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo())
@@ -630,7 +630,7 @@ public static class PrototypeSceneBuilder
         Debug.Log($"Created Prototype 0.7 miniboss buff scene at {MinibossBuffScenePath}.");
     }
 
-    [MenuItem("Tools/Cod Evadare/Create Prototype 0.8 Boss Fight Scene")]
+    [MenuItem("Tools/Cod Evadare/Legacy Prototypes/Create Prototype 0.8 Boss Fight Scene")]
     public static void CreatePrototypeBossFightScene()
     {
         if (!Application.isBatchMode && !EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo())
@@ -702,7 +702,7 @@ public static class PrototypeSceneBuilder
         Debug.Log($"Created Prototype 0.8 boss fight scene at {BossFightScenePath}.");
     }
 
-    [MenuItem("Tools/Cod Evadare/Create Prototype 0.9 Full Laboratory Level")]
+    [MenuItem("Tools/Cod Evadare/Legacy Prototypes/Create Prototype 0.9 Full Laboratory Level")]
     public static void CreatePrototypeFullLaboratoryLevel()
     {
         if (!Application.isBatchMode && !EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo())
@@ -854,7 +854,7 @@ public static class PrototypeSceneBuilder
         Debug.Log($"Created Prototype 0.9 full laboratory level at {FullLaboratoryLevelScenePath}.");
     }
 
-    [MenuItem("Tools/Cod Evadare/Create Main Menu Scene")]
+    [MenuItem("Tools/Cod Evadare/Legacy Prototypes/Create Main Menu Scene")]
     public static void CreateMainMenuScene()
     {
         if (!Application.isBatchMode && !EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo())
@@ -880,7 +880,7 @@ public static class PrototypeSceneBuilder
         Debug.Log($"Created main menu scene at {MainMenuScenePath}.");
     }
 
-    [MenuItem("Tools/Cod Evadare/Create Prototype 1.0 Final Demo")]
+    [MenuItem("Tools/Cod Evadare/Legacy Prototypes/Create Prototype 1.0 Final Demo")]
     public static void CreatePrototypeFinalDemo()
     {
         if (!Application.isBatchMode && !EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo())
@@ -984,7 +984,7 @@ public static class PrototypeSceneBuilder
             out GameObject victoryPanel,
             out Text victoryText);
 
-        AddFinalDemoUiOverlays(root.transform, out GameObject pausePanel, out DemoMessageUI2D demoMessageUI);
+        AddFinalDemoUiOverlays(root.transform, out GameObject pausePanel);
 
         CreateFinalDemoGameSystems(
             root.transform,
@@ -999,7 +999,6 @@ public static class PrototypeSceneBuilder
             victoryPanel,
             victoryText,
             pausePanel,
-            demoMessageUI,
             out BuffChoiceController2D buffChoiceController,
             out LevelEndController2D levelEndController);
 
@@ -1025,7 +1024,7 @@ public static class PrototypeSceneBuilder
         Debug.Log($"Created Prototype 1.0 final demo scene at {FinalDemoScenePath}.");
     }
 
-    [MenuItem("Tools/Cod Evadare/Create Prototype 2.0 Prison Level")]
+    [MenuItem("Tools/Cod Evadare/Legacy Prototypes/Create Prototype 2.0 Prison Level")]
     public static void CreatePrototypePrisonLevel()
     {
         if (!Application.isBatchMode && !EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo())
@@ -1140,7 +1139,7 @@ public static class PrototypeSceneBuilder
             out Text victoryText);
 
         AddPrisonKeycardUI(root.transform, playerKeyring);
-        AddFinalDemoUiOverlays(root.transform, out GameObject pausePanel, out DemoMessageUI2D demoMessageUI);
+        AddFinalDemoUiOverlays(root.transform, out GameObject pausePanel);
         Text gatePromptText = root.transform.Find("UI/Canvas/DemoMessageText")?.GetComponent<Text>();
 
         CreatePrisonGameSystems(
@@ -1156,7 +1155,6 @@ public static class PrototypeSceneBuilder
             victoryPanel,
             victoryText,
             pausePanel,
-            demoMessageUI,
             out BuffChoiceController2D buffChoiceController,
             out LevelEndController2D levelEndController);
 
@@ -1183,7 +1181,7 @@ public static class PrototypeSceneBuilder
         Debug.Log($"Created Prototype 2.0 prison level at {PrisonLevelScenePath}.");
     }
 
-    [MenuItem("Tools/Cod Evadare/Create Prototype 2.1 Balanced Prison Level")]
+    [MenuItem("Tools/Cod Evadare/Legacy Prototypes/Create Prototype 2.1 Balanced Prison Level")]
     public static void CreatePrototypeBalancedPrisonLevel()
     {
         if (!Application.isBatchMode && !EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo())
@@ -1301,7 +1299,7 @@ public static class PrototypeSceneBuilder
             out Text victoryText);
 
         AddPrisonKeycardUI(root.transform, playerKeyring);
-        AddFinalDemoUiOverlays(root.transform, out GameObject pausePanel, out DemoMessageUI2D demoMessageUI);
+        AddFinalDemoUiOverlays(root.transform, out GameObject pausePanel);
         Text gatePromptText = root.transform.Find("UI/Canvas/DemoMessageText")?.GetComponent<Text>();
 
         CreatePrisonGameSystems(
@@ -1317,7 +1315,6 @@ public static class PrototypeSceneBuilder
             victoryPanel,
             victoryText,
             pausePanel,
-            demoMessageUI,
             out BuffChoiceController2D buffChoiceController,
             out LevelEndController2D levelEndController,
             "Prison Escape",
@@ -1349,7 +1346,7 @@ public static class PrototypeSceneBuilder
         Debug.Log($"Created Prototype 2.1 balanced prison level at {BalancedPrisonLevelScenePath}.");
     }
 
-    [MenuItem("Tools/Cod Evadare/Update Main Menu With Level 2")]
+    [MenuItem("Tools/Cod Evadare/Legacy Prototypes/Update Main Menu With Level 2")]
     public static void UpdateMainMenuWithLevel2()
     {
         CreateMainMenuScene();
@@ -1369,7 +1366,7 @@ public static class PrototypeSceneBuilder
 
         if (!addedAnyPrisonScene)
         {
-            Debug.LogWarning($"Main menu was updated, but no prison scene exists yet. Run Tools/Cod Evadare/Create Prototype 2.0 Prison Level or Tools/Cod Evadare/Create Prototype 2.1 Balanced Prison Level before using the Level 2 buttons.");
+            Debug.LogWarning($"Main menu was updated, but no prison scene exists yet. Run Tools/Cod Evadare/Legacy Prototypes/Create Prototype 2.0 Prison Level or Tools/Cod Evadare/Legacy Prototypes/Create Prototype 2.1 Balanced Prison Level before using the Level 2 buttons.");
         }
     }
 
@@ -5505,14 +5502,13 @@ public static class PrototypeSceneBuilder
         }
     }
 
-    private static void AddFinalDemoUiOverlays(Transform root, out GameObject pausePanel, out DemoMessageUI2D demoMessageUI)
+    private static void AddFinalDemoUiOverlays(Transform root, out GameObject pausePanel)
     {
         Transform canvasTransform = root.Find("UI/Canvas");
 
         if (canvasTransform == null)
         {
             pausePanel = null;
-            demoMessageUI = null;
             return;
         }
 
@@ -5548,7 +5544,7 @@ public static class PrototypeSceneBuilder
         messageText.color = new Color(0.9f, 0.96f, 1f, 1f);
         messageText.raycastTarget = false;
 
-        demoMessageUI = messageObject.AddComponent<DemoMessageUI2D>();
+        DemoMessageUI2D demoMessageUI = messageObject.AddComponent<DemoMessageUI2D>();
         AssignObjectReference(demoMessageUI, "messageText", messageText);
         AssignFloat(demoMessageUI, "defaultDuration", 2f);
     }
@@ -5740,7 +5736,6 @@ public static class PrototypeSceneBuilder
         GameObject victoryPanel,
         Text victoryText,
         GameObject pausePanel,
-        DemoMessageUI2D demoMessageUI,
         out BuffChoiceController2D buffChoiceController,
         out LevelEndController2D levelEndController,
         string levelName = "Prison Escape",
@@ -5817,8 +5812,6 @@ public static class PrototypeSceneBuilder
         AssignObjectReference(audioManager, "victoryClip", AssetDatabase.LoadAssetAtPath<AudioClip>(VictoryAudioPath));
         AssignObjectReference(audioManager, "gameOverClip", AssetDatabase.LoadAssetAtPath<AudioClip>(GameOverAudioPath));
         AssignFloat(audioManager, "volume", 0.6f);
-
-        _ = demoMessageUI;
     }
 
     private static void CreatePrisonGameSystems(
@@ -5834,7 +5827,6 @@ public static class PrototypeSceneBuilder
         GameObject victoryPanel,
         Text victoryText,
         GameObject pausePanel,
-        DemoMessageUI2D demoMessageUI,
         out BuffChoiceController2D buffChoiceController,
         out LevelEndController2D levelEndController,
         string levelName = "Prison Escape",
@@ -5918,11 +5910,6 @@ public static class PrototypeSceneBuilder
         AssignObjectReference(audioManager, "laserClip", AssetDatabase.LoadAssetAtPath<AudioClip>(LaserAudioPath));
         AssignObjectReference(audioManager, "keycardClip", AssetDatabase.LoadAssetAtPath<AudioClip>(KeycardAudioPath));
         AssignFloat(audioManager, "volume", 0.6f);
-
-        GameObject demoMessageObject = new GameObject("DemoMessageUI");
-        demoMessageObject.transform.SetParent(gameSystems.transform);
-        _ = demoMessageObject;
-        _ = demoMessageUI;
     }
 
     private static void WirePauseButton(GameObject pausePanel, string buttonName, UnityEngine.Events.UnityAction action)
@@ -5976,8 +5963,7 @@ public static class PrototypeSceneBuilder
 
     private static Font GetBuiltinUIFont()
     {
-        Font font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
-        return font != null ? font : Resources.GetBuiltinResource<Font>("Arial.ttf");
+        return Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
     }
 
     private static Material GetOrCreateMaterial(string assetPath, string shaderName, Color color)

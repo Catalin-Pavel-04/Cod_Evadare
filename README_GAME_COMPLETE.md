@@ -6,7 +6,7 @@ Unity version: 2022.3.62f3 LTS
 
 Open the Unity project and run:
 
-`Tools/Cod Evadare/Build Content Complete MVP`
+`Tools/Cod Evadare/Build/Content Complete MVP`
 
 Main scene:
 

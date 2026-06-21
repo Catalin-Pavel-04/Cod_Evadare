@@ -17,6 +17,7 @@ public static class ContentCompleteGameBuilder
     private const string LevelScenesFolder = "Assets/_Project/Scenes/Levels";
     private const string MainMenuScenePath = GameScenesFolder + "/MainMenu.unity";
     private const string LevelSelectScenePath = GameScenesFolder + "/LevelSelect.unity";
+    private const string SampleScenePath = "Assets/Scenes/SampleScene.unity";
     private const string BulletPrefabPath = "Assets/_Project/Prefabs/Weapons/Bullet.prefab";
     private const string EnemyProjectilePrefabPath = "Assets/_Project/Prefabs/Projectiles/EnemyProjectile.prefab";
     private const string HealthPickupPrefabPath = "Assets/_Project/Prefabs/Pickups/HealthPickup.prefab";
@@ -106,22 +107,28 @@ public static class ContentCompleteGameBuilder
         public int StartingMoney;
     }
 
-    [MenuItem("Tools/Cod Evadare/Build Content Complete MVP")]
+    [MenuItem("Tools/Cod Evadare/Build/Content Complete MVP")]
     public static void BuildContentCompleteMvp()
     {
         CreateRequiredFolders();
         GeneratePlaceholderAssets();
-        CreateScriptableObjectContent();
         CreatePrefabs();
-        BuildGameMenus();
-        BuildAllFullLevels();
+        CreateMainMenuScene();
+        CreateLevelSelectScene();
+
+        foreach (LevelDefinition level in GetLevels())
+        {
+            CreateLevelScene(level);
+        }
+
+        UpdateBuildSettings();
         UpdateDocs();
         AssetDatabase.SaveAssets();
         AssetDatabase.Refresh();
         Debug.Log("Built content complete MVP.");
     }
 
-    [MenuItem("Tools/Cod Evadare/Build Game Menus")]
+    [MenuItem("Tools/Cod Evadare/Build/Game Menus")]
     public static void BuildGameMenus()
     {
         CreateRequiredFolders();
@@ -133,12 +140,11 @@ public static class ContentCompleteGameBuilder
         Debug.Log("Built game menus.");
     }
 
-    [MenuItem("Tools/Cod Evadare/Build All Full Levels")]
+    [MenuItem("Tools/Cod Evadare/Build/All Full Levels")]
     public static void BuildAllFullLevels()
     {
         CreateRequiredFolders();
         GeneratePlaceholderAssets();
-        CreateScriptableObjectContent();
         CreatePrefabs();
 
         foreach (LevelDefinition level in GetLevels())
@@ -152,7 +158,7 @@ public static class ContentCompleteGameBuilder
         Debug.Log("Built all full levels.");
     }
 
-    [MenuItem("Tools/Cod Evadare/Build Generated Assets Only")]
+    [MenuItem("Tools/Cod Evadare/Build/Generated Assets Only")]
     public static void BuildGeneratedAssetsOnly()
     {
         CreateRequiredFolders();
@@ -162,7 +168,7 @@ public static class ContentCompleteGameBuilder
         Debug.Log("Built generated placeholder assets.");
     }
 
-    [MenuItem("Tools/Cod Evadare/Build ScriptableObject Content Only")]
+    [MenuItem("Tools/Cod Evadare/Build/ScriptableObject Content Only")]
     public static void BuildScriptableObjectContentOnly()
     {
         CreateRequiredFolders();
@@ -171,6 +177,14 @@ public static class ContentCompleteGameBuilder
         AssetDatabase.SaveAssets();
         AssetDatabase.Refresh();
         Debug.Log("Built ScriptableObject content.");
+    }
+
+    [MenuItem("Tools/Cod Evadare/Cleanup/Build Settings")]
+    public static void CleanupBuildSettings()
+    {
+        UpdateBuildSettings();
+        AssetDatabase.SaveAssets();
+        Debug.Log("Build Settings cleaned. Active game scenes are kept; legacy prototype scenes are excluded.");
     }
 
     private static void CreateRequiredFolders()
@@ -211,6 +225,11 @@ public static class ContentCompleteGameBuilder
     {
         GameObject bulletPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(BulletPrefabPath);
 
+        if (bulletPrefab == null && LoadSprite("Bullet_Prototype") != null)
+        {
+            bulletPrefab = CreateBulletPrefab();
+        }
+
         CreateWeapon("Pistol", WeaponRarity2D.Common, bulletPrefab, 0.20f, 12, 1, 1.0f, 1, 12f, 2f, 1, 0f);
         CreateWeapon("SMG", WeaponRarity2D.Rare, bulletPrefab, 0.08f, 24, 1, 1.2f, 1, 13f, 2f, 1, 3f);
         CreateWeapon("Shotgun", WeaponRarity2D.Epic, bulletPrefab, 0.55f, 6, 1, 1.4f, 1, 11f, 1.2f, 5, 35f);
@@ -245,7 +264,7 @@ public static class ContentCompleteGameBuilder
 
     private static void CreatePrefabs()
     {
-        GameObject bulletPrefab = CreateBulletPrefab();
+        CreateBulletPrefab();
         CreateScriptableObjectContent();
         GameObject enemyProjectilePrefab = CreateEnemyProjectilePrefab();
 
@@ -289,8 +308,6 @@ public static class ContentCompleteGameBuilder
         CreateEnemyPrefab("GhostEnemy", LoadSprite("GhostEnemy"), EnemyArchetype.Ranged, 3, 1.1f, 1, enemyProjectilePrefab, null);
         CreateEnemyPrefab("SurgeonMiniboss", LoadSprite("SurgeonMiniboss"), EnemyArchetype.Miniboss, 24, 1.25f, 2, null, "Surgeon");
         CreateEnemyPrefab("NightmareDoctorBoss", LoadSprite("NightmareDoctorBoss"), EnemyArchetype.Boss, 68, 1.05f, 1, enemyProjectilePrefab, "Nightmare Doctor");
-
-        _ = bulletPrefab;
     }
 
     private static void CreateMainMenuScene()
@@ -322,15 +339,13 @@ public static class ContentCompleteGameBuilder
         Button newGameButton = CreateButton(mainPanel.transform, "NewGameButton", "New Game", new Vector2(0f, 140f));
         Button continueButton = CreateButton(mainPanel.transform, "ContinueButton", "Continue", new Vector2(0f, 80f));
         Button levelSelectButton = CreateButton(mainPanel.transform, "LevelSelectButton", "Level Select", new Vector2(0f, 20f));
-        Button demoButton = CreateButton(mainPanel.transform, "LaboratoryDemoButton", "Laboratory Demo", new Vector2(0f, -40f));
-        Button controlsButton = CreateButton(mainPanel.transform, "ControlsButton", "Controls", new Vector2(0f, -100f));
-        Button quitButton = CreateButton(mainPanel.transform, "QuitButton", "Quit", new Vector2(0f, -160f));
+        Button controlsButton = CreateButton(mainPanel.transform, "ControlsButton", "Controls", new Vector2(0f, -40f));
+        Button quitButton = CreateButton(mainPanel.transform, "QuitButton", "Quit", new Vector2(0f, -100f));
         Button backButton = CreateButton(controlsPanel.transform, "BackButton", "Back", new Vector2(0f, -160f));
 
         UnityEventTools.AddPersistentListener(newGameButton.onClick, controller.PlayNewGame);
         UnityEventTools.AddPersistentListener(continueButton.onClick, controller.ContinueGame);
         UnityEventTools.AddPersistentListener(levelSelectButton.onClick, controller.ShowLevelSelect);
-        UnityEventTools.AddPersistentListener(demoButton.onClick, controller.PlayDemo);
         UnityEventTools.AddPersistentListener(controlsButton.onClick, controller.ShowControls);
         UnityEventTools.AddPersistentListener(quitButton.onClick, controller.QuitGame);
         UnityEventTools.AddPersistentListener(backButton.onClick, controller.ShowMainMenu);
@@ -398,10 +413,8 @@ public static class ContentCompleteGameBuilder
         player.transform.position = new Vector3(-28f, 0f, 0f);
         AssignObjectReference(cameraObject.GetComponent<CameraFollow2D>(), "target", player.transform);
 
-        GameObject uiRoot = CreateGameplayUi(root.transform, playerHealth, resources, shooting, playerBuffs, keyring, out ObjectiveUI2D objectiveUI, out ShopUI2D shopUI, out BuffChoiceController2D buffChoices, out GameObject gameOverPanel, out GameObject victoryPanel, out Text victoryText, out GameObject nextLevelButton, out GameObject pausePanel);
-        GameObject gameSystems = CreateGameSystems(root.transform, level, playerHealth, playerBuffs, objectiveUI, gameOverPanel, victoryPanel, victoryText, nextLevelButton, pausePanel, buffChoices);
-        _ = uiRoot;
-        _ = gameSystems;
+        CreateGameplayUi(root.transform, playerHealth, resources, shooting, playerBuffs, keyring, out ObjectiveUI2D objectiveUI, out ShopUI2D shopUI, out BuffChoiceController2D buffChoices, out GameObject gameOverPanel, out GameObject victoryPanel, out Text victoryText, out GameObject nextLevelButton, out GameObject pausePanel);
+        CreateGameSystems(root.transform, level, playerHealth, objectiveUI, gameOverPanel, victoryPanel, victoryText, nextLevelButton, pausePanel);
 
         Sprite wallSprite = LoadSprite(level.WallSprite);
         Sprite floorSprite = LoadSprite(level.FloorSprite);
@@ -422,7 +435,7 @@ public static class ContentCompleteGameBuilder
         CreateShopRoom(root.transform, -7f, level, wallSprite, floorSprite, shopUI, objectiveUI);
         CreateCombatRoom(root.transform, "Combat_Room_02", 4f, level, wallSprite, floorSprite, level.CombatTwoEnemies, hazardPrefab, new[] { ammoPickup, moneyPickup, weaponPickup }, objectiveUI, level.CombatObjective, "Proceed to the miniboss");
         CreateMinibossRoom(root.transform, 16f, level, wallSprite, floorSprite, objectiveUI, buffChoices);
-        CreateBossRoom(root.transform, 29f, level, wallSprite, floorSprite, objectiveUI, victoryText);
+        CreateBossRoom(root.transform, 29f, level, wallSprite, floorSprite, objectiveUI);
 
         CreateEventSystem(root.transform);
         EditorSceneManager.SaveScene(scene, $"{LevelScenesFolder}/{level.SceneName}.unity");
@@ -582,7 +595,7 @@ public static class ContentCompleteGameBuilder
         return uiRoot;
     }
 
-    private static GameObject CreateGameSystems(Transform parent, LevelDefinition level, PlayerHealth2D playerHealth, PlayerBuffs2D playerBuffs, ObjectiveUI2D objectiveUI, GameObject gameOverPanel, GameObject victoryPanel, Text victoryText, GameObject nextLevelButton, GameObject pausePanel, BuffChoiceController2D buffChoices)
+    private static GameObject CreateGameSystems(Transform parent, LevelDefinition level, PlayerHealth2D playerHealth, ObjectiveUI2D objectiveUI, GameObject gameOverPanel, GameObject victoryPanel, Text victoryText, GameObject nextLevelButton, GameObject pausePanel)
     {
         GameObject systems = new GameObject("GameSystems");
         systems.transform.SetParent(parent);
@@ -636,8 +649,6 @@ public static class ContentCompleteGameBuilder
         AssignString(flow, "startingObjective", level.StartObjective);
         AssignString(flow, "controlsHint", level.ControlsHint);
 
-        _ = playerBuffs;
-        _ = buffChoices;
         return systems;
     }
 
@@ -728,7 +739,7 @@ public static class ContentCompleteGameBuilder
         CreateCameraZone(room.transform, new Vector3(centerX, 0f, 0f), new Vector2(10.5f, 8f), 6.7f);
     }
 
-    private static void CreateBossRoom(Transform parent, float centerX, LevelDefinition level, Sprite wallSprite, Sprite floorSprite, ObjectiveUI2D objectiveUI, Text victoryText)
+    private static void CreateBossRoom(Transform parent, float centerX, LevelDefinition level, Sprite wallSprite, Sprite floorSprite, ObjectiveUI2D objectiveUI)
     {
         GameObject room = new GameObject("Boss_Room");
         room.transform.SetParent(parent);
@@ -748,7 +759,6 @@ public static class ContentCompleteGameBuilder
         AssignString(controller, "victoryMessage", level.VictoryMessage);
         LevelEndController2D levelEnd = UnityEngine.Object.FindObjectOfType<LevelEndController2D>();
         AssignObjectReference(controller, "levelEndController", levelEnd);
-        _ = victoryText;
         CreateRoomTrigger(room.transform, centerX, 14.8f, 8f, controller);
         CreateCameraZone(room.transform, new Vector3(centerX, 0f, 0f), new Vector2(16.8f, 9.6f), 7.4f);
     }
@@ -1508,8 +1518,6 @@ public static class ContentCompleteGameBuilder
     {
         const int size = 64;
         Texture2D texture = new Texture2D(size, size, TextureFormat.RGBA32, false);
-        Color clear = new Color(0f, 0f, 0f, 0f);
-
         for (int y = 0; y < size; y++)
         {
             for (int x = 0; x < size; x++)
@@ -1534,7 +1542,6 @@ public static class ContentCompleteGameBuilder
             importer.SaveAndReimport();
         }
 
-        _ = clear;
     }
 
     private static Color GetSpritePixel(int x, int y, int size, Color primary, Color secondary, Color accent, int shape)
@@ -1621,15 +1628,7 @@ public static class ContentCompleteGameBuilder
             AddBuildSceneIfExists(scenes, $"{LevelScenesFolder}/{level.SceneName}.unity");
         }
 
-        foreach (EditorBuildSettingsScene existingScene in EditorBuildSettings.scenes)
-        {
-            if (existingScene == null || string.IsNullOrWhiteSpace(existingScene.path) || ContainsScene(scenes, existingScene.path))
-            {
-                continue;
-            }
-
-            scenes.Add(existingScene);
-        }
+        AddBuildSceneIfExists(scenes, SampleScenePath);
 
         EditorBuildSettings.scenes = scenes.ToArray();
     }
@@ -1675,7 +1674,7 @@ Unity version: 2022.3.62f3 LTS
 
 Open the Unity project and run:
 
-`Tools/Cod Evadare/Build Content Complete MVP`
+`Tools/Cod Evadare/Build/Content Complete MVP`
 
 Main scene:
 

@@ -5,10 +5,11 @@ public static class GameProgress2D
     private const string PlayerPrefsPrefix = "CodEvadare_";
     private const string HighestUnlockedLevelKey = PlayerPrefsPrefix + "HighestUnlockedLevel";
     private const int FirstLevelIndex = 1;
+    private const int MaxLevelIndex = 5;
 
     public static int GetHighestUnlockedLevel()
     {
-        return Mathf.Max(FirstLevelIndex, PlayerPrefs.GetInt(HighestUnlockedLevelKey, FirstLevelIndex));
+        return Mathf.Clamp(PlayerPrefs.GetInt(HighestUnlockedLevelKey, FirstLevelIndex), FirstLevelIndex, MaxLevelIndex);
     }
 
     public static bool IsLevelUnlocked(int levelIndex)
@@ -18,7 +19,7 @@ public static class GameProgress2D
 
     public static void UnlockLevel(int levelIndex)
     {
-        int clampedLevelIndex = Mathf.Max(FirstLevelIndex, levelIndex);
+        int clampedLevelIndex = Mathf.Clamp(levelIndex, FirstLevelIndex, MaxLevelIndex);
 
         if (clampedLevelIndex <= GetHighestUnlockedLevel())
         {

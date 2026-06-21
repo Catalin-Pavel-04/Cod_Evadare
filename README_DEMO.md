@@ -1,4 +1,4 @@
-# Cod: Evadare - Prototype Demo
+# Cod: Evadare - Legacy Prototype Demo
 
 Unity version: 2022.3.62f3 LTS
 
@@ -6,15 +6,26 @@ Unity version: 2022.3.62f3 LTS
 
 Open this repository in Unity Hub using Unity 2022.3.62f3 LTS.
 
-## Generate Demo Scenes
+## Current Recommended Flow
+
+Use `README_GAME_COMPLETE.md` and generate the current game with:
+
+- `Tools/Cod Evadare/Build/Content Complete MVP`
+
+The active game scenes are under:
+
+- `Assets/_Project/Scenes/Game`
+- `Assets/_Project/Scenes/Levels`
+
+## Generate Legacy Demo Scenes
 
 Use the Unity editor menu:
 
-- `Tools/Cod Evadare/Create Main Menu Scene`
-- `Tools/Cod Evadare/Create Prototype 1.0 Final Demo`
-- `Tools/Cod Evadare/Create Prototype 2.0 Prison Level`
-- `Tools/Cod Evadare/Create Prototype 2.1 Balanced Prison Level`
-- `Tools/Cod Evadare/Update Main Menu With Level 2`
+- `Tools/Cod Evadare/Legacy Prototypes/Create Main Menu Scene`
+- `Tools/Cod Evadare/Legacy Prototypes/Create Prototype 1.0 Final Demo`
+- `Tools/Cod Evadare/Legacy Prototypes/Create Prototype 2.0 Prison Level`
+- `Tools/Cod Evadare/Legacy Prototypes/Create Prototype 2.1 Balanced Prison Level`
+- `Tools/Cod Evadare/Legacy Prototypes/Update Main Menu With Level 2`
 
 Main scene:
 
@@ -29,7 +40,7 @@ Level 2 scene:
 - `Assets/_Project/Scenes/Prototype_PrisonLevel.unity`
 - `Assets/_Project/Scenes/Prototype_PrisonLevel_Balanced.unity`
 
-## Play From Main Menu
+## Play From Legacy Main Menu
 
 Open `Assets/_Project/Scenes/MainMenu.unity`, press Play, then select `Play Demo` for Level 1, `Play Level 2: Prison` for the original Level 2, or `Play Level 2: Prison Balanced` for Prototype 2.1.
 
@@ -68,6 +79,7 @@ Level 2: Prison Escape
 
 ## Known Limitations
 
+- These scenes are kept only as legacy prototype references and are not part of the cleaned Build Settings.
 - Art and audio are generated placeholders.
 - Enemy and boss AI are prototype-simple.
 - Balance is tuned for short prototype demos and still needs Play Mode testing.
