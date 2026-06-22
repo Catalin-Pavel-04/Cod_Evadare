@@ -146,7 +146,7 @@ public static class CodEvadarePickupPropHazardEnvironmentVisuals
         }
 
         bool changed = ApplySpriteVisual(owner, "Visual", "PickupSpriteRenderer", sprite, 0.11f, 0f, 16, Vector3.zero);
-        changed |= DisableRootSpriteRenderer(owner);
+        changed |= DisableRootSpriteRenderer(owner, FindVisualRenderer(owner.transform, "Visual/PickupSpriteRenderer"));
         return changed;
     }
 
@@ -181,7 +181,7 @@ public static class CodEvadarePickupPropHazardEnvironmentVisuals
         }
 
         bool changed = ApplySpriteVisual(owner, "Visual", "HazardSpriteRenderer", sprite, 0.095f, 0f, 6, Vector3.zero);
-        changed |= DisableRootSpriteRenderer(owner);
+        changed |= DisableRootSpriteRenderer(owner, FindVisualRenderer(owner.transform, "Visual/HazardSpriteRenderer"));
         return changed;
     }
 
@@ -204,7 +204,7 @@ public static class CodEvadarePickupPropHazardEnvironmentVisuals
 
         changed |= ApplySpriteVisual(owner, "Visual", "LaserEmitter_A", sprites.LaserEmitter, 0.1f, emitterRotation, 9, firstEmitterPosition);
         changed |= ApplySpriteVisual(owner, "Visual", "LaserEmitter_B", sprites.LaserEmitter, 0.1f, emitterRotation, 9, secondEmitterPosition);
-        changed |= DisableRootSpriteRenderer(owner);
+        changed |= DisableRootSpriteRenderer(owner, beamRenderer);
         return changed;
     }
 
@@ -227,6 +227,17 @@ public static class CodEvadarePickupPropHazardEnvironmentVisuals
         Transform lockedVisual = owner.transform.Find("Visual/LockedGateSpriteRenderer");
         Transform openVisual = owner.transform.Find("OpenVisual");
         SpriteRenderer lockedRenderer = lockedVisual != null ? lockedVisual.GetComponent<SpriteRenderer>() : null;
+        SpriteRenderer openRenderer = openVisual != null ? openVisual.GetComponentInChildren<SpriteRenderer>(true) : null;
+
+        if (lockedRenderer != null)
+        {
+            changed |= SetFootprintRenderer(lockedRenderer, owner, owner.GetComponent<SpriteRenderer>(), FootprintDrawMode.Stretch);
+        }
+
+        if (openRenderer != null)
+        {
+            changed |= SetFootprintRenderer(openRenderer, owner, owner.GetComponent<SpriteRenderer>(), FootprintDrawMode.Stretch);
+        }
 
         if (lockedRenderer != null)
         {
@@ -243,7 +254,7 @@ public static class CodEvadarePickupPropHazardEnvironmentVisuals
             changed |= SetSerializedObjectReference(lockedGate, "openVisual", openVisual.gameObject);
         }
 
-        changed |= DisableRootSpriteRenderer(owner);
+        changed |= DisableRootSpriteRenderer(owner, lockedRenderer);
         return changed;
     }
 
@@ -264,10 +275,11 @@ public static class CodEvadarePickupPropHazardEnvironmentVisuals
 
         if (doorRenderer != null)
         {
+            changed |= SetFootprintRenderer(doorRenderer, owner, owner.GetComponent<SpriteRenderer>(), FootprintDrawMode.Stretch);
             changed |= SetSerializedObjectReference(door, "spriteRenderer", doorRenderer);
         }
 
-        changed |= DisableRootSpriteRenderer(owner);
+        changed |= DisableRootSpriteRenderer(owner, doorRenderer);
         return changed;
     }
 
@@ -347,10 +359,21 @@ public static class CodEvadarePickupPropHazardEnvironmentVisuals
 
         if (visualRenderer != null && (lowerName.Contains("wall") || lowerName.Contains("floor")))
         {
-            changed |= SetTiledRenderer(visualRenderer, owner, rootRenderer);
+            changed |= SetFootprintRenderer(visualRenderer, owner, rootRenderer, FootprintDrawMode.Tiled);
+        }
+        else if (visualRenderer != null &&
+                 (lowerName.Contains("cover") ||
+                  lowerName.Contains("crate") ||
+                  lowerName.Contains("barrel") ||
+                  lowerName.Contains("terminal") ||
+                  lowerName.Contains("shop") ||
+                  lowerName.Contains("kiosk") ||
+                  lowerName.Contains("pillar")))
+        {
+            changed |= SetFootprintRenderer(visualRenderer, owner, rootRenderer, FootprintDrawMode.Stretch);
         }
 
-        changed |= DisableRootSpriteRenderer(owner);
+        changed |= DisableRootSpriteRenderer(owner, visualRenderer);
         return changed;
     }
 
@@ -411,12 +434,18 @@ public static class CodEvadarePickupPropHazardEnvironmentVisuals
 
     private static bool SetTiledRenderer(SpriteRenderer renderer, GameObject owner, SpriteRenderer rootRenderer)
     {
+        return SetFootprintRenderer(renderer, owner, rootRenderer, FootprintDrawMode.Tiled);
+    }
+
+    private static bool SetFootprintRenderer(SpriteRenderer renderer, GameObject owner, SpriteRenderer rootRenderer, FootprintDrawMode drawMode)
+    {
         bool changed = false;
         Vector2 targetSize = GetGameplayFootprint(owner, rootRenderer);
+        SpriteDrawMode targetDrawMode = drawMode == FootprintDrawMode.Tiled ? SpriteDrawMode.Tiled : SpriteDrawMode.Sliced;
 
-        if (renderer.drawMode != SpriteDrawMode.Tiled)
+        if (renderer.drawMode != targetDrawMode)
         {
-            renderer.drawMode = SpriteDrawMode.Tiled;
+            renderer.drawMode = targetDrawMode;
             changed = true;
         }
 
@@ -426,9 +455,16 @@ public static class CodEvadarePickupPropHazardEnvironmentVisuals
             changed = true;
         }
 
+        if (renderer.transform.localScale != Vector3.one)
+        {
+            renderer.transform.localScale = Vector3.one;
+            changed = true;
+        }
+
         if (changed)
         {
             EditorUtility.SetDirty(renderer);
+            EditorUtility.SetDirty(renderer.transform);
         }
 
         return changed;
@@ -451,7 +487,7 @@ public static class CodEvadarePickupPropHazardEnvironmentVisuals
         return Vector2.one;
     }
 
-    private static bool DisableRootSpriteRenderer(GameObject owner)
+    private static bool DisableRootSpriteRenderer(GameObject owner, SpriteRenderer replacementRenderer = null)
     {
         SpriteRenderer renderer = owner.GetComponent<SpriteRenderer>();
 
@@ -460,9 +496,39 @@ public static class CodEvadarePickupPropHazardEnvironmentVisuals
             return false;
         }
 
+        if (replacementRenderer != null && !IsUsableVisualReplacement(replacementRenderer))
+        {
+            return false;
+        }
+
         renderer.enabled = false;
         EditorUtility.SetDirty(renderer);
         return true;
+    }
+
+    private static bool IsUsableVisualReplacement(SpriteRenderer renderer)
+    {
+        if (renderer == null || renderer.sprite == null || !renderer.enabled)
+        {
+            return false;
+        }
+
+        if (!renderer.gameObject.activeSelf)
+        {
+            return false;
+        }
+
+        Vector2 spriteSize = new Vector2(renderer.sprite.bounds.size.x, renderer.sprite.bounds.size.y);
+        Vector2 footprint = renderer.drawMode == SpriteDrawMode.Simple
+            ? Vector2.Scale(spriteSize, Abs(renderer.transform.localScale))
+            : Vector2.Scale(renderer.size, Abs(renderer.transform.localScale));
+
+        return footprint.x > 0.05f && footprint.y > 0.05f;
+    }
+
+    private static Vector2 Abs(Vector3 vector)
+    {
+        return new Vector2(Mathf.Abs(vector.x), Mathf.Abs(vector.y));
     }
 
     private static Transform EnsureChildPath(Transform owner, string childPath, ref bool changed)
@@ -566,6 +632,12 @@ public static class CodEvadarePickupPropHazardEnvironmentVisuals
 
             yield return path;
         }
+    }
+
+    private enum FootprintDrawMode
+    {
+        Tiled,
+        Stretch
     }
 
     private sealed class SpriteLibrary
