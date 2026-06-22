@@ -61,3 +61,11 @@ All art and audio are generated placeholders. Layouts are functional MVP combat 
 Run `Tools/Cod Evadare/UI/Build Complete UI Art Pass` to regenerate the generated UI sprites, theme assets, showcase scene, and safe scene styling pass.
 
 Showcase scene: `Assets/_Project/Scenes/Game/UI_Showcase.unity`
+
+## Gameplay Visual Art Pass 2.0
+
+Run `Tools/Cod Evadare/Art/Build Gameplay Visual Art Pass` to apply import settings for the richer generated sprites used by the player, enemies, pickups, weapons, projectiles, walls, floors, doors, cover, hazards, and bosses. Version 2.0 uses larger source sprites, clearer silhouettes, smoother import settings, corrected pixels-per-unit, and more detailed environment panels.
+
+Run `Tools/Cod Evadare/Art/Apply Mobile Art Scale To Open Scene` on an open generated scene to convert existing long walls, floors, doors, gates, bars, and corridors to tiled mobile-style rendering with corrected dimensions.
+
+The sprites are refreshed in-place under `Assets/_Project/Art/Generated`, so existing scene and prefab references keep working.

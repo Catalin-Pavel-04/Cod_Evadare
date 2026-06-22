@@ -805,12 +805,15 @@ public static class ContentCompleteGameBuilder
         GameObject door = new GameObject(name);
         door.transform.SetParent(parent);
         door.transform.position = position;
-        door.transform.localScale = new Vector3(0.38f, 2.4f, 1f);
+        door.transform.localScale = Vector3.one;
         SpriteRenderer renderer = door.AddComponent<SpriteRenderer>();
         renderer.sprite = sprite;
+        renderer.drawMode = SpriteDrawMode.Tiled;
+        renderer.size = new Vector2(0.8f, 2.4f);
         renderer.sortingOrder = 6;
         renderer.enabled = false;
         BoxCollider2D collider = door.AddComponent<BoxCollider2D>();
+        collider.size = renderer.size;
         collider.enabled = false;
         DoorController2D controller = door.AddComponent<DoorController2D>();
         AssignObjectReference(controller, "spriteRenderer", renderer);
@@ -975,11 +978,14 @@ public static class ContentCompleteGameBuilder
         GameObject wall = new GameObject(name);
         wall.transform.SetParent(parent);
         wall.transform.position = position;
-        wall.transform.localScale = scale;
+        wall.transform.localScale = Vector3.one;
         SpriteRenderer renderer = wall.AddComponent<SpriteRenderer>();
         renderer.sprite = sprite;
+        renderer.drawMode = SpriteDrawMode.Tiled;
+        renderer.size = GetChunkyTileSize(scale);
         renderer.sortingOrder = 1;
-        wall.AddComponent<BoxCollider2D>();
+        BoxCollider2D collider = wall.AddComponent<BoxCollider2D>();
+        collider.size = renderer.size;
     }
 
     private static void CreateFloor(Transform parent, string name, Sprite sprite, Vector3 position, Vector3 scale, Color themeColor)
@@ -987,11 +993,30 @@ public static class ContentCompleteGameBuilder
         GameObject floor = new GameObject(name);
         floor.transform.SetParent(parent);
         floor.transform.position = position;
-        floor.transform.localScale = scale;
+        floor.transform.localScale = Vector3.one;
         SpriteRenderer renderer = floor.AddComponent<SpriteRenderer>();
         renderer.sprite = sprite;
+        renderer.drawMode = SpriteDrawMode.Tiled;
+        renderer.size = new Vector2(Mathf.Abs(scale.x), Mathf.Abs(scale.y));
         renderer.sortingOrder = -5;
         renderer.color = new Color(themeColor.r, themeColor.g, themeColor.b, 0.35f);
+    }
+
+    private static Vector2 GetChunkyTileSize(Vector3 scale)
+    {
+        float width = Mathf.Abs(scale.x);
+        float height = Mathf.Abs(scale.y);
+
+        if (width >= height)
+        {
+            height = Mathf.Max(0.6f, height);
+        }
+        else
+        {
+            width = Mathf.Max(0.6f, width);
+        }
+
+        return new Vector2(width, height);
     }
 
     private static GameObject CreateBulletPrefab()

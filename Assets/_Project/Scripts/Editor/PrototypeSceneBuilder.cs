@@ -2763,13 +2763,16 @@ public static class PrototypeSceneBuilder
         GameObject wall = new GameObject(name);
         wall.transform.SetParent(parent);
         wall.transform.position = position;
-        wall.transform.localScale = scale;
+        wall.transform.localScale = Vector3.one;
 
         SpriteRenderer spriteRenderer = wall.AddComponent<SpriteRenderer>();
         spriteRenderer.sprite = sprite;
+        spriteRenderer.drawMode = SpriteDrawMode.Tiled;
+        spriteRenderer.size = GetChunkyTileSize(scale);
         spriteRenderer.sortingOrder = 0;
 
-        wall.AddComponent<BoxCollider2D>();
+        BoxCollider2D collider = wall.AddComponent<BoxCollider2D>();
+        collider.size = spriteRenderer.size;
     }
 
     private static void CreateRoomLoopWalls(Transform parent, Sprite sprite, out DoorController2D leftDoor, out DoorController2D rightDoor)
@@ -4073,13 +4076,16 @@ public static class PrototypeSceneBuilder
         GameObject segment = new GameObject(name);
         segment.transform.SetParent(parent);
         segment.transform.position = position;
-        segment.transform.localScale = scale;
+        segment.transform.localScale = Vector3.one;
 
         SpriteRenderer spriteRenderer = segment.AddComponent<SpriteRenderer>();
         spriteRenderer.sprite = sprite;
+        spriteRenderer.drawMode = SpriteDrawMode.Tiled;
+        spriteRenderer.size = GetChunkyTileSize(scale);
         spriteRenderer.sortingOrder = 0;
 
-        segment.AddComponent<BoxCollider2D>();
+        BoxCollider2D collider = segment.AddComponent<BoxCollider2D>();
+        collider.size = spriteRenderer.size;
     }
 
     private static DoorController2D CreateDoor(Transform parent, string name, Sprite sprite, Vector3 position)
@@ -4087,14 +4093,17 @@ public static class PrototypeSceneBuilder
         GameObject door = new GameObject(name);
         door.transform.SetParent(parent);
         door.transform.position = position;
-        door.transform.localScale = new Vector3(0.4f, 2.8f, 1f);
+        door.transform.localScale = Vector3.one;
 
         SpriteRenderer spriteRenderer = door.AddComponent<SpriteRenderer>();
         spriteRenderer.sprite = sprite;
+        spriteRenderer.drawMode = SpriteDrawMode.Tiled;
+        spriteRenderer.size = new Vector2(0.85f, 2.8f);
         spriteRenderer.sortingOrder = 5;
         spriteRenderer.enabled = false;
 
         BoxCollider2D collider = door.AddComponent<BoxCollider2D>();
+        collider.size = spriteRenderer.size;
         collider.enabled = false;
 
         DoorController2D doorController = door.AddComponent<DoorController2D>();
@@ -4102,6 +4111,23 @@ public static class PrototypeSceneBuilder
         AssignObjectReference(doorController, "doorCollider", collider);
 
         return doorController;
+    }
+
+    private static Vector2 GetChunkyTileSize(Vector3 scale)
+    {
+        float width = Mathf.Abs(scale.x);
+        float height = Mathf.Abs(scale.y);
+
+        if (width >= height)
+        {
+            height = Mathf.Max(0.6f, height);
+        }
+        else
+        {
+            width = Mathf.Max(0.6f, width);
+        }
+
+        return new Vector2(width, height);
     }
 
     private static EnemySpawner2D CreateEnemySpawner(Transform parent, GameObject enemyPrefab)
