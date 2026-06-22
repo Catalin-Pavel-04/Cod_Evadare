@@ -301,11 +301,13 @@ public static class CodEvadarePickupPropHazardEnvironmentVisuals
         {
             sprite = IsMostlyHorizontal(owner.transform) ? sprites.WallHorizontal : sprites.WallVertical;
             rendererName = "WallSpriteRenderer";
+            scale = 1f;
         }
         else if (lowerName.Contains("floor"))
         {
             sprite = lowerName.Contains("hazard") ? sprites.HazardStripeFloor : sprites.SciFiFloor;
             rendererName = "FloorSpriteRenderer";
+            scale = 1f;
             sortingOrder = Mathf.Min(sortingOrder, -1);
         }
         else if (lowerName.Contains("cover") || lowerName.Contains("crate"))
@@ -345,7 +347,7 @@ public static class CodEvadarePickupPropHazardEnvironmentVisuals
 
         if (visualRenderer != null && (lowerName.Contains("wall") || lowerName.Contains("floor")))
         {
-            changed |= SetTiledRenderer(visualRenderer);
+            changed |= SetTiledRenderer(visualRenderer, owner, rootRenderer);
         }
 
         changed |= DisableRootSpriteRenderer(owner);
@@ -407,9 +409,10 @@ public static class CodEvadarePickupPropHazardEnvironmentVisuals
         return changed;
     }
 
-    private static bool SetTiledRenderer(SpriteRenderer renderer)
+    private static bool SetTiledRenderer(SpriteRenderer renderer, GameObject owner, SpriteRenderer rootRenderer)
     {
         bool changed = false;
+        Vector2 targetSize = GetGameplayFootprint(owner, rootRenderer);
 
         if (renderer.drawMode != SpriteDrawMode.Tiled)
         {
@@ -417,13 +420,35 @@ public static class CodEvadarePickupPropHazardEnvironmentVisuals
             changed = true;
         }
 
-        if (renderer.size != Vector2.one)
+        if (renderer.size != targetSize)
         {
-            renderer.size = Vector2.one;
+            renderer.size = targetSize;
             changed = true;
         }
 
+        if (changed)
+        {
+            EditorUtility.SetDirty(renderer);
+        }
+
         return changed;
+    }
+
+    private static Vector2 GetGameplayFootprint(GameObject owner, SpriteRenderer rootRenderer)
+    {
+        BoxCollider2D boxCollider = owner.GetComponent<BoxCollider2D>();
+
+        if (boxCollider != null && boxCollider.size.x > 0f && boxCollider.size.y > 0f)
+        {
+            return boxCollider.size;
+        }
+
+        if (rootRenderer != null && rootRenderer.drawMode != SpriteDrawMode.Simple && rootRenderer.size.x > 0f && rootRenderer.size.y > 0f)
+        {
+            return rootRenderer.size;
+        }
+
+        return Vector2.one;
     }
 
     private static bool DisableRootSpriteRenderer(GameObject owner)
