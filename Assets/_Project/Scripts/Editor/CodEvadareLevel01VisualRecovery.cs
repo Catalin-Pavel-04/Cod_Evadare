@@ -130,6 +130,7 @@ public static class CodEvadareLevel01VisualRecovery
             changed |= ApplySizedVisual(visualRenderer, sprite, drawMode, targetSize, targetOffset, GetSortingOrder(kind, rootRenderer), Color.white);
         }
 
+        changed |= RemoveNestedVisualChildren(owner, visualRenderer);
         changed |= DisableBrokenExtraVisuals(owner, visualRenderer, targetSize);
 
         if (rootRenderer != null)
@@ -992,6 +993,58 @@ public static class CodEvadareLevel01VisualRecovery
         return changed;
     }
 
+    private static bool RemoveNestedVisualChildren(GameObject owner, SpriteRenderer keepRenderer)
+    {
+        Transform visualRoot = owner.transform.Find("Visual");
+
+        if (visualRoot == null)
+        {
+            return false;
+        }
+
+        bool changed = false;
+        List<GameObject> objectsToDelete = new List<GameObject>();
+
+        foreach (Transform child in visualRoot.GetComponentsInChildren<Transform>(true))
+        {
+            if (child == visualRoot || child == keepRenderer.transform)
+            {
+                continue;
+            }
+
+            if (child.name == "Visual" || child.name == "OpenVisual")
+            {
+                objectsToDelete.Add(child.gameObject);
+                continue;
+            }
+
+            SpriteRenderer renderer = child.GetComponent<SpriteRenderer>();
+
+            if (renderer != null && child.parent != visualRoot && renderer.name != "Shadow")
+            {
+                objectsToDelete.Add(child.gameObject);
+            }
+        }
+
+        for (int i = 0; i < objectsToDelete.Count; i++)
+        {
+            if (objectsToDelete[i] == null)
+            {
+                continue;
+            }
+
+            Object.DestroyImmediate(objectsToDelete[i]);
+            changed = true;
+        }
+
+        if (changed)
+        {
+            EditorUtility.SetDirty(owner);
+        }
+
+        return changed;
+    }
+
     private static bool TryGetLocalFootprint(GameObject owner, SpriteRenderer rootRenderer, SpriteRenderer visualRenderer, out Vector2 size, out Vector2 offset)
     {
         BoxCollider2D box = owner.GetComponent<BoxCollider2D>();
@@ -1493,6 +1546,8 @@ public static class CodEvadareLevel01VisualRecovery
         builder.AppendLine("- `Assets/_Project/Scenes/Levels/Level_01_Laboratory.unity` after running `Tools/Cod Evadare/Art/Recovery/Recover Level 01 Laboratory Visuals`");
         builder.AppendLine();
         builder.AppendLine("The latest recovery pass generates small clean sci-fi floor, wall, door, grate, hazard stripe and HUD panel sprites under `RuntimeTransparent/VisualRecovery`. These are used for gameplay footprint visuals because the larger art-pack room panel sprites are too large to tile directly as walls or floors.");
+        builder.AppendLine();
+        builder.AppendLine("It also removes broken nested visual hierarchies such as `Visual/FloorSpriteRenderer/Visual/FloorSpriteRenderer`. Those were created by an older visual pass that accidentally processed child renderers as gameplay objects.");
         builder.AppendLine();
         builder.AppendLine("## Scene Objects Changed");
         builder.AppendLine();

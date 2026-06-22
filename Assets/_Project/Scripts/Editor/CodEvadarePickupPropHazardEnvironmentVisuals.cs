@@ -90,6 +90,11 @@ public static class CodEvadarePickupPropHazardEnvironmentVisuals
             {
                 foreach (Transform transform in root.GetComponentsInChildren<Transform>(true))
                 {
+                    if (IsVisualDescendant(transform))
+                    {
+                        continue;
+                    }
+
                     GameObject current = transform.gameObject;
 
                     changed |= ApplyPickupVisual(current, sprites);
@@ -617,6 +622,23 @@ public static class CodEvadarePickupPropHazardEnvironmentVisuals
     {
         Vector3 scale = transform.localScale;
         return Mathf.Abs(scale.x) >= Mathf.Abs(scale.y);
+    }
+
+    private static bool IsVisualDescendant(Transform transform)
+    {
+        Transform current = transform.parent;
+
+        while (current != null)
+        {
+            if (current.name == "Visual" || current.name == "OpenVisual")
+            {
+                return true;
+            }
+
+            current = current.parent;
+        }
+
+        return false;
     }
 
     private static IEnumerable<string> FindScenePaths()

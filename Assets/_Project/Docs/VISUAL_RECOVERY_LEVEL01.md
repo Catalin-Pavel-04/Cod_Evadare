@@ -15,12 +15,14 @@ Focused visual recovery for `Assets/_Project/Scenes/Levels/Level_01_Laboratory.u
 
 The latest recovery pass generates small clean sci-fi floor, wall, door, grate, hazard stripe and HUD panel sprites under `RuntimeTransparent/VisualRecovery`. These are used for gameplay footprint visuals because the larger art-pack room panel sprites are too large to tile directly as walls or floors.
 
+It also removes broken nested visual hierarchies such as `Visual/FloorSpriteRenderer/Visual/FloorSpriteRenderer`. Those were created by an older visual pass that accidentally processed child renderers as gameplay objects.
+
 ## Scene Objects Changed
 
-- Environment objects repaired: 55
+- Environment objects repaired: 43
 - Decorative floor/prop visuals added under `VisualRecovery_Level01`: 12
 - Shadows repaired/added: 0
-- HUD panels repaired: 9
+- HUD panels repaired: 0
 
 Representative changed scene objects:
 - `Level_01_Laboratory/Start_Area/StartFloor`
@@ -34,8 +36,6 @@ Representative changed scene objects:
 - `Level_01_Laboratory/Combat_Room_01/Walls/Wall_Left_Lower`
 - `Level_01_Laboratory/Combat_Room_01/Walls/Wall_Right_Upper`
 - `Level_01_Laboratory/Combat_Room_01/Walls/Wall_Right_Lower`
-- `Level_01_Laboratory/Combat_Room_01/Doors/Door_Left`
-- `Level_01_Laboratory/Combat_Room_01/Doors/Door_Right`
 - `Level_01_Laboratory/Shop_Area/Floor`
 - `Level_01_Laboratory/Shop_Area/ShopWall_Top`
 - `Level_01_Laboratory/Shop_Area/ShopWall_Bottom`
@@ -43,10 +43,6 @@ Representative changed scene objects:
 - `Level_01_Laboratory/Shop_Area/ShopWall_Left_Lower`
 - `Level_01_Laboratory/Shop_Area/ShopWall_Right_Upper`
 - `Level_01_Laboratory/Shop_Area/ShopWall_Right_Lower`
-- `Level_01_Laboratory/Shop_Area/ShopItem_Health`
-- `Level_01_Laboratory/Shop_Area/ShopItem_Ammo`
-- `Level_01_Laboratory/Shop_Area/ShopItem_Weapon`
-- `Level_01_Laboratory/Shop_Area/ObjectiveTrigger_Shop`
 - `Level_01_Laboratory/Combat_Room_02/Floor`
 - `Level_01_Laboratory/Combat_Room_02/Walls/Wall_Top`
 - `Level_01_Laboratory/Combat_Room_02/Walls/Wall_Bottom`
@@ -54,8 +50,6 @@ Representative changed scene objects:
 - `Level_01_Laboratory/Combat_Room_02/Walls/Wall_Left_Lower`
 - `Level_01_Laboratory/Combat_Room_02/Walls/Wall_Right_Upper`
 - `Level_01_Laboratory/Combat_Room_02/Walls/Wall_Right_Lower`
-- `Level_01_Laboratory/Combat_Room_02/Doors/Door_Left`
-- `Level_01_Laboratory/Combat_Room_02/Doors/Door_Right`
 - `Level_01_Laboratory/Miniboss_Room/Floor`
 - `Level_01_Laboratory/Miniboss_Room/Walls/Wall_Top`
 - `Level_01_Laboratory/Miniboss_Room/Walls/Wall_Bottom`
@@ -63,8 +57,6 @@ Representative changed scene objects:
 - `Level_01_Laboratory/Miniboss_Room/Walls/Wall_Left_Lower`
 - `Level_01_Laboratory/Miniboss_Room/Walls/Wall_Right_Upper`
 - `Level_01_Laboratory/Miniboss_Room/Walls/Wall_Right_Lower`
-- `Level_01_Laboratory/Miniboss_Room/Doors/Door_Left`
-- `Level_01_Laboratory/Miniboss_Room/Doors/Door_Right`
 - `Level_01_Laboratory/Boss_Room/Floor`
 - `Level_01_Laboratory/Boss_Room/Walls/Wall_Top`
 - `Level_01_Laboratory/Boss_Room/Walls/Wall_Bottom`
@@ -72,8 +64,6 @@ Representative changed scene objects:
 - `Level_01_Laboratory/Boss_Room/Walls/Wall_Left_Lower`
 - `Level_01_Laboratory/Boss_Room/Walls/Wall_Right_Upper`
 - `Level_01_Laboratory/Boss_Room/Walls/Wall_Right_Lower`
-- `Level_01_Laboratory/Boss_Room/Doors/Door_Left`
-- `Level_01_Laboratory/Boss_Room/Doors/Door_Right`
 - `Level_01_Laboratory/Boss_Room/Cover/Cover_01`
 - `Level_01_Laboratory/Boss_Room/Cover/Cover_02`
 - `Level_01_Laboratory/Boss_Room/Cover/Cover_03`
@@ -86,15 +76,6 @@ Representative changed scene objects:
 - `Level_01_Laboratory/Combat_Room_02/ToxicPuddle/Visual/HazardSpriteRenderer`
 - `Level_01_Laboratory/Combat_Room_02/ToxicPuddle`
 - `Level_01_Laboratory/Combat_Room_02/ToxicPuddle/Visual/HazardSpriteRenderer`
-- `Level_01_Laboratory/UI/Canvas/HealthPanel`
-- `Level_01_Laboratory/UI/Canvas/ResourcePanel`
-- `Level_01_Laboratory/UI/Canvas/ObjectivePanel`
-- `Level_01_Laboratory/UI/Canvas/ShopPanel`
-- `Level_01_Laboratory/UI/Canvas/BossHealthPanel`
-- `Level_01_Laboratory/UI/Canvas/BuffChoicePanel`
-- `Level_01_Laboratory/UI/Canvas/GameOverPanel`
-- `Level_01_Laboratory/UI/Canvas/VictoryPanel`
-- `Level_01_Laboratory/UI/Canvas/PausePanel`
 
 ## Prefabs Changed
 
