@@ -1,0 +1,1795 @@
+{
+  "assets": [
+    {
+      "asset_name": "Player_Body_Base",
+      "category": "Player",
+      "target_path": "Assets/_Project/Art/Sprites/Player/Player_Body_Base.png",
+      "source_file": "futuristic_sci_fi_soldier_from_above.png",
+      "size": "1254x1254",
+      "mode": "RGB",
+      "alpha_extrema": "",
+      "note": ""
+    },
+    {
+      "asset_name": "Player_Body_Aiming",
+      "category": "Player",
+      "target_path": "Assets/_Project/Art/Sprites/Player/Player_Body_Aiming.png",
+      "source_file": "futuristic_armored_soldier_aiming_weapon.png",
+      "size": "1254x1254",
+      "mode": "RGB",
+      "alpha_extrema": "",
+      "note": ""
+    },
+    {
+      "asset_name": "Player_Body_Hit",
+      "category": "Player",
+      "target_path": "Assets/_Project/Art/Sprites/Player/Player_Body_Hit.png",
+      "source_file": "futuristic_soldier_in_defensive_stance.png",
+      "size": "1254x1254",
+      "mode": "RGB",
+      "alpha_extrema": "",
+      "note": ""
+    },
+    {
+      "asset_name": "Player_Body_Defeated",
+      "category": "Player",
+      "target_path": "Assets/_Project/Art/Sprites/Player/Player_Body_Defeated.png",
+      "source_file": "fallen_futuristic_soldier_in_tactical_armor.png",
+      "size": "1254x1254",
+      "mode": "RGB",
+      "alpha_extrema": "",
+      "note": ""
+    },
+    {
+      "asset_name": "Player_Portrait",
+      "category": "Player",
+      "target_path": "Assets/_Project/Art/Sprites/Player/Player_Portrait.png",
+      "source_file": "futuristic_soldier_avatar_emblem.png",
+      "size": "1254x1254",
+      "mode": "RGB",
+      "alpha_extrema": "",
+      "note": ""
+    },
+    {
+      "asset_name": "Player_Shadow",
+      "category": "Player",
+      "target_path": "Assets/_Project/Art/Sprites/Player/Player_Shadow.png",
+      "source_file": "soft_oval_shadow_on_transparent_background.png",
+      "size": "1254x1254",
+      "mode": "RGB",
+      "alpha_extrema": "",
+      "note": ""
+    },
+    {
+      "asset_name": "Player_SelectionRing",
+      "category": "Player",
+      "target_path": "Assets/_Project/Art/Sprites/Player/Player_SelectionRing.png",
+      "source_file": "futuristic_neon_energy_ring_design.png",
+      "size": "1254x1254",
+      "mode": "RGB",
+      "alpha_extrema": "",
+      "note": ""
+    },
+    {
+      "asset_name": "Player_Crosshair",
+      "category": "Player",
+      "target_path": "Assets/_Project/Art/Sprites/Player/Player_Crosshair.png",
+      "source_file": "futuristic_cyan_crosshair_ui_element.png",
+      "size": "1254x1254",
+      "mode": "RGB",
+      "alpha_extrema": "",
+      "note": ""
+    },
+    {
+      "asset_name": "Player_ObjectiveBeacon",
+      "category": "Player",
+      "target_path": "Assets/_Project/Art/Sprites/Player/Player_ObjectiveBeacon.png",
+      "source_file": "futuristic_holographic_beacon_device.png",
+      "size": "1254x1254",
+      "mode": "RGB",
+      "alpha_extrema": "",
+      "note": ""
+    },
+    {
+      "asset_name": "CE_LogoBadge",
+      "category": "Player",
+      "target_path": "Assets/_Project/Art/Sprites/Player/CE_LogoBadge.png",
+      "source_file": "futuristic_metallic_tech_emblem.png",
+      "size": "1254x1254",
+      "mode": "RGB",
+      "alpha_extrema": "",
+      "note": ""
+    },
+    {
+      "asset_name": "PlayerEquipped_Pistol",
+      "category": "Player/EquippedVariants",
+      "target_path": "Assets/_Project/Art/Sprites/Player/EquippedVariants/PlayerEquipped_Pistol.png",
+      "source_file": "futuristic_sci_fi_soldier_from_above.png",
+      "size": "1254x1254",
+      "mode": "RGB",
+      "alpha_extrema": "",
+      "note": ""
+    },
+    {
+      "asset_name": "PlayerEquipped_Rifle",
+      "category": "Player/EquippedVariants",
+      "target_path": "Assets/_Project/Art/Sprites/Player/EquippedVariants/PlayerEquipped_Rifle.png",
+      "source_file": "futuristic_armored_soldier_aiming_weapon.png",
+      "size": "1254x1254",
+      "mode": "RGB",
+      "alpha_extrema": "",
+      "note": ""
+    },
+    {
+      "asset_name": "PlayerEquipped_PlasmaRifle",
+      "category": "Player/EquippedVariants",
+      "target_path": "Assets/_Project/Art/Sprites/Player/EquippedVariants/PlayerEquipped_PlasmaRifle.png",
+      "source_file": "futuristic_soldier_with_energy_rifle.png",
+      "size": "1254x1254",
+      "mode": "RGB",
+      "alpha_extrema": "",
+      "note": ""
+    },
+    {
+      "asset_name": "PlayerEquipped_ArcaneStaff",
+      "category": "Player/EquippedVariants",
+      "target_path": "Assets/_Project/Art/Sprites/Player/EquippedVariants/PlayerEquipped_ArcaneStaff.png",
+      "source_file": "futuristic_soldier_with_energy_staff.png",
+      "size": "1254x1254",
+      "mode": "RGB",
+      "alpha_extrema": "",
+      "note": ""
+    },
+    {
+      "asset_name": "PlayerEquipped_Shotgun",
+      "category": "Player/EquippedVariants",
+      "target_path": "Assets/_Project/Art/Sprites/Player/EquippedVariants/PlayerEquipped_Shotgun.png",
+      "source_file": "futuristic_soldier_with_glowing_rifle.png",
+      "size": "1254x1254",
+      "mode": "RGB",
+      "alpha_extrema": "",
+      "note": ""
+    },
+    {
+      "asset_name": "PlayerEquipped_AssaultRifle",
+      "category": "Player/EquippedVariants",
+      "target_path": "Assets/_Project/Art/Sprites/Player/EquippedVariants/PlayerEquipped_AssaultRifle.png",
+      "source_file": "futuristic_soldier_with_rifle_in_stance.png",
+      "size": "1254x1254",
+      "mode": "RGB",
+      "alpha_extrema": "",
+      "note": ""
+    },
+    {
+      "asset_name": "Weapon_Pistol",
+      "category": "Weapons",
+      "target_path": "Assets/_Project/Art/Sprites/Weapons/Weapon_Pistol.png",
+      "source_file": "futuristic_sci_fi_pistol_design.png",
+      "size": "1254x1254",
+      "mode": "RGB",
+      "alpha_extrema": "",
+      "note": ""
+    },
+    {
+      "asset_name": "Weapon_Revolver",
+      "category": "Weapons",
+      "target_path": "Assets/_Project/Art/Sprites/Weapons/Weapon_Revolver.png",
+      "source_file": "futuristic_sci_fi_revolver_icon.png",
+      "size": "1254x1254",
+      "mode": "RGB",
+      "alpha_extrema": "",
+      "note": ""
+    },
+    {
+      "asset_name": "Weapon_SMG",
+      "category": "Weapons",
+      "target_path": "Assets/_Project/Art/Sprites/Weapons/Weapon_SMG.png",
+      "source_file": "futuristic_sci_fi_submachine_gun_concept.png",
+      "size": "1254x1254",
+      "mode": "RGB",
+      "alpha_extrema": "",
+      "note": ""
+    },
+    {
+      "asset_name": "Weapon_Shotgun",
+      "category": "Weapons",
+      "target_path": "Assets/_Project/Art/Sprites/Weapons/Weapon_Shotgun.png",
+      "source_file": "futuristic_shotgun_with_neon_accents.png",
+      "size": "1254x1254",
+      "mode": "RGB",
+      "alpha_extrema": "",
+      "note": ""
+    },
+    {
+      "asset_name": "Weapon_AssaultRifle",
+      "category": "Weapons",
+      "target_path": "Assets/_Project/Art/Sprites/Weapons/Weapon_AssaultRifle.png",
+      "source_file": "futuristic_sci_fi_rifle_design.png",
+      "size": "1254x1254",
+      "mode": "RGB",
+      "alpha_extrema": "",
+      "note": ""
+    },
+    {
+      "asset_name": "Weapon_PlasmaRifle",
+      "category": "Weapons",
+      "target_path": "Assets/_Project/Art/Sprites/Weapons/Weapon_PlasmaRifle.png",
+      "source_file": "futuristic_energy_rifle_concept_art.png",
+      "size": "1254x1254",
+      "mode": "RGB",
+      "alpha_extrema": "",
+      "note": ""
+    },
+    {
+      "asset_name": "Weapon_ArcaneStaff",
+      "category": "Weapons",
+      "target_path": "Assets/_Project/Art/Sprites/Weapons/Weapon_ArcaneStaff.png",
+      "source_file": "futuristic_staff_with_glowing_purple_orb.png",
+      "size": "1254x1254",
+      "mode": "RGB",
+      "alpha_extrema": "",
+      "note": ""
+    },
+    {
+      "asset_name": "Weapon_Grenade",
+      "category": "Weapons",
+      "target_path": "Assets/_Project/Art/Sprites/Weapons/Weapon_Grenade.png",
+      "source_file": "futuristic_energy_grenade_with_glowing_accents.png",
+      "size": "1254x1254",
+      "mode": "RGB",
+      "alpha_extrema": "",
+      "note": ""
+    },
+    {
+      "asset_name": "Weapon_MeleeBlade",
+      "category": "Weapons",
+      "target_path": "Assets/_Project/Art/Sprites/Weapons/Weapon_MeleeBlade.png",
+      "source_file": "futuristic_sci_fi_energy_blade.png",
+      "size": "1254x1254",
+      "mode": "RGB",
+      "alpha_extrema": "",
+      "note": ""
+    },
+    {
+      "asset_name": "Weapon_EmptyPedestal",
+      "category": "Weapons",
+      "target_path": "Assets/_Project/Art/Sprites/Weapons/Weapon_EmptyPedestal.png",
+      "source_file": "futuristic_sci_fi_platform_with_neon_accents.png",
+      "size": "1254x1254",
+      "mode": "RGB",
+      "alpha_extrema": "",
+      "note": ""
+    },
+    {
+      "asset_name": "Projectile_BulletTracer",
+      "category": "Projectiles/Effects",
+      "target_path": "Assets/_Project/Art/Sprites/Projectiles/Projectile_BulletTracer.png",
+      "source_file": "sci_fi_red_energy_projectile.png",
+      "size": "1254x1254",
+      "mode": "RGB",
+      "alpha_extrema": "",
+      "note": ""
+    },
+    {
+      "asset_name": "Projectile_PlasmaBolt",
+      "category": "Projectiles/Effects",
+      "target_path": "Assets/_Project/Art/Sprites/Projectiles/Projectile_PlasmaBolt.png",
+      "source_file": "glowing_sci_fi_energy_bolt.png",
+      "size": "1254x1254",
+      "mode": "RGB",
+      "alpha_extrema": "",
+      "note": ""
+    },
+    {
+      "asset_name": "Projectile_ShotgunPelletBurst",
+      "category": "Projectiles/Effects",
+      "target_path": "Assets/_Project/Art/Sprites/Projectiles/Projectile_ShotgunPelletBurst.png",
+      "source_file": "sci_fi_energy_burst_effect.png",
+      "size": "1254x1254",
+      "mode": "RGB",
+      "alpha_extrema": "",
+      "note": ""
+    },
+    {
+      "asset_name": "Projectile_ArcaneOrb",
+      "category": "Projectiles/Effects",
+      "target_path": "Assets/_Project/Art/Sprites/Projectiles/Projectile_ArcaneOrb.png",
+      "source_file": "glowing_purple_energy_orb_with_aura.png",
+      "size": "1254x1254",
+      "mode": "RGB",
+      "alpha_extrema": "",
+      "note": ""
+    },
+    {
+      "asset_name": "Projectile_ToxicSpit",
+      "category": "Projectiles/Effects",
+      "target_path": "Assets/_Project/Art/Sprites/Projectiles/Projectile_ToxicSpit.png",
+      "source_file": "glowing_toxic_green_energy_projectile.png",
+      "size": "1254x1254",
+      "mode": "RGB",
+      "alpha_extrema": "",
+      "note": ""
+    },
+    {
+      "asset_name": "Projectile_EnemyLaser",
+      "category": "Projectiles/Effects",
+      "target_path": "Assets/_Project/Art/Sprites/Projectiles/Projectile_EnemyLaser.png",
+      "source_file": "sci_fi_red_energy_projectile.png",
+      "size": "1254x1254",
+      "mode": "RGB",
+      "alpha_extrema": "",
+      "note": ""
+    },
+    {
+      "asset_name": "Effect_MuzzleFlash_Small",
+      "category": "Projectiles/Effects",
+      "target_path": "Assets/_Project/Art/Sprites/Projectiles/Effect_MuzzleFlash_Small.png",
+      "source_file": "tech_emblem_with_gunfire_effect.png",
+      "size": "1254x1254",
+      "mode": "RGB",
+      "alpha_extrema": "",
+      "note": ""
+    },
+    {
+      "asset_name": "Effect_MuzzleFlash_Large",
+      "category": "Projectiles/Effects",
+      "target_path": "Assets/_Project/Art/Sprites/Projectiles/Effect_MuzzleFlash_Large.png",
+      "source_file": "explosive_energy_burst_on_clear_backdrop.png",
+      "size": "1254x1254",
+      "mode": "RGB",
+      "alpha_extrema": "",
+      "note": ""
+    },
+    {
+      "asset_name": "Effect_ImpactSpark",
+      "category": "Projectiles/Effects",
+      "target_path": "Assets/_Project/Art/Sprites/Projectiles/Effect_ImpactSpark.png",
+      "source_file": "sci_fi_energy_impact_emblem.png",
+      "size": "1254x1254",
+      "mode": "RGB",
+      "alpha_extrema": "",
+      "note": ""
+    },
+    {
+      "asset_name": "Effect_ExplosionBurst",
+      "category": "Projectiles/Effects",
+      "target_path": "Assets/_Project/Art/Sprites/Projectiles/Effect_ExplosionBurst.png",
+      "source_file": "radiant_energy_burst_explosion.png",
+      "size": "1254x1254",
+      "mode": "RGB",
+      "alpha_extrema": "",
+      "note": ""
+    },
+    {
+      "asset_name": "Pickup_Medkit",
+      "category": "Pickups/Loot",
+      "target_path": "Assets/_Project/Art/Sprites/Pickups/Pickup_Medkit.png",
+      "source_file": "futuristic_sci_fi_health_pack_icon.png",
+      "size": "1254x1254",
+      "mode": "RGB",
+      "alpha_extrema": "",
+      "note": ""
+    },
+    {
+      "asset_name": "Pickup_Ammo",
+      "category": "Pickups/Loot",
+      "target_path": "Assets/_Project/Art/Sprites/Pickups/Pickup_Ammo.png",
+      "source_file": "futuristic_ammo_power_up_icon.png",
+      "size": "1254x1254",
+      "mode": "RGB",
+      "alpha_extrema": "",
+      "note": ""
+    },
+    {
+      "asset_name": "Pickup_Money",
+      "category": "Pickups/Loot",
+      "target_path": "Assets/_Project/Art/Sprites/Pickups/Pickup_Money.png",
+      "source_file": "futuristic_tech_coin_stack.png",
+      "size": "1254x1254",
+      "mode": "RGB",
+      "alpha_extrema": "",
+      "note": ""
+    },
+    {
+      "asset_name": "Pickup_Keycard",
+      "category": "Pickups/Loot",
+      "target_path": "Assets/_Project/Art/Sprites/Pickups/Pickup_Keycard.png",
+      "source_file": "futuristic_high_tech_access_card.png",
+      "size": "1254x1254",
+      "mode": "RGB",
+      "alpha_extrema": "",
+      "note": ""
+    },
+    {
+      "asset_name": "Pickup_BuffVial",
+      "category": "Pickups/Loot",
+      "target_path": "Assets/_Project/Art/Sprites/Pickups/Pickup_BuffVial.png",
+      "source_file": "futuristic_energy_vial_with_glowing_core.png",
+      "size": "1254x1254",
+      "mode": "RGB",
+      "alpha_extrema": "",
+      "note": ""
+    },
+    {
+      "asset_name": "Pickup_ArmorShard",
+      "category": "Pickups/Loot",
+      "target_path": "Assets/_Project/Art/Sprites/Pickups/Pickup_ArmorShard.png",
+      "source_file": "futuristic_sci_fi_shield_emblem.png",
+      "size": "1254x1254",
+      "mode": "RGB",
+      "alpha_extrema": "",
+      "note": ""
+    },
+    {
+      "asset_name": "Pickup_WeaponCrate",
+      "category": "Pickups/Loot",
+      "target_path": "Assets/_Project/Art/Sprites/Pickups/Pickup_WeaponCrate.png",
+      "source_file": "futuristic_loot_crate_design.png",
+      "size": "1254x1254",
+      "mode": "RGB",
+      "alpha_extrema": "",
+      "note": ""
+    },
+    {
+      "asset_name": "LootRing_Rare",
+      "category": "Pickups/Loot",
+      "target_path": "Assets/_Project/Art/Sprites/Pickups/LootRing_Rare.png",
+      "source_file": "futuristic_neon_energy_ring_design.png",
+      "size": "1254x1254",
+      "mode": "RGB",
+      "alpha_extrema": "",
+      "note": ""
+    },
+    {
+      "asset_name": "LootRing_Epic",
+      "category": "Pickups/Loot",
+      "target_path": "Assets/_Project/Art/Sprites/Pickups/LootRing_Epic.png",
+      "source_file": "futuristic_energy_portal_ring_design.png",
+      "size": "1254x1254",
+      "mode": "RGB",
+      "alpha_extrema": "",
+      "note": ""
+    },
+    {
+      "asset_name": "LootRing_Legendary",
+      "category": "Pickups/Loot",
+      "target_path": "Assets/_Project/Art/Sprites/Pickups/LootRing_Legendary.png",
+      "source_file": "futuristic_glowing_energy_portal_ring.png",
+      "size": "1254x1254",
+      "mode": "RGB",
+      "alpha_extrema": "",
+      "note": ""
+    },
+    {
+      "asset_name": "BuffIcon_MaxHealth",
+      "category": "BuffIcons",
+      "target_path": "Assets/_Project/Art/Sprites/Buffs/BuffIcon_MaxHealth.png",
+      "source_file": "health_upgrade_emblem_with_neon_accents.png",
+      "size": "1254x1254",
+      "mode": "RGB",
+      "alpha_extrema": "",
+      "note": ""
+    },
+    {
+      "asset_name": "BuffIcon_Heal",
+      "category": "BuffIcons",
+      "target_path": "Assets/_Project/Art/Sprites/Buffs/BuffIcon_Heal.png",
+      "source_file": "futuristic_health_medkit_emblem.png",
+      "size": "1254x1254",
+      "mode": "RGB",
+      "alpha_extrema": "",
+      "note": ""
+    },
+    {
+      "asset_name": "BuffIcon_MoveSpeed",
+      "category": "BuffIcons",
+      "target_path": "Assets/_Project/Art/Sprites/Buffs/BuffIcon_MoveSpeed.png",
+      "source_file": "futuristic_energy_bolt_icon.png",
+      "size": "1254x1254",
+      "mode": "RGB",
+      "alpha_extrema": "",
+      "note": ""
+    },
+    {
+      "asset_name": "BuffIcon_FireRate",
+      "category": "BuffIcons",
+      "target_path": "Assets/_Project/Art/Sprites/Buffs/BuffIcon_FireRate.png",
+      "source_file": "tech_emblem_with_gunfire_effect.png",
+      "size": "1254x1254",
+      "mode": "RGB",
+      "alpha_extrema": "",
+      "note": ""
+    },
+    {
+      "asset_name": "BuffIcon_Damage",
+      "category": "BuffIcons",
+      "target_path": "Assets/_Project/Art/Sprites/Buffs/BuffIcon_Damage.png",
+      "source_file": "sci_fi_energy_impact_emblem.png",
+      "size": "1254x1254",
+      "mode": "RGB",
+      "alpha_extrema": "",
+      "note": ""
+    },
+    {
+      "asset_name": "BuffIcon_Reload",
+      "category": "BuffIcons",
+      "target_path": "Assets/_Project/Art/Sprites/Buffs/BuffIcon_Reload.png",
+      "source_file": "futuristic_reload_icon_with_neon_accents.png",
+      "size": "1254x1254",
+      "mode": "RGB",
+      "alpha_extrema": "",
+      "note": ""
+    },
+    {
+      "asset_name": "BuffIcon_MaxAmmo",
+      "category": "BuffIcons",
+      "target_path": "Assets/_Project/Art/Sprites/Buffs/BuffIcon_MaxAmmo.png",
+      "source_file": "futuristic_ammo_icon_with_neon_accents.png",
+      "size": "1254x1254",
+      "mode": "RGB",
+      "alpha_extrema": "",
+      "note": ""
+    },
+    {
+      "asset_name": "BuffIcon_Money",
+      "category": "BuffIcons",
+      "target_path": "Assets/_Project/Art/Sprites/Buffs/BuffIcon_Money.png",
+      "source_file": "futuristic_tech_token_emblem.png",
+      "size": "1254x1254",
+      "mode": "RGB",
+      "alpha_extrema": "",
+      "note": ""
+    },
+    {
+      "asset_name": "BuffIcon_Shield",
+      "category": "BuffIcons",
+      "target_path": "Assets/_Project/Art/Sprites/Buffs/BuffIcon_Shield.png",
+      "source_file": "futuristic_sci_fi_shield_emblem.png",
+      "size": "1254x1254",
+      "mode": "RGB",
+      "alpha_extrema": "",
+      "note": ""
+    },
+    {
+      "asset_name": "BuffIcon_Critical",
+      "category": "BuffIcons",
+      "target_path": "Assets/_Project/Art/Sprites/Buffs/BuffIcon_Critical.png",
+      "source_file": "futuristic_alert_symbol_with_skull_motif.png",
+      "size": "1254x1254",
+      "mode": "RGB",
+      "alpha_extrema": "",
+      "note": ""
+    },
+    {
+      "asset_name": "Prop_AutomaticDoor_Horizontal",
+      "category": "Props",
+      "target_path": "Assets/_Project/Art/Sprites/Props/Prop_AutomaticDoor_Horizontal.png",
+      "source_file": "a_2d_digital_illustration_features_a_horizontal_sc.png",
+      "size": "1536x1024",
+      "mode": "RGBA",
+      "alpha_extrema": "(0, 255)",
+      "note": ""
+    },
+    {
+      "asset_name": "Prop_AutomaticDoor_Vertical",
+      "category": "Props",
+      "target_path": "Assets/_Project/Art/Sprites/Props/Prop_AutomaticDoor_Vertical.png",
+      "source_file": "futuristic_industrial_door_with_neon_accents.png",
+      "size": "1254x1254",
+      "mode": "RGB",
+      "alpha_extrema": "",
+      "note": ""
+    },
+    {
+      "asset_name": "Prop_LockedPrisonGate_Horizontal",
+      "category": "Props",
+      "target_path": "Assets/_Project/Art/Sprites/Props/Prop_LockedPrisonGate_Horizontal.png",
+      "source_file": "futuristic_industrial_gate_with_cyan_highlights.png",
+      "size": "1254x1254",
+      "mode": "RGB",
+      "alpha_extrema": "",
+      "note": ""
+    },
+    {
+      "asset_name": "Prop_LockedPrisonGate_Vertical",
+      "category": "Props",
+      "target_path": "Assets/_Project/Art/Sprites/Props/Prop_LockedPrisonGate_Vertical.png",
+      "source_file": "futuristic_sci_fi_security_gate.png",
+      "size": "1254x1254",
+      "mode": "RGB",
+      "alpha_extrema": "",
+      "note": ""
+    },
+    {
+      "asset_name": "Prop_WallTerminal",
+      "category": "Props",
+      "target_path": "Assets/_Project/Art/Sprites/Props/Prop_WallTerminal.png",
+      "source_file": "futuristic_wall_mounted_control_panel.png",
+      "size": "1254x1254",
+      "mode": "RGB",
+      "alpha_extrema": "",
+      "note": ""
+    },
+    {
+      "asset_name": "Prop_ShopKiosk",
+      "category": "Props",
+      "target_path": "Assets/_Project/Art/Sprites/Props/Prop_ShopKiosk.png",
+      "source_file": "futuristic_vending_terminal_kiosk.png",
+      "size": "1254x1254",
+      "mode": "RGB",
+      "alpha_extrema": "",
+      "note": ""
+    },
+    {
+      "asset_name": "Prop_ExtractionBeacon",
+      "category": "Props",
+      "target_path": "Assets/_Project/Art/Sprites/Props/Prop_ExtractionBeacon.png",
+      "source_file": "futuristic_teleportation_beacon_device.png",
+      "size": "1254x1254",
+      "mode": "RGB",
+      "alpha_extrema": "",
+      "note": ""
+    },
+    {
+      "asset_name": "Prop_ObjectiveTerminal",
+      "category": "Props",
+      "target_path": "Assets/_Project/Art/Sprites/Props/Prop_ObjectiveTerminal.png",
+      "source_file": "futuristic_sci_fi_control_console.png",
+      "size": "1254x1254",
+      "mode": "RGB",
+      "alpha_extrema": "",
+      "note": ""
+    },
+    {
+      "asset_name": "Prop_LowCoverBlock",
+      "category": "Props",
+      "target_path": "Assets/_Project/Art/Sprites/Props/Prop_LowCoverBlock.png",
+      "source_file": "futuristic_industrial_hazard_panel.png",
+      "size": "1254x1254",
+      "mode": "RGB",
+      "alpha_extrema": "",
+      "note": ""
+    },
+    {
+      "asset_name": "Prop_TallCoverCrate",
+      "category": "Props",
+      "target_path": "Assets/_Project/Art/Sprites/Props/Prop_TallCoverCrate.png",
+      "source_file": "futuristic_sci_fi_industrial_crate.png",
+      "size": "1254x1254",
+      "mode": "RGB",
+      "alpha_extrema": "",
+      "note": ""
+    },
+    {
+      "asset_name": "Prop_ExplosiveBarrel",
+      "category": "Props",
+      "target_path": "Assets/_Project/Art/Sprites/Props/Prop_ExplosiveBarrel.png",
+      "source_file": "futuristic_explosive_containment_canister.png",
+      "size": "1254x1254",
+      "mode": "RGB",
+      "alpha_extrema": "",
+      "note": ""
+    },
+    {
+      "asset_name": "Prop_HealingStation",
+      "category": "Props",
+      "target_path": "Assets/_Project/Art/Sprites/Props/Prop_HealingStation.png",
+      "source_file": "futuristic_healing_pod_design.png",
+      "size": "1254x1254",
+      "mode": "RGB",
+      "alpha_extrema": "",
+      "note": ""
+    },
+    {
+      "asset_name": "Prop_SecurityCamera",
+      "category": "Props",
+      "target_path": "Assets/_Project/Art/Sprites/Props/Prop_SecurityCamera.png",
+      "source_file": "sci_fi_security_turret_module.png",
+      "size": "1254x1254",
+      "mode": "RGB",
+      "alpha_extrema": "",
+      "note": ""
+    },
+    {
+      "asset_name": "Prop_AlarmLight",
+      "category": "Props",
+      "target_path": "Assets/_Project/Art/Sprites/Props/Prop_AlarmLight.png",
+      "source_file": "futuristic_sci_fi_alarm_panel.png",
+      "size": "1254x1254",
+      "mode": "RGB",
+      "alpha_extrema": "",
+      "note": ""
+    },
+    {
+      "asset_name": "Hazard_LaserEmitterPost",
+      "category": "Hazards",
+      "target_path": "Assets/_Project/Art/Sprites/Hazards/Hazard_LaserEmitterPost.png",
+      "source_file": "futuristic_sci_fi_drone_core_design.png",
+      "size": "1254x1254",
+      "mode": "RGB",
+      "alpha_extrema": "",
+      "note": ""
+    },
+    {
+      "asset_name": "Hazard_LaserBeamHorizontal",
+      "category": "Hazards",
+      "target_path": "Assets/_Project/Art/Sprites/Hazards/Hazard_LaserBeamHorizontal.png",
+      "source_file": "glowing_red_laser_beam_on_clear_backdrop.png",
+      "size": "1254x1254",
+      "mode": "RGB",
+      "alpha_extrema": "",
+      "note": ""
+    },
+    {
+      "asset_name": "Hazard_LaserBeamVertical",
+      "category": "Hazards",
+      "target_path": "Assets/_Project/Art/Sprites/Hazards/Hazard_LaserBeamVertical.png",
+      "source_file": "red_neon_beam_on_transparent_background.png",
+      "size": "1254x1254",
+      "mode": "RGB",
+      "alpha_extrema": "",
+      "note": ""
+    },
+    {
+      "asset_name": "Hazard_ElectricFloorTile",
+      "category": "Hazards",
+      "target_path": "Assets/_Project/Art/Sprites/Hazards/Hazard_ElectricFloorTile.png",
+      "source_file": "futuristic_electrified_industrial_floor_tile.png",
+      "size": "1254x1254",
+      "mode": "RGB",
+      "alpha_extrema": "",
+      "note": ""
+    },
+    {
+      "asset_name": "Hazard_ToxicPuddleSmall",
+      "category": "Hazards",
+      "target_path": "Assets/_Project/Art/Sprites/Hazards/Hazard_ToxicPuddleSmall.png",
+      "source_file": "glowing_toxic_acid_puddle_sprite.png",
+      "size": "1254x1254",
+      "mode": "RGB",
+      "alpha_extrema": "",
+      "note": ""
+    },
+    {
+      "asset_name": "Hazard_ToxicPuddleLarge",
+      "category": "Hazards",
+      "target_path": "Assets/_Project/Art/Sprites/Hazards/Hazard_ToxicPuddleLarge.png",
+      "source_file": "neon_green_toxic_slime_pool.png",
+      "size": "1254x1254",
+      "mode": "RGB",
+      "alpha_extrema": "",
+      "note": ""
+    },
+    {
+      "asset_name": "Hazard_BloodlessDangerStain",
+      "category": "Hazards",
+      "target_path": "Assets/_Project/Art/Sprites/Hazards/Hazard_BloodlessDangerStain.png",
+      "source_file": "red_energy_spill_hazard_symbol.png",
+      "size": "1254x1254",
+      "mode": "RGB",
+      "alpha_extrema": "",
+      "note": ""
+    },
+    {
+      "asset_name": "Hazard_TurretTrap",
+      "category": "Hazards",
+      "target_path": "Assets/_Project/Art/Sprites/Hazards/Hazard_TurretTrap.png",
+      "source_file": "futuristic_sci_fi_turret_design.png",
+      "size": "1254x1254",
+      "mode": "RGB",
+      "alpha_extrema": "",
+      "note": ""
+    },
+    {
+      "asset_name": "Hazard_WarningSign",
+      "category": "Hazards",
+      "target_path": "Assets/_Project/Art/Sprites/Hazards/Hazard_WarningSign.png",
+      "source_file": "futuristic_warning_emblem_icon.png",
+      "size": "1254x1254",
+      "mode": "RGB",
+      "alpha_extrema": "",
+      "note": ""
+    },
+    {
+      "asset_name": "Marker_BossWarning",
+      "category": "Hazards",
+      "target_path": "Assets/_Project/Art/Sprites/Hazards/Marker_BossWarning.png",
+      "source_file": "sci_fi_warning_beacon_with_glowing_accents.png",
+      "size": "1254x1254",
+      "mode": "RGB",
+      "alpha_extrema": "",
+      "note": ""
+    },
+    {
+      "asset_name": "Necromancer_Aura",
+      "category": "Hazards/VFX",
+      "target_path": "Assets/_Project/Art/Sprites/Hazards/VFX/Necromancer_Aura.png",
+      "source_file": "mystical_purple_energy_ring.png",
+      "size": "1254x1254",
+      "mode": "RGB",
+      "alpha_extrema": "",
+      "note": ""
+    },
+    {
+      "asset_name": "Necromancer_SummonEffect",
+      "category": "Hazards/VFX",
+      "target_path": "Assets/_Project/Art/Sprites/Hazards/VFX/Necromancer_SummonEffect.png",
+      "source_file": "violet_energy_sigil_with_glowing_runes.png",
+      "size": "1254x1254",
+      "mode": "RGB",
+      "alpha_extrema": "",
+      "note": ""
+    },
+    {
+      "asset_name": "Tile_WallHorizontal",
+      "category": "Tiles/Environment",
+      "target_path": "Assets/_Project/Art/Sprites/Tiles/Tile_WallHorizontal.png",
+      "source_file": "futuristic_sci_fi_corridor_wall_panel.png",
+      "size": "1254x1254",
+      "mode": "RGB",
+      "alpha_extrema": "",
+      "note": ""
+    },
+    {
+      "asset_name": "Tile_WallVertical",
+      "category": "Tiles/Environment",
+      "target_path": "Assets/_Project/Art/Sprites/Tiles/Tile_WallVertical.png",
+      "source_file": "futuristic_industrial_wall_panel.png",
+      "size": "1254x1254",
+      "mode": "RGB",
+      "alpha_extrema": "",
+      "note": ""
+    },
+    {
+      "asset_name": "Tile_InnerCorner",
+      "category": "Tiles/Environment",
+      "target_path": "Assets/_Project/Art/Sprites/Tiles/Tile_InnerCorner.png",
+      "source_file": "futuristic_sci_fi_corner_tile_asset.png",
+      "size": "1254x1254",
+      "mode": "RGB",
+      "alpha_extrema": "",
+      "note": ""
+    },
+    {
+      "asset_name": "Tile_OuterCorner",
+      "category": "Tiles/Environment",
+      "target_path": "Assets/_Project/Art/Sprites/Tiles/Tile_OuterCorner.png",
+      "source_file": "sci_fi_corner_module_with_neon_accents.png",
+      "size": "1254x1254",
+      "mode": "RGB",
+      "alpha_extrema": "",
+      "note": ""
+    },
+    {
+      "asset_name": "Tile_DoorFrame",
+      "category": "Tiles/Environment",
+      "target_path": "Assets/_Project/Art/Sprites/Tiles/Tile_DoorFrame.png",
+      "source_file": "futuristic_industrial_doorway_asset.png",
+      "size": "1254x1254",
+      "mode": "RGB",
+      "alpha_extrema": "",
+      "note": ""
+    },
+    {
+      "asset_name": "Tile_PrisonFence",
+      "category": "Tiles/Environment",
+      "target_path": "Assets/_Project/Art/Sprites/Tiles/Tile_PrisonFence.png",
+      "source_file": "sci_fi_industrial_security_gate_panel.png",
+      "size": "1254x1254",
+      "mode": "RGB",
+      "alpha_extrema": "",
+      "note": ""
+    },
+    {
+      "asset_name": "Tile_SciFiFloor",
+      "category": "Tiles/Environment",
+      "target_path": "Assets/_Project/Art/Sprites/Tiles/Tile_SciFiFloor.png",
+      "source_file": "futuristic_industrial_sci_fi_floor_tile.png",
+      "size": "1254x1254",
+      "mode": "RGB",
+      "alpha_extrema": "",
+      "note": ""
+    },
+    {
+      "asset_name": "Tile_FloorGrate",
+      "category": "Tiles/Environment",
+      "target_path": "Assets/_Project/Art/Sprites/Tiles/Tile_FloorGrate.png",
+      "source_file": "industrial_sci_fi_floor_grate_tile.png",
+      "size": "1254x1254",
+      "mode": "RGB",
+      "alpha_extrema": "",
+      "note": ""
+    },
+    {
+      "asset_name": "Tile_HazardStripeFloor",
+      "category": "Tiles/Environment",
+      "target_path": "Assets/_Project/Art/Sprites/Tiles/Tile_HazardStripeFloor.png",
+      "source_file": "futuristic_industrial_hazard_panel.png",
+      "size": "1254x1254",
+      "mode": "RGB",
+      "alpha_extrema": "",
+      "note": ""
+    },
+    {
+      "asset_name": "Tile_MetalPillar",
+      "category": "Tiles/Environment",
+      "target_path": "Assets/_Project/Art/Sprites/Tiles/Tile_MetalPillar.png",
+      "source_file": "futuristic_industrial_power_column_design.png",
+      "size": "1254x1254",
+      "mode": "RGB",
+      "alpha_extrema": "",
+      "note": ""
+    },
+    {
+      "asset_name": "Decal_Biohazard",
+      "category": "Tiles/Environment",
+      "target_path": "Assets/_Project/Art/Sprites/Tiles/Decal_Biohazard.png",
+      "source_file": "futuristic_biohazard_emblem_with_neon_accents.png",
+      "size": "1254x1254",
+      "mode": "RGB",
+      "alpha_extrema": "",
+      "note": ""
+    },
+    {
+      "asset_name": "Decal_CrackMetal",
+      "category": "Tiles/Environment",
+      "target_path": "Assets/_Project/Art/Sprites/Tiles/Decal_CrackMetal.png",
+      "source_file": "cracked_metal_panel_with_glowing_energy.png",
+      "size": "1254x1254",
+      "mode": "RGB",
+      "alpha_extrema": "",
+      "note": ""
+    },
+    {
+      "asset_name": "Decal_DangerArrow",
+      "category": "Tiles/Environment",
+      "target_path": "Assets/_Project/Art/Sprites/Tiles/Decal_DangerArrow.png",
+      "source_file": "futuristic_sci_fi_direction_marker.png",
+      "size": "1254x1254",
+      "mode": "RGB",
+      "alpha_extrema": "",
+      "note": ""
+    },
+    {
+      "asset_name": "Decal_HospitalWarning",
+      "category": "Tiles/Environment",
+      "target_path": "Assets/_Project/Art/Sprites/Tiles/Decal_HospitalWarning.png",
+      "source_file": "hazardous_biohazard_emblem_with_glowing_accents.png",
+      "size": "1254x1254",
+      "mode": "RGB",
+      "alpha_extrema": "",
+      "note": ""
+    },
+    {
+      "asset_name": "Light_NeonCyanWall",
+      "category": "Tiles/Environment",
+      "target_path": "Assets/_Project/Art/Sprites/Tiles/Light_NeonCyanWall.png",
+      "source_file": "cyan_glow_sci_fi_panel_design.png",
+      "size": "1254x1254",
+      "mode": "RGB",
+      "alpha_extrema": "",
+      "note": ""
+    },
+    {
+      "asset_name": "Light_RedAlarmWall",
+      "category": "Tiles/Environment",
+      "target_path": "Assets/_Project/Art/Sprites/Tiles/Light_RedAlarmWall.png",
+      "source_file": "futuristic_sci_fi_alarm_panel.png",
+      "size": "1254x1254",
+      "mode": "RGB",
+      "alpha_extrema": "",
+      "note": ""
+    },
+    {
+      "asset_name": "Shadow_RoomBlob",
+      "category": "Tiles/Environment",
+      "target_path": "Assets/_Project/Art/Sprites/Tiles/Shadow_RoomBlob.png",
+      "source_file": "dark_smoke_cloud_on_transparent_background.png",
+      "size": "1254x1254",
+      "mode": "RGB",
+      "alpha_extrema": "",
+      "note": ""
+    },
+    {
+      "asset_name": "Prop_SciFiCrateSmall",
+      "category": "Tiles/Environment",
+      "target_path": "Assets/_Project/Art/Sprites/Tiles/Prop_SciFiCrateSmall.png",
+      "source_file": "futuristic_loot_crate_design.png",
+      "size": "1254x1254",
+      "mode": "RGB",
+      "alpha_extrema": "",
+      "note": ""
+    },
+    {
+      "asset_name": "UI_Icon_Health",
+      "category": "UI/Icons",
+      "target_path": "Assets/_Project/Art/Sprites/UI/Icons/UI_Icon_Health.png",
+      "source_file": "futuristic_medical_tech_emblem.png",
+      "size": "1254x1254",
+      "mode": "RGB",
+      "alpha_extrema": "",
+      "note": ""
+    },
+    {
+      "asset_name": "UI_Icon_Ammo",
+      "category": "UI/Icons",
+      "target_path": "Assets/_Project/Art/Sprites/UI/Icons/UI_Icon_Ammo.png",
+      "source_file": "futuristic_ammo_icon_with_neon_accents.png",
+      "size": "1254x1254",
+      "mode": "RGB",
+      "alpha_extrema": "",
+      "note": ""
+    },
+    {
+      "asset_name": "UI_Icon_Money",
+      "category": "UI/Icons",
+      "target_path": "Assets/_Project/Art/Sprites/UI/Icons/UI_Icon_Money.png",
+      "source_file": "futuristic_glowing_credit_token.png",
+      "size": "1254x1254",
+      "mode": "RGB",
+      "alpha_extrema": "",
+      "note": ""
+    },
+    {
+      "asset_name": "UI_Icon_Keycard",
+      "category": "UI/Icons",
+      "target_path": "Assets/_Project/Art/Sprites/UI/Icons/UI_Icon_Keycard.png",
+      "source_file": "futuristic_access_card_with_glowing_accents.png",
+      "size": "1254x1254",
+      "mode": "RGB",
+      "alpha_extrema": "",
+      "note": ""
+    },
+    {
+      "asset_name": "UI_Icon_Weapon",
+      "category": "UI/Icons",
+      "target_path": "Assets/_Project/Art/Sprites/UI/Icons/UI_Icon_Weapon.png",
+      "source_file": "futuristic_weapon_emblem_badge.png",
+      "size": "1254x1254",
+      "mode": "RGB",
+      "alpha_extrema": "",
+      "note": ""
+    },
+    {
+      "asset_name": "UI_Icon_Buff",
+      "category": "UI/Icons",
+      "target_path": "Assets/_Project/Art/Sprites/UI/Icons/UI_Icon_Buff.png",
+      "source_file": "futuristic_power_up_icon_with_energy_vial.png",
+      "size": "1254x1254",
+      "mode": "RGB",
+      "alpha_extrema": "",
+      "note": ""
+    },
+    {
+      "asset_name": "UI_Icon_Objective",
+      "category": "UI/Icons",
+      "target_path": "Assets/_Project/Art/Sprites/UI/Icons/UI_Icon_Objective.png",
+      "source_file": "futuristic_hud_target_emblem.png",
+      "size": "1254x1254",
+      "mode": "RGB",
+      "alpha_extrema": "",
+      "note": ""
+    },
+    {
+      "asset_name": "UI_Icon_Boss",
+      "category": "UI/Icons",
+      "target_path": "Assets/_Project/Art/Sprites/UI/Icons/UI_Icon_Boss.png",
+      "source_file": "menacing_tech_emblem_with_fiery_glow.png",
+      "size": "1254x1254",
+      "mode": "RGB",
+      "alpha_extrema": "",
+      "note": ""
+    },
+    {
+      "asset_name": "UI_Icon_Reload",
+      "category": "UI/Icons",
+      "target_path": "Assets/_Project/Art/Sprites/UI/Icons/UI_Icon_Reload.png",
+      "source_file": "futuristic_ammo_reload_icon.png",
+      "size": "1254x1254",
+      "mode": "RGB",
+      "alpha_extrema": "",
+      "note": ""
+    },
+    {
+      "asset_name": "UI_Icon_Warning",
+      "category": "UI/Icons",
+      "target_path": "Assets/_Project/Art/Sprites/UI/Icons/UI_Icon_Warning.png",
+      "source_file": "futuristic_warning_emblem_icon.png",
+      "size": "1254x1254",
+      "mode": "RGB",
+      "alpha_extrema": "",
+      "note": ""
+    },
+    {
+      "asset_name": "UI_HealthBar_Frame",
+      "category": "UI/PanelsCards",
+      "target_path": "Assets/_Project/Art/Sprites/UI/Panels/UI_HealthBar_Frame.png",
+      "source_file": "futuristic_sci_fi_ui_frame.png",
+      "size": "1254x1254",
+      "mode": "RGB",
+      "alpha_extrema": "",
+      "note": ""
+    },
+    {
+      "asset_name": "UI_HealthBar_Fill",
+      "category": "UI/PanelsCards",
+      "target_path": "Assets/_Project/Art/Sprites/UI/Panels/UI_HealthBar_Fill.png",
+      "source_file": "futuristic_glowing_progress_bar.png",
+      "size": "2172x724",
+      "mode": "RGB",
+      "alpha_extrema": "",
+      "note": ""
+    },
+    {
+      "asset_name": "UI_AmmoPanel",
+      "category": "UI/PanelsCards",
+      "target_path": "Assets/_Project/Art/Sprites/UI/Panels/UI_AmmoPanel.png",
+      "source_file": "futuristic_sci_fi_hud_panel_design.png",
+      "size": "2172x724",
+      "mode": "RGB",
+      "alpha_extrema": "",
+      "note": ""
+    },
+    {
+      "asset_name": "UI_MoneyPanel",
+      "category": "UI/PanelsCards",
+      "target_path": "Assets/_Project/Art/Sprites/UI/Panels/UI_MoneyPanel.png",
+      "source_file": "futuristic_sci_fi_hud_interface_panel.png",
+      "size": "1448x1086",
+      "mode": "RGB",
+      "alpha_extrema": "",
+      "note": ""
+    },
+    {
+      "asset_name": "UI_KeycardPanel",
+      "category": "UI/PanelsCards",
+      "target_path": "Assets/_Project/Art/Sprites/UI/Panels/UI_KeycardPanel.png",
+      "source_file": "futuristic_sci_fi_game_interface_panel.png",
+      "size": "1254x1254",
+      "mode": "RGB",
+      "alpha_extrema": "",
+      "note": ""
+    },
+    {
+      "asset_name": "UI_WeaponPanel",
+      "category": "UI/PanelsCards",
+      "target_path": "Assets/_Project/Art/Sprites/UI/Panels/UI_WeaponPanel.png",
+      "source_file": "futuristic_weapon_display_interface.png",
+      "size": "1254x1254",
+      "mode": "RGB",
+      "alpha_extrema": "",
+      "note": ""
+    },
+    {
+      "asset_name": "UI_ObjectivePanel",
+      "category": "UI/PanelsCards",
+      "target_path": "Assets/_Project/Art/Sprites/UI/Panels/UI_ObjectivePanel.png",
+      "source_file": "futuristic_ui_panel_with_neon_accents.png",
+      "size": "1448x1086",
+      "mode": "RGB",
+      "alpha_extrema": "",
+      "note": ""
+    },
+    {
+      "asset_name": "UI_BuffStatusPanel",
+      "category": "UI/PanelsCards",
+      "target_path": "Assets/_Project/Art/Sprites/UI/Panels/UI_BuffStatusPanel.png",
+      "source_file": "futuristic_sci_fi_hud_overlay_frame.png",
+      "size": "2172x724",
+      "mode": "RGB",
+      "alpha_extrema": "",
+      "note": ""
+    },
+    {
+      "asset_name": "UI_BossHealthBar_Frame",
+      "category": "UI/PanelsCards",
+      "target_path": "Assets/_Project/Art/Sprites/UI/Panels/UI_BossHealthBar_Frame.png",
+      "source_file": "futuristic_ui_frame_with_neon_accents.png",
+      "size": "1448x1086",
+      "mode": "RGB",
+      "alpha_extrema": "",
+      "note": ""
+    },
+    {
+      "asset_name": "UI_BossHealthBar_Fill",
+      "category": "UI/PanelsCards",
+      "target_path": "Assets/_Project/Art/Sprites/UI/Panels/UI_BossHealthBar_Fill.png",
+      "source_file": "futuristic_sci_fi_energy_bar.png",
+      "size": "1254x1254",
+      "mode": "RGB",
+      "alpha_extrema": "",
+      "note": ""
+    },
+    {
+      "asset_name": "UI_PauseMenuPanel",
+      "category": "UI/PanelsCards",
+      "target_path": "Assets/_Project/Art/Sprites/UI/Panels/UI_PauseMenuPanel.png",
+      "source_file": "futuristic_sci_fi_hud_panel.png",
+      "size": "1254x1254",
+      "mode": "RGB",
+      "alpha_extrema": "",
+      "note": ""
+    },
+    {
+      "asset_name": "UI_ShopItemCard",
+      "category": "UI/PanelsCards",
+      "target_path": "Assets/_Project/Art/Sprites/UI/Panels/UI_ShopItemCard.png",
+      "source_file": "futuristic_sci_fi_ui_card_frame.png",
+      "size": "1122x1402",
+      "mode": "RGB",
+      "alpha_extrema": "",
+      "note": ""
+    },
+    {
+      "asset_name": "UI_BuffChoiceCard",
+      "category": "UI/PanelsCards",
+      "target_path": "Assets/_Project/Art/Sprites/UI/Panels/UI_BuffChoiceCard.png",
+      "source_file": "futuristic_sci_fi_tech_ui_panel.png",
+      "size": "1122x1402",
+      "mode": "RGB",
+      "alpha_extrema": "",
+      "note": ""
+    },
+    {
+      "asset_name": "UI_UnlockedLevelCard",
+      "category": "UI/PanelsCards",
+      "target_path": "Assets/_Project/Art/Sprites/UI/Panels/UI_UnlockedLevelCard.png",
+      "source_file": "futuristic_sci_fi_control_panel_interface.png",
+      "size": "1086x1448",
+      "mode": "RGB",
+      "alpha_extrema": "",
+      "note": ""
+    },
+    {
+      "asset_name": "UI_LockedLevelCard",
+      "category": "UI/PanelsCards",
+      "target_path": "Assets/_Project/Art/Sprites/UI/Panels/UI_LockedLevelCard.png",
+      "source_file": "futuristic_sci_fi_ui_frame.png",
+      "size": "1254x1254",
+      "mode": "RGB",
+      "alpha_extrema": "",
+      "note": ""
+    },
+    {
+      "asset_name": "UI_Button_Normal",
+      "category": "UI/Buttons",
+      "target_path": "Assets/_Project/Art/Sprites/UI/Buttons/UI_Button_Normal.png",
+      "source_file": "futuristic_metallic_ui_panel.png",
+      "size": "2172x724",
+      "mode": "RGB",
+      "alpha_extrema": "",
+      "note": ""
+    },
+    {
+      "asset_name": "UI_Button_Hover",
+      "category": "UI/Buttons",
+      "target_path": "Assets/_Project/Art/Sprites/UI/Buttons/UI_Button_Hover.png",
+      "source_file": "futuristic_sci_fi_interface_panel.png",
+      "size": "2172x724",
+      "mode": "RGB",
+      "alpha_extrema": "",
+      "note": ""
+    },
+    {
+      "asset_name": "UI_Button_Pressed",
+      "category": "UI/Buttons",
+      "target_path": "Assets/_Project/Art/Sprites/UI/Buttons/UI_Button_Pressed.png",
+      "source_file": "futuristic_sci_fi_control_panel.png",
+      "size": "2172x724",
+      "mode": "RGB",
+      "alpha_extrema": "",
+      "note": ""
+    },
+    {
+      "asset_name": "UI_Button_Confirm",
+      "category": "UI/Buttons",
+      "target_path": "Assets/_Project/Art/Sprites/UI/Buttons/UI_Button_Confirm.png",
+      "source_file": "futuristic_sci_fi_ui_confirmation_button.png",
+      "size": "1254x1254",
+      "mode": "RGB",
+      "alpha_extrema": "",
+      "note": ""
+    },
+    {
+      "asset_name": "UI_Button_Danger",
+      "category": "UI/Buttons",
+      "target_path": "Assets/_Project/Art/Sprites/UI/Buttons/UI_Button_Danger.png",
+      "source_file": "futuristic_sci_fi_alarm_button_design.png",
+      "size": "1254x1254",
+      "mode": "RGB",
+      "alpha_extrema": "",
+      "note": ""
+    },
+    {
+      "asset_name": "Enemy_PrisonGuard",
+      "category": "Enemies",
+      "target_path": "Assets/_Project/Art/Sprites/Enemies/Enemy_PrisonGuard.png",
+      "source_file": "futuristic_armored_guard_in_stance.png",
+      "size": "1254x1254",
+      "mode": "RGB",
+      "alpha_extrema": "",
+      "note": ""
+    },
+    {
+      "asset_name": "Enemy_RangedGuard",
+      "category": "Enemies",
+      "target_path": "Assets/_Project/Art/Sprites/Enemies/Enemy_RangedGuard.png",
+      "source_file": "futuristic_soldier_in_tactical_combat_stance.png",
+      "size": "1254x1254",
+      "mode": "RGB",
+      "alpha_extrema": "",
+      "note": ""
+    },
+    {
+      "asset_name": "Enemy_RiotGuard",
+      "category": "Enemies",
+      "target_path": "Assets/_Project/Art/Sprites/Enemies/Enemy_RiotGuard.png",
+      "source_file": "armored_soldier_with_riot_shield.png",
+      "size": "1254x1254",
+      "mode": "RGB",
+      "alpha_extrema": "",
+      "note": ""
+    },
+    {
+      "asset_name": "Enemy_LabMutant",
+      "category": "Enemies",
+      "target_path": "Assets/_Project/Art/Sprites/Enemies/Enemy_LabMutant.png",
+      "source_file": "mutated_laboratory_creature_sprite.png",
+      "size": "1254x1254",
+      "mode": "RGB",
+      "alpha_extrema": "",
+      "note": ""
+    },
+    {
+      "asset_name": "Enemy_ZombieWalker",
+      "category": "Enemies",
+      "target_path": "Assets/_Project/Art/Sprites/Enemies/Enemy_ZombieWalker.png",
+      "source_file": "futuristic_zombie_like_creature_with_glowing_crack.png",
+      "size": "1254x1254",
+      "mode": "RGB",
+      "alpha_extrema": "",
+      "note": ""
+    },
+    {
+      "asset_name": "Enemy_ZombieRunner",
+      "category": "Enemies",
+      "target_path": "Assets/_Project/Art/Sprites/Enemies/Enemy_ZombieRunner.png",
+      "source_file": "futuristic_armored_cyborg_in_predatory_pose.png",
+      "size": "1254x1254",
+      "mode": "RGB",
+      "alpha_extrema": "",
+      "note": ""
+    },
+    {
+      "asset_name": "Enemy_Drone",
+      "category": "Enemies",
+      "target_path": "Assets/_Project/Art/Sprites/Enemies/Enemy_Drone.png",
+      "source_file": "futuristic_sci_fi_drone_in_space.png",
+      "size": "1254x1254",
+      "mode": "RGB",
+      "alpha_extrema": "",
+      "note": ""
+    },
+    {
+      "asset_name": "Enemy_SecurityBot",
+      "category": "Enemies",
+      "target_path": "Assets/_Project/Art/Sprites/Enemies/Enemy_SecurityBot.png",
+      "source_file": "sci_fi_mech_with_glowing_blue_eye.png",
+      "size": "1254x1254",
+      "mode": "RGB",
+      "alpha_extrema": "",
+      "note": ""
+    },
+    {
+      "asset_name": "Enemy_HauntedMedic",
+      "category": "Enemies",
+      "target_path": "Assets/_Project/Art/Sprites/Enemies/Enemy_HauntedMedic.png",
+      "source_file": "futuristic_medic_in_dystopian_attire.png",
+      "size": "1254x1254",
+      "mode": "RGB",
+      "alpha_extrema": "",
+      "note": ""
+    },
+    {
+      "asset_name": "Enemy_Ghost",
+      "category": "Enemies",
+      "target_path": "Assets/_Project/Art/Sprites/Enemies/Enemy_Ghost.png",
+      "source_file": "futuristic_ethereal_armored_entity.png",
+      "size": "1254x1254",
+      "mode": "RGB",
+      "alpha_extrema": "",
+      "note": ""
+    },
+    {
+      "asset_name": "Miniboss_RiotBrute",
+      "category": "Bosses/Minibosses",
+      "target_path": "Assets/_Project/Art/Sprites/Bosses/Miniboss_RiotBrute.png",
+      "source_file": "futuristic_armored_enforcer_with_shield_and_mace.png",
+      "size": "1254x1254",
+      "mode": "RGB",
+      "alpha_extrema": "",
+      "note": ""
+    },
+    {
+      "asset_name": "Miniboss_LabAlpha",
+      "category": "Bosses/Minibosses",
+      "target_path": "Assets/_Project/Art/Sprites/Bosses/Miniboss_LabAlpha.png",
+      "source_file": "cybernetic_mutant_with_glowing_tech_details.png",
+      "size": "1254x1254",
+      "mode": "RGB",
+      "alpha_extrema": "",
+      "note": ""
+    },
+    {
+      "asset_name": "Miniboss_Necromancer",
+      "category": "Bosses/Minibosses",
+      "target_path": "Assets/_Project/Art/Sprites/Bosses/Miniboss_Necromancer.png",
+      "source_file": "hooded_sorcerer_with_glowing_purple_energy.png",
+      "size": "1254x1254",
+      "mode": "RGB",
+      "alpha_extrema": "",
+      "note": ""
+    },
+    {
+      "asset_name": "Miniboss_ReactorGuardian",
+      "category": "Bosses/Minibosses",
+      "target_path": "Assets/_Project/Art/Sprites/Bosses/Miniboss_ReactorGuardian.png",
+      "source_file": "futuristic_mech_with_glowing_reactor_core.png",
+      "size": "1254x1254",
+      "mode": "RGB",
+      "alpha_extrema": "",
+      "note": ""
+    },
+    {
+      "asset_name": "Miniboss_Surgeon",
+      "category": "Bosses/Minibosses",
+      "target_path": "Assets/_Project/Art/Sprites/Bosses/Miniboss_Surgeon.png",
+      "source_file": "sinister_mad_doctor_concept_art.png",
+      "size": "1254x1254",
+      "mode": "RGB",
+      "alpha_extrema": "",
+      "note": ""
+    },
+    {
+      "asset_name": "Miniboss_ShadowWarden",
+      "category": "Bosses/Minibosses",
+      "target_path": "Assets/_Project/Art/Sprites/Bosses/Miniboss_ShadowWarden.png",
+      "source_file": "futuristic_armored_sentinel_with_energy_weapon.png",
+      "size": "1254x1254",
+      "mode": "RGB",
+      "alpha_extrema": "",
+      "note": ""
+    },
+    {
+      "asset_name": "Boss_Experiment01",
+      "category": "Bosses/Minibosses",
+      "target_path": "Assets/_Project/Art/Sprites/Bosses/Boss_Experiment01.png",
+      "source_file": "menacing_cyborg_game_boss_concept.png",
+      "size": "1254x1254",
+      "mode": "RGB",
+      "alpha_extrema": "",
+      "note": ""
+    },
+    {
+      "asset_name": "Boss_TheWarden",
+      "category": "Bosses/Minibosses",
+      "target_path": "Assets/_Project/Art/Sprites/Bosses/Boss_TheWarden.png",
+      "source_file": "armored_cyborg_enforcer_with_glowing_accents.png",
+      "size": "1254x1254",
+      "mode": "RGB",
+      "alpha_extrema": "",
+      "note": ""
+    },
+    {
+      "asset_name": "Boss_Abomination",
+      "category": "Bosses/Minibosses",
+      "target_path": "Assets/_Project/Art/Sprites/Bosses/Boss_Abomination.png",
+      "source_file": "cyborg_brute_with_glowing_green_energy.png",
+      "size": "1254x1254",
+      "mode": "RGB",
+      "alpha_extrema": "",
+      "note": ""
+    },
+    {
+      "asset_name": "Boss_AICore",
+      "category": "Bosses/Minibosses",
+      "target_path": "Assets/_Project/Art/Sprites/Bosses/Boss_AICore.png",
+      "source_file": "futuristic_robotic_engine_core_concept.png",
+      "size": "1254x1254",
+      "mode": "RGB",
+      "alpha_extrema": "",
+      "note": ""
+    },
+    {
+      "asset_name": "Boss_NightmareDoctor",
+      "category": "Bosses/Minibosses",
+      "target_path": "Assets/_Project/Art/Sprites/Bosses/Boss_NightmareDoctor.png",
+      "source_file": "sinister_cyborg_doctor_with_glowing_tech.png",
+      "size": "1254x1254",
+      "mode": "RGB",
+      "alpha_extrema": "",
+      "note": ""
+    },
+    {
+      "asset_name": "Boss_FinalEscapeOverlord",
+      "category": "Bosses/Minibosses",
+      "target_path": "Assets/_Project/Art/Sprites/Bosses/Boss_FinalEscapeOverlord.png",
+      "source_file": "a_digital_illustration_in_a_top_down_perspective_f.png",
+      "size": "1536x1024",
+      "mode": "RGBA",
+      "alpha_extrema": "(0, 255)",
+      "note": ""
+    },
+    {
+      "asset_name": "Thumbnail_Laboratory",
+      "category": "LevelThumbnails",
+      "target_path": "Assets/_Project/Art/Thumbnails/Thumbnail_Laboratory.png",
+      "source_file": "futuristic_lab_with_tactical_guards.png",
+      "size": "1672x941",
+      "mode": "RGB",
+      "alpha_extrema": "",
+      "note": "thumbnail/reference image, not transparent sprite"
+    },
+    {
+      "asset_name": "Thumbnail_Prison",
+      "category": "LevelThumbnails",
+      "target_path": "Assets/_Project/Art/Thumbnails/Thumbnail_Prison.png",
+      "source_file": "high_tech_prison_compound_surveillance_layout.png",
+      "size": "1672x941",
+      "mode": "RGB",
+      "alpha_extrema": "",
+      "note": "thumbnail/reference image, not transparent sprite"
+    },
+    {
+      "asset_name": "Thumbnail_ZombieCity",
+      "category": "LevelThumbnails",
+      "target_path": "Assets/_Project/Art/Thumbnails/Thumbnail_ZombieCity.png",
+      "source_file": "ruined_city_under_toxic_siege.png",
+      "size": "1672x941",
+      "mode": "RGB",
+      "alpha_extrema": "",
+      "note": "thumbnail/reference image, not transparent sprite"
+    },
+    {
+      "asset_name": "Thumbnail_SciFiBase",
+      "category": "LevelThumbnails",
+      "target_path": "Assets/_Project/Art/Thumbnails/Thumbnail_SciFiBase.png",
+      "source_file": "futuristic_industrial_facility_with_glowing_reacto.png",
+      "size": "1672x941",
+      "mode": "RGB",
+      "alpha_extrema": "",
+      "note": "thumbnail/reference image, not transparent sprite"
+    },
+    {
+      "asset_name": "Thumbnail_HorrorHospital",
+      "category": "LevelThumbnails",
+      "target_path": "Assets/_Project/Art/Thumbnails/Thumbnail_HorrorHospital.png",
+      "source_file": "haunted_hospital_corridor_with_spectral_figures.png",
+      "size": "1672x941",
+      "mode": "RGB",
+      "alpha_extrema": "",
+      "note": "thumbnail/reference image, not transparent sprite"
+    },
+    {
+      "asset_name": "Mockup_MainMenu",
+      "category": "References/Mockups",
+      "target_path": "Assets/_Project/Art/References/Mockups/Mockup_MainMenu.png",
+      "source_file": "evadare_prison_lockdown_interface.png",
+      "size": "1672x941",
+      "mode": "RGB",
+      "alpha_extrema": "",
+      "note": "reference/mockup only, do not use directly as in-game sprite"
+    },
+    {
+      "asset_name": "Mockup_LevelSelect",
+      "category": "References/Mockups",
+      "target_path": "Assets/_Project/Art/References/Mockups/Mockup_LevelSelect.png",
+      "source_file": "level_select_in_a_cyberpunk_world.png",
+      "size": "1672x941",
+      "mode": "RGB",
+      "alpha_extrema": "",
+      "note": "reference/mockup only, do not use directly as in-game sprite"
+    },
+    {
+      "asset_name": "Mockup_PauseMenu",
+      "category": "References/Mockups",
+      "target_path": "Assets/_Project/Art/References/Mockups/Mockup_PauseMenu.png",
+      "source_file": "paused_game_in_cyberpunk_prison_complex.png",
+      "size": "1672x941",
+      "mode": "RGB",
+      "alpha_extrema": "",
+      "note": "reference/mockup only, do not use directly as in-game sprite"
+    },
+    {
+      "asset_name": "Mockup_GameOver",
+      "category": "References/Mockups",
+      "target_path": "Assets/_Project/Art/References/Mockups/Mockup_GameOver.png",
+      "source_file": "prison_block_lockdown_game_over_screen.png",
+      "size": "1672x941",
+      "mode": "RGB",
+      "alpha_extrema": "",
+      "note": "reference/mockup only, do not use directly as in-game sprite"
+    },
+    {
+      "asset_name": "Mockup_Victory",
+      "category": "References/Mockups",
+      "target_path": "Assets/_Project/Art/References/Mockups/Mockup_Victory.png",
+      "source_file": "victory_achieved_in_block_07.png",
+      "size": "1672x941",
+      "mode": "RGB",
+      "alpha_extrema": "",
+      "note": "reference/mockup only, do not use directly as in-game sprite"
+    },
+    {
+      "asset_name": "Mockup_ShopInterface",
+      "category": "References/Mockups",
+      "target_path": "Assets/_Project/Art/References/Mockups/Mockup_ShopInterface.png",
+      "source_file": "futuristic_sci_fi_shop_interface.png",
+      "size": "1672x941",
+      "mode": "RGB",
+      "alpha_extrema": "",
+      "note": "reference/mockup only, do not use directly as in-game sprite"
+    },
+    {
+      "asset_name": "Mockup_BuffChoice",
+      "category": "References/Mockups",
+      "target_path": "Assets/_Project/Art/References/Mockups/Mockup_BuffChoice.png",
+      "source_file": "futuristic_buff_selection_interface.png",
+      "size": "1672x941",
+      "mode": "RGB",
+      "alpha_extrema": "",
+      "note": "reference/mockup only, do not use directly as in-game sprite"
+    },
+    {
+      "asset_name": "Mockup_BossFightHUD",
+      "category": "References/Mockups",
+      "target_path": "Assets/_Project/Art/References/Mockups/Mockup_BossFightHUD.png",
+      "source_file": "industrial_combat_against_warden_kraug.png",
+      "size": "1672x941",
+      "mode": "RGB",
+      "alpha_extrema": "",
+      "note": "reference/mockup only, do not use directly as in-game sprite"
+    },
+    {
+      "asset_name": "Mockup_PrisonHUD",
+      "category": "References/Mockups",
+      "target_path": "Assets/_Project/Art/References/Mockups/Mockup_PrisonHUD.png",
+      "source_file": "prison_lockdown_escape_the_yard.png",
+      "size": "1672x941",
+      "mode": "RGB",
+      "alpha_extrema": "",
+      "note": "reference/mockup only, do not use directly as in-game sprite"
+    },
+    {
+      "asset_name": "Mockup_LaboratoryHUD",
+      "category": "References/Mockups",
+      "target_path": "Assets/_Project/Art/References/Mockups/Mockup_LaboratoryHUD.png",
+      "source_file": "dark_sci_fi_lab_combat_dashboard.png",
+      "size": "1672x941",
+      "mode": "RGB",
+      "alpha_extrema": "",
+      "note": "reference/mockup only, do not use directly as in-game sprite"
+    },
+    {
+      "asset_name": "Gameplay_LaboratoryCombatRoom",
+      "category": "References/Mockups",
+      "target_path": "Assets/_Project/Art/References/Mockups/Gameplay_LaboratoryCombatRoom.png",
+      "source_file": "laboratorul_de_salvare_și_luptă.png",
+      "size": "1672x941",
+      "mode": "RGB",
+      "alpha_extrema": "",
+      "note": "reference/mockup only, do not use directly as in-game sprite"
+    },
+    {
+      "asset_name": "Gameplay_LaboratoryBossRoom",
+      "category": "References/Mockups",
+      "target_path": "Assets/_Project/Art/References/Mockups/Gameplay_LaboratoryBossRoom.png",
+      "source_file": "battling_the_experiment_in_the_lab.png",
+      "size": "1672x941",
+      "mode": "RGB",
+      "alpha_extrema": "",
+      "note": "reference/mockup only, do not use directly as in-game sprite"
+    },
+    {
+      "asset_name": "Gameplay_PrisonCombatRoom",
+      "category": "References/Mockups",
+      "target_path": "Assets/_Project/Art/References/Mockups/Gameplay_PrisonCombatRoom.png",
+      "source_file": "locked_down_in_the_compound.png",
+      "size": "1672x941",
+      "mode": "RGB",
+      "alpha_extrema": "",
+      "note": "reference/mockup only, do not use directly as in-game sprite"
+    },
+    {
+      "asset_name": "Gameplay_PrisonYardLockdown",
+      "category": "References/Mockups",
+      "target_path": "Assets/_Project/Art/References/Mockups/Gameplay_PrisonYardLockdown.png",
+      "source_file": "secure_the_yard_lockdown_breach.png",
+      "size": "1672x941",
+      "mode": "RGB",
+      "alpha_extrema": "",
+      "note": "reference/mockup only, do not use directly as in-game sprite"
+    },
+    {
+      "asset_name": "Gameplay_ZombieCityStreetCombat",
+      "category": "References/Mockups",
+      "target_path": "Assets/_Project/Art/References/Mockups/Gameplay_ZombieCityStreetCombat.png",
+      "source_file": "surviving_the_infected_urban_chaos.png",
+      "size": "1672x941",
+      "mode": "RGB",
+      "alpha_extrema": "",
+      "note": "reference/mockup only, do not use directly as in-game sprite"
+    },
+    {
+      "asset_name": "Gameplay_ZombieCityBossArena",
+      "category": "References/Mockups",
+      "target_path": "Assets/_Project/Art/References/Mockups/Gameplay_ZombieCityBossArena.png",
+      "source_file": "apocalyptic_showdown_in_zombie_city.png",
+      "size": "1672x941",
+      "mode": "RGB",
+      "alpha_extrema": "",
+      "note": "reference/mockup only, do not use directly as in-game sprite"
+    },
+    {
+      "asset_name": "Gameplay_SciFiBaseSecurityRoom",
+      "category": "References/Mockups",
+      "target_path": "Assets/_Project/Art/References/Mockups/Gameplay_SciFiBaseSecurityRoom.png",
+      "source_file": "cod_evadare_security_checkpoint_breach.png",
+      "size": "1672x941",
+      "mode": "RGB",
+      "alpha_extrema": "",
+      "note": "reference/mockup only, do not use directly as in-game sprite"
+    },
+    {
+      "asset_name": "Gameplay_SciFiBaseReactorRoom",
+      "category": "References/Mockups",
+      "target_path": "Assets/_Project/Art/References/Mockups/Gameplay_SciFiBaseReactorRoom.png",
+      "source_file": "futuristic_reactor_arena_battle.png",
+      "size": "1672x941",
+      "mode": "RGB",
+      "alpha_extrema": "",
+      "note": "reference/mockup only, do not use directly as in-game sprite"
+    },
+    {
+      "asset_name": "Gameplay_HorrorHospitalWard",
+      "category": "References/Mockups",
+      "target_path": "Assets/_Project/Art/References/Mockups/Gameplay_HorrorHospitalWard.png",
+      "source_file": "hospital_ward_under_siege_sci_fi_shooter.png",
+      "size": "1672x941",
+      "mode": "RGB",
+      "alpha_extrema": "",
+      "note": "reference/mockup only, do not use directly as in-game sprite"
+    },
+    {
+      "asset_name": "Gameplay_HorrorHospitalFinalBoss",
+      "category": "References/Mockups",
+      "target_path": "Assets/_Project/Art/References/Mockups/Gameplay_HorrorHospitalFinalBoss.png",
+      "source_file": "boss_fight_in_sci_fi_horror_lab.png",
+      "size": "1672x941",
+      "mode": "RGB",
+      "alpha_extrema": "",
+      "note": "reference/mockup only, do not use directly as in-game sprite"
+    },
+    {
+      "asset_name": "Reference_StyleGuide",
+      "category": "References/Mockups",
+      "target_path": "Assets/_Project/Art/References/Mockups/Reference_StyleGuide.png",
+      "source_file": "cod_evadare_game_style_guide.png",
+      "size": "1672x941",
+      "mode": "RGB",
+      "alpha_extrema": "",
+      "note": "reference/mockup only, do not use directly as in-game sprite"
+    },
+    {
+      "asset_name": "Reference_WorldElements",
+      "category": "References/Mockups",
+      "target_path": "Assets/_Project/Art/References/Mockups/Reference_WorldElements.png",
+      "source_file": "cod_evadare_world_elements_guide.png",
+      "size": "1672x941",
+      "mode": "RGB",
+      "alpha_extrema": "",
+      "note": "reference/mockup only, do not use directly as in-game sprite"
+    }
+  ],
+  "missing": []
+}
