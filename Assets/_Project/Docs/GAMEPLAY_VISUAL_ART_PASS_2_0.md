@@ -2,7 +2,7 @@
 
 This pass refreshes generated gameplay sprites in-place so existing prefab and scene references keep their Unity GUIDs.
 
-Version 2.0 uses larger source sprites, smoother import settings, stronger silhouettes, richer environment panels, and clearer pickups/projectiles. Sprite pixels-per-unit are matched to each generated PNG size so bigger art does not stretch the map.
+Version 2.0 uses larger source sprites, smoother import settings, stronger silhouettes, richer environment panels, clearer pickups/projectiles, and corrected pixels-per-unit so bigger art does not stretch the map.
 
 Run `Tools/Cod Evadare/Art/Build Gameplay Visual Art Pass` from Unity to apply import settings. Existing polished PNGs are preserved; missing generated sprites are recreated with fallback procedural art.
 
